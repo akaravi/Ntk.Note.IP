@@ -8,7 +8,7 @@ import { distinctUntilChanged, filter, switchMap, take } from 'rxjs';
 import { DeviceInfoService } from '../core/device-info.service';
 import { IpHistoryEntry, IpHistoryService } from '../core/ip-history.service';
 import { API_BASE_URL } from '../web-api-client';
-import { apiV1Group } from '../core/api-routes';
+import { MY_IP_SHORT_PATH } from '../core/api-routes';
 import {
   DnsPropagationResultDto,
   DnsResolveResultDto,
@@ -127,7 +127,7 @@ export class IpLookupComponent implements OnInit, OnDestroy {
 
   plainIpUrl(): string {
     const base = this.apiBaseUrl.replace(/\/$/, '');
-    return `${base}${apiV1Group('IpLookup')}/GetMyIpPlain`;
+    return `${base}${MY_IP_SHORT_PATH}`;
   }
 
   activeCurlCommand(): string {

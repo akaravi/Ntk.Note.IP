@@ -105,3 +105,23 @@
   font-size: 0.88rem;
   color: var(--ip-accent, var(--pico-primary));
 }
+
+@media (max-width: 576px) {
+  .ip-notes__address-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .ip-notes__row {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}

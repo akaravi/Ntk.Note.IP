@@ -1,0 +1,60 @@
+<section class="static-page" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="static-page__hero">
+    <h1>{{ i18n.t('COPYRIGHT.TITLE') }}</h1>
+    <p class="static-page__tagline">{{ i18n.t('COPYRIGHT.SUBTITLE') }}</p>
+  </header>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.OWNERSHIP_TITLE') }}</h2>
+    <p>© {{ year }} — {{ i18n.t('COPYRIGHT.OWNERSHIP_BODY') }}</p>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.LICENSE_TITLE') }}</h2>
+    <p>{{ i18n.t('COPYRIGHT.LICENSE_BODY') }}</p>
+    <ul>
+      <li>{{ i18n.t('COPYRIGHT.LICENSE_ITEM_1') }}</li>
+      <li>{{ i18n.t('COPYRIGHT.LICENSE_ITEM_2') }}</li>
+      <li>{{ i18n.t('COPYRIGHT.LICENSE_ITEM_3') }}</li>
+    </ul>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.TRADEMARKS_TITLE') }}</h2>
+    <p>{{ i18n.t('COPYRIGHT.TRADEMARKS_BODY') }}</p>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.THIRD_PARTY_TITLE') }}</h2>
+    <p>{{ i18n.t('COPYRIGHT.THIRD_PARTY_BODY') }}</p>
+    <ul>
+      <li>{{ i18n.t('COPYRIGHT.THIRD_PARTY_ITEM_1') }}</li>
+      <li>{{ i18n.t('COPYRIGHT.THIRD_PARTY_ITEM_2') }}</li>
+      <li>{{ i18n.t('COPYRIGHT.THIRD_PARTY_ITEM_3') }}</li>
+    </ul>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.PRIVACY_TITLE') }}</h2>
+    <p>{{ i18n.t('COPYRIGHT.PRIVACY_BODY') }}</p>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('COPYRIGHT.CONTACT_TITLE') }}</h2>
+    <p>{{ i18n.t('COPYRIGHT.CONTACT_BODY') }}</p>
+    <div class="static-page__contact">
+      <a href="mailto:karavi.alireza@gmail.com">karavi.alireza@gmail.com</a>
+      <nav class="static-page__links" aria-label="Legal links">
+        <a href="https://ntk.ir/" target="_blank" rel="noopener noreferrer">ntk.ir</a>
+        <a href="https://alikaravi.com/" target="_blank" rel="noopener noreferrer">alikaravi.com</a>
+        <a href="https://github.com/akaravi" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+    </div>
+  </article>
+
+  <p class="static-page__back">
+    <a routerLink="/about">{{ i18n.t('FOOTER.ABOUT') }}</a>
+    ·
+    <a routerLink="/ip-lookup">{{ i18n.t('COPYRIGHT.BACK') }}</a>
+  </p>
+</section>

@@ -15,4 +15,14 @@ public class DatabaseProviderConfigurationTests
     {
         DatabaseProviderConfiguration.IsPostgreSql(provider).ShouldBe(expected);
     }
+
+    [TestCase("SqlServer", true)]
+    [TestCase("sqlserver", true)]
+    [TestCase("MSSQL", true)]
+    [TestCase("Sqlite", false)]
+    [TestCase(null, false)]
+    public void IsSqlServer_Should_Match_Provider(string? provider, bool expected)
+    {
+        DatabaseProviderConfiguration.IsSqlServer(provider).ShouldBe(expected);
+    }
 }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Moq;
 using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.GeoIp;
@@ -27,10 +28,43 @@ public class GeoEnrichedIpLookupProviderTests
                 City = "Mountain View"
             });
 
-        var provider = new GeoEnrichedIpLookupProvider(inner.Object, geoDb.Object);
+        var provider = CreateProvider(inner.Object, geoDb.Object);
         var result = await provider.LookupAsync("8.8.8.8");
 
         result.CountryCode.ShouldBe("US");
         result.City.ShouldBe("Mountain View");
     }
+
+    [Test]
+    public async Task ShouldUseOfflineGeoWhenOnlineProviderFails()
+    {
+        var inner = new Mock<IIpLookupProvider>();
+        inner.Setup(p => p.LookupAsync("95.38.10.25", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("provider down"));
+
+        var geoDb = new Mock<IGeoIpDatabase>();
+        geoDb.Setup(g => g.TryLookupAsync("95.38.10.25", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new GeoIpLookupResult
+            {
+                Address = "95.38.10.25",
+                CountryCode = "IR",
+                Country = "Iran",
+                City = "Tehran"
+            });
+
+        var provider = CreateProvider(inner.Object, geoDb.Object);
+        var result = await provider.LookupAsync("95.38.10.25");
+
+        result.Address.ShouldBe("95.38.10.25");
+        result.CountryCode.ShouldBe("IR");
+        result.City.ShouldBe("Tehran");
+    }
+
+    private static GeoEnrichedIpLookupProvider CreateProvider(
+        IIpLookupProvider inner,
+        IGeoIpDatabase geoDb) =>
+        new(
+            inner,
+            geoDb,
+            Mock.Of<ILogger<GeoEnrichedIpLookupProvider>>());
 }

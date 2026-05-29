@@ -2,6 +2,53 @@
 
 ## 2026-05-29 22:30 (Asia/Tehran)
 
+- **Pages:** `/about` and `/copyright` Angular pages (fa/en i18n) — IPNote.ir, NTK (ntk.ir), Alireza Karavi (alikaravi.com, GitHub akaravi). Static `about.html` / `copyright.html` in wwwroot. Footer links on all SPA pages + changelog/status.
+
+## 2026-05-29 22:10 (Asia/Tehran)
+
+- **Brand icon:** New squircle icon with bold white **IP** on violet gradient; `scripts/generate-app-icons.py` generates Web/PWA/React/Mobile/template sizes. Replaced favicon (48px), apple-touch (180), PWA 192/512, Flutter launcher + splash. Nav brand icon 40×40.
+
+## 2026-05-29 21:50 (Asia/Tehran)
+
+- **Fix:** `GetIpDetails` / `GetGeoLocation` HTTP 500 in Production — `IpApi` (HTTP) failing on server; added `IpWhoIsLookupProvider` (HTTPS), Production `IpLookup:Provider=IpWhoIs`, offline geo fallback in `GeoEnrichedIpLookupProvider`, resilient Redis cache, `MaxMind` alias for MMDB.
+
+## 2026-05-29 21:45 (Asia/Tehran)
+
+- **LastRunInfo.html (Part 72):** بعد از هر `run-all.ps1` فایل `LastRunInfo.html` در ریشه پروژه با سه جدول به‌روز می‌شود: نتیجه اجرا، آدرس‌های سرویس، تخصیص پورت‌ها (5340–5349). اسکریپت `write-last-run-info.ps1`؛ helperهای `Get-IpNotePortAllocationRows` و `Get-IpNoteDevServiceUrlRows` در `local-dev-ports.ps1`.
+
+## 2026-05-29 21:10 (Asia/Tehran)
+
+- **SQL Server migrations (Part 71):** پروژه `Infrastructure.SqlServer` با migration `InitialIpNoteSchema` ایجاد شد و روی دیتابیس `NTK_IP_NOTE` (s45.ntkhost.com) اعمال شد — جداول Identity، IpNotes، IpLookupRecords، OutboxMessages، PushDeviceRegistrations و غیره.
+- **Fix:** `DatabaseProviderConfiguration.UseSqlServer`؛ `ApplicationDbContextFactory` فقط `appsettings.{Environment}.json`؛ `Program.cs` از migrate در زمان OpenAPI build صرف‌نظر می‌کند؛ `ApplyMigrationsOnStartup` فقط در Production.
+- **Script:** `scripts/migrate-database.ps1` بر اساس provider پروژه migration مناسب (SqlServer/Sqlite) را انتخاب می‌کند.
+
+## 2026-05-29 21:15 (Asia/Tehran)
+
+- **Fix AdminOutbox 500:** SQLite cannot `ORDER BY DateTimeOffset`; `GetListAdminOutboxMessages` now loads filtered rows then sorts by `OccurredOn` in memory. Added `AdminOutboxTests`.
+
+## 2026-05-29 20:48 (Asia/Tehran)
+
+- **run-all fixes:** Admin endpoint handler names made globally unique; `IpLookupTests` runs as user before lookup; AppHost networking — `WithExternalHttpEndpoints` for Web, `spa-http` on port 5342 for Angular dev.
+- **run-all:** Debug build + 86 tests passed; Flutter CI passed; AppHost background PID; health/smoke OK on `http://localhost:5340`; HTTPS 5341 unreachable (dev cert not bound in http profile).
+
+## 2026-05-29 21:00 (Asia/Tehran)
+
+- **Angular UI — mobile nav:** Hamburger menu for viewports &lt;768px (`nav-toggle`, slide-down panel, body scroll lock, close on route/Escape). i18n `NAV.OPEN_MENU` / `NAV.CLOSE_MENU`.
+- **Responsive pass:** Home action buttons stack on mobile; ip-lookup (details dl, plain-actions, mini-dl); ip-notes (address/delete rows); dashboard (export, timeline head); admin layout (header, nav links).
+
+## 2026-05-29 20:30 (Asia/Tehran)
+
+- **Admin panel (Part 70):** Backend — `Policies.RequireAdministrator`, MediatR admin queries/commands, endpoint groups `AdminDashboard`, `AdminAccess`, `AdminUsers`, `AdminIpNotes`, `AdminIpLookupRecords`, `AdminPushDevices`, `AdminOutbox`; `IAdminUserService` / `AdminUserService` for user list and role assignment.
+- **Security:** `GetListIpLookupRecords` and `GetOneIpLookupRecord` now scope by `CreatedBy` for non-administrator users.
+- **Angular:** `/admin` layout with dashboard, users, notes, lookups, push, outbox; `AdminGuard`, `AdminService`, `isAdministrator$` on `AuthService`; nav link «مدیریت» for admins; `ADMIN.*` i18n (fa/en).
+- **Tests:** `AdminApiTests` functional tests for 403/200 on admin endpoints.
+
+## 2026-05-29 20:15 (Asia/Tehran)
+
+- **Angular UI:** `GetMyIpPlain` calls and curl/code snippets now use short path `/myip` instead of `/api/v1/IpLookup/GetMyIpPlain`. Constant `MY_IP_SHORT_PATH` in `api-routes.ts`; `IpLookupService.getMyIpPlain()` and `IpLookupComponent.plainIpUrl()` updated.
+
+## 2026-05-29 22:30 (Asia/Tehran)
+
 - **DevOps:** `_build-all-projects.ps1` — پیش‌فرض `-AndroidArtifact all` (APK + AAB)؛ لاگ مسیر APK/AAB در `publish\flutter\android` و داخل ZIP `mobile_android/`.
 
 ## 2026-05-29 22:15 (Asia/Tehran)

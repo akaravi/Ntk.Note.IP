@@ -35,7 +35,10 @@
     "IP_LOOKUP": "جستجوی IP",
     "DASHBOARD": "داشبورد",
     "IP_NOTES": "یادداشت‌ها",
-    "TOOLS": "ابزارها"
+    "TOOLS": "ابزارها",
+    "ADMIN": "مدیریت",
+    "OPEN_MENU": "باز کردن منو",
+    "CLOSE_MENU": "بستن منو"
   },
   "DASHBOARD": {
     "TITLE": "داشبورد",
@@ -191,5 +194,54 @@
   "MESSAGE": {
     "NETWORK_ERROR": "خطا در اتصال به شبکه",
     "VALIDATION_ERROR": "اطلاعات وارد شده معتبر نیست"
+  },
+  "ADMIN": {
+    "TITLE": "پنل مدیریت",
+    "SUBTITLE": "مدیریت کاربران، یادداشت‌ها، جستجوها و زیرساخت",
+    "BACK_TO_APP": "بازگشت به اپ",
+    "EMPTY": "موردی برای نمایش نیست.",
+    "SEARCH_PLACEHOLDER": "جستجو در یادداشت‌ها…",
+    "SEARCH_IP_PLACEHOLDER": "جستجو IP یا شهر…",
+    "FILTER_PENDING_ONLY": "فقط در انتظار پردازش",
+    "CONFIRM_DELETE": "آیا از حذف مطمئن هستید؟",
+    "EDIT_ROLES": "ویرایش نقش‌ها",
+    "ROLES_HINT": "Administrator, …",
+    "NAV": {
+      "DASHBOARD": "داشبورد",
+      "USERS": "کاربران",
+      "IP_NOTES": "یادداشت‌ها",
+      "IP_LOOKUPS": "جستجوها",
+      "PUSH": "پوش",
+      "OUTBOX": "Outbox"
+    },
+    "STAT": {
+      "USERS": "کاربر",
+      "NOTES": "یادداشت",
+      "LOOKUPS": "جستجو",
+      "PUSH": "دستگاه پوش",
+      "OUTBOX_PENDING": "Outbox معلق",
+      "SNAPSHOTS": "اسنپ‌شات IP"
+    },
+    "COL": {
+      "ROLES": "نقش‌ها",
+      "STATUS": "وضعیت",
+      "ACTIONS": "عملیات",
+      "OWNER": "مالک",
+      "CREATED": "ایجاد",
+      "LOCATION": "موقعیت",
+      "ISP": "ISP",
+      "PLATFORM": "پلتفرم",
+      "TOKEN": "توکن",
+      "TYPE": "نوع",
+      "OCCURRED": "زمان رویداد",
+      "PROCESSED": "پردازش‌شده",
+      "ERROR": "خطا",
+      "SIZE": "حجم"
+    },
+    "STATUS": {
+      "CONFIRMED": "تأییدشده",
+      "PENDING": "در انتظار",
+      "LOCKED": "قفل"
+    }
   }
 }

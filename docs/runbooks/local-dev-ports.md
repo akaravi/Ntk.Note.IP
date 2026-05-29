@@ -21,8 +21,10 @@ Canonical map for **local** execution. Production/Docker use other ports (e.g. 8
 - `src/AppHost/Properties/launchSettings.json`
 - `src/AppHost/Program.cs` (Aspire endpoint pins)
 - `src/Web/appsettings.Development.json` (CORS)
-- `scripts/local-dev-ports.ps1` (scripts helper)
+- `scripts/local-dev-ports.ps1` (scripts helper; also feeds **LastRunInfo.html** port table)
 - Flutter `AppConfig` default: `http://10.0.2.2:5340`
+
+After `run-all.ps1`, see **`LastRunInfo.html`** at repo root for execution results, service URLs, and this port map.
 
 ## Quick URLs
 

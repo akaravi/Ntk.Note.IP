@@ -24,12 +24,12 @@ public class IpLookupTests : TestBase
     [Test]
     public async Task ShouldActionLookupAndPersistRecord()
     {
+        await TestApp.RunAsDefaultUserAsync();
+
         var record = await TestApp.SendAsync(new ActionLookupIpCommand { Address = "8.8.8.8" });
         record.Address.ShouldBe("8.8.8.8");
         record.CountryCode.ShouldBe("IR");
         record.City.ShouldBe("Tehran");
-
-        await TestApp.RunAsDefaultUserAsync();
 
         var list = await TestApp.SendAsync(new GetListIpLookupRecordsQuery());
         list.ShouldContain(r => r.Id == record.Id);

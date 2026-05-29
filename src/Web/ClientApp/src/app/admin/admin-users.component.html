@@ -1,0 +1,58 @@
+<article class="admin-card">
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>{{ i18n.t('AUTH.EMAIL') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.ROLES') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.STATUS') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.ACTIONS') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>
+                <div>{{ user.email ?? user.userName }}</div>
+                <small class="admin-shell__muted"><code>{{ user.id }}</code></small>
+              </td>
+              <td>
+                @if (editingUserId() === user.id) {
+                  <input [(ngModel)]="roleDraftValue" [placeholder]="i18n.t('ADMIN.ROLES_HINT')" />
+                } @else {
+                  {{ rolesLabel(user) }}
+                }
+              </td>
+              <td>
+                @if (user.lockoutEnd) {
+                  <span class="admin-badge admin-badge--danger">{{ i18n.t('ADMIN.STATUS.LOCKED') }}</span>
+                } @else if (user.emailConfirmed) {
+                  <span class="admin-badge">{{ i18n.t('ADMIN.STATUS.CONFIRMED') }}</span>
+                } @else {
+                  <span class="admin-badge admin-badge--warn">{{ i18n.t('ADMIN.STATUS.PENDING') }}</span>
+                }
+              </td>
+              <td>
+                <div class="admin-actions">
+                  @if (editingUserId() === user.id) {
+                    <button type="button" (click)="saveRoles(user.id)">{{ i18n.t('COMMON.SAVE') }}</button>
+                    <button type="button" class="outline secondary" (click)="cancelEdit()">{{ i18n.t('COMMON.CANCEL') }}</button>
+                  } @else {
+                    <button type="button" class="outline" (click)="startEdit(user)">{{ i18n.t('ADMIN.EDIT_ROLES') }}</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

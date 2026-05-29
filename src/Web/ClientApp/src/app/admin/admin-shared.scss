@@ -1,0 +1,118 @@
+.admin-card {
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-surface);
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.85rem;
+}
+
+.admin-stat {
+  padding: 0.85rem 1rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-surface-elevated);
+  border: 1px solid var(--ip-border);
+
+  strong {
+    display: block;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--ip-accent);
+  }
+
+  span {
+    color: var(--ip-text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  th,
+  td {
+    padding: 0.65rem 0.75rem;
+    text-align: start;
+    border-bottom: 1px solid var(--ip-border);
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--ip-surface-elevated);
+    color: var(--ip-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  code {
+    font-size: 0.82rem;
+    word-break: break-all;
+  }
+}
+
+.admin-alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  border: 1px solid color-mix(in srgb, var(--ip-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--ip-danger) 12%, transparent);
+  color: var(--ip-text);
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: var(--ip-accent-soft);
+  color: var(--ip-accent);
+}
+
+.admin-badge--warn {
+  background: color-mix(in srgb, var(--ip-warning) 18%, transparent);
+  color: var(--ip-warning);
+}
+
+.admin-badge--danger {
+  background: color-mix(in srgb, var(--ip-danger) 15%, transparent);
+  color: var(--ip-danger);
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.admin-actions button {
+  margin: 0;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.admin-shell__muted {
+  color: var(--ip-text-muted);
+}

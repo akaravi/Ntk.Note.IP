@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { apiV1Group } from '../core/api-routes';
+import { apiV1Group, MY_IP_SHORT_PATH } from '../core/api-routes';
 import { API_BASE_URL } from '../web-api-client';
 
 export interface ErrorExceptionResult<T> {
@@ -57,12 +57,14 @@ export interface IpLookupRecordDto {
 @Injectable({ providedIn: 'root' })
 export class IpLookupService {
   private readonly base: string;
+  private readonly origin: string;
 
   constructor(
     private readonly http: HttpClient,
     @Inject(API_BASE_URL) baseUrl: string
   ) {
-    this.base = `${baseUrl}${apiV1Group('IpLookup')}`;
+    this.origin = baseUrl.replace(/\/$/, '');
+    this.base = `${this.origin}${apiV1Group('IpLookup')}`;
   }
 
   getMyIp(): Observable<MyIpDto> {
@@ -70,7 +72,7 @@ export class IpLookupService {
   }
 
   getMyIpPlain(): Observable<string> {
-    return this.http.get(`${this.base}/GetMyIpPlain`, { responseType: 'text' });
+    return this.http.get(`${this.origin}${MY_IP_SHORT_PATH}`, { responseType: 'text' });
   }
 
   getIpDetails(address: string): Observable<IpDetailsDto> {

@@ -10,8 +10,6 @@ var databaseServer = builder
 var web = builder.AddProject<Projects.Web>(Services.WebApi)
     .WithReference(databaseServer)
     .WaitFor(databaseServer)
-    .WithHttpEndpoint(port: 5340, name: "http")
-    .WithHttpsEndpoint(port: 5341, name: "https")
     .WithExternalHttpEndpoints()
     .WithAspNetCoreEnvironment()
     .WithUrlForEndpoint("http", url =>
@@ -35,8 +33,7 @@ if (builder.ExecutionContext.IsRunMode)
         .WithRunScript("start")
         .WithReference(web)
         .WaitFor(web)
-        .WithHttpEndpoint(port: 5342, env: "PORT")
-        .WithExternalHttpEndpoints();
+        .WithHttpEndpoint(port: 5342, env: "PORT", name: "spa-http", isProxied: false);
 }
 
 builder.Build().Run();

@@ -1,14 +1,17 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.IpLookup;
 
 namespace Ntk.Note.IP.Infrastructure.IpLookup;
 
 /// <summary>
-/// Free-tier ip-api.com JSON lookup (non-commercial; rate-limited).
+/// Free-tier ip-api.com JSON lookup (non-commercial; rate-limited; HTTP only on free tier).
 /// </summary>
-public sealed class IpApiLookupProvider(HttpClient httpClient) : IIpLookupProvider
+public sealed class IpApiLookupProvider(
+    HttpClient httpClient,
+    ILogger<IpApiLookupProvider> logger) : IIpLookupProvider
 {
     private const string Fields =
         "status,message,country,countryCode,regionName,city,lat,lon,timezone,isp,org,as,proxy,hosting,mobile,query";
@@ -18,32 +21,51 @@ public sealed class IpApiLookupProvider(HttpClient httpClient) : IIpLookupProvid
         var url =
             $"http://ip-api.com/json/{Uri.EscapeDataString(normalizedAddress)}?fields={Fields}";
 
-        var response = await httpClient.GetFromJsonAsync<IpApiResponse>(url, cancellationToken);
-
-        if (response is null || !string.Equals(response.Status, "success", StringComparison.OrdinalIgnoreCase))
+        HttpResponseMessage response;
+        try
         {
-            throw new InvalidOperationException(response?.Message ?? "IP lookup provider returned no data.");
+            response = await httpClient.GetAsync(url, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "ip-api.com request failed for {Address}", normalizedAddress);
+            throw new InvalidOperationException("IP lookup provider request failed.", ex);
         }
 
-        var payload = JsonSerializer.Serialize(response);
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogWarning(
+                "ip-api.com returned {StatusCode} for {Address}",
+                (int)response.StatusCode,
+                normalizedAddress);
+            throw new InvalidOperationException($"IP lookup provider returned {(int)response.StatusCode}.");
+        }
+
+        var payload = await response.Content.ReadFromJsonAsync<IpApiResponse>(cancellationToken);
+        if (payload is null || !string.Equals(payload.Status, "success", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(payload?.Message ?? "IP lookup provider returned no data.");
+        }
+
+        var raw = JsonSerializer.Serialize(payload);
 
         return new IpLookupResultDto
         {
-            Address = response.Query ?? normalizedAddress,
-            CountryCode = response.CountryCode,
-            Country = response.Country,
-            Region = response.RegionName,
-            City = response.City,
-            Latitude = response.Lat,
-            Longitude = response.Lon,
-            Timezone = response.Timezone,
-            Asn = response.As,
-            Isp = response.Isp ?? response.Org,
-            Proxy = response.Proxy,
-            Hosting = response.Hosting,
-            Mobile = response.Mobile,
+            Address = payload.Query ?? normalizedAddress,
+            CountryCode = payload.CountryCode,
+            Country = payload.Country,
+            Region = payload.RegionName,
+            City = payload.City,
+            Latitude = payload.Lat,
+            Longitude = payload.Lon,
+            Timezone = payload.Timezone,
+            Asn = payload.As,
+            Isp = payload.Isp ?? payload.Org,
+            Proxy = payload.Proxy,
+            Hosting = payload.Hosting,
+            Mobile = payload.Mobile,
             Tor = false,
-            ProviderPayload = payload
+            ProviderPayload = raw
         };
     }
 

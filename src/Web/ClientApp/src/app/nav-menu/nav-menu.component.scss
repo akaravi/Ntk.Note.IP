@@ -1,12 +1,170 @@
-// Styles handled globally in styles.scss
-
 :host ::ng-deep .nav-brand {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--pico-contrast);
 }
 
 :host ::ng-deep .nav-brand-icon {
-  border-radius: 6px;
+  border-radius: 10px;
   vertical-align: middle;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--ip-accent, var(--pico-primary)) 25%, transparent);
+}
+
+.nav-shell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+}
+
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    width: auto;
+    flex-shrink: 0;
+  }
+}
+
+.nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 1px solid var(--ip-border, var(--pico-muted-border-color));
+  border-radius: var(--pico-border-radius);
+  color: var(--ip-text, var(--pico-color));
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--ip-accent, var(--pico-primary));
+    color: var(--ip-accent, var(--pico-primary));
+  }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.nav-panel {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-panel {
+    position: fixed;
+    inset: var(--header-height) 0 0 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.25rem var(--pico-block-spacing-horizontal);
+    background: var(--ip-surface, var(--pico-background-color));
+    border-top: 1px solid var(--ip-border, var(--pico-muted-border-color));
+    overflow-y: auto;
+    transform: translateY(-8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+
+    &--open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  }
+
+  .nav-links,
+  .nav-utilities {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .nav-links a,
+  .nav-utilities a {
+    display: block;
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--pico-border-radius);
+    color: var(--ip-text, var(--pico-color));
+    font-weight: 500;
+
+    &:hover,
+    &.pico-active {
+      background: var(--ip-accent-soft, color-mix(in srgb, var(--pico-primary) 15%, transparent));
+      color: var(--ip-accent, var(--pico-primary));
+    }
+  }
+
+  .nav-utilities {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--ip-border, var(--pico-muted-border-color));
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+
+    li:not(.nav-separator) {
+      flex: 1 1 auto;
+    }
+
+    .nav-lang {
+      width: 100%;
+    }
+
+    .nav-separator {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .nav-panel {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .nav-links,
+  .nav-utilities {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
 }

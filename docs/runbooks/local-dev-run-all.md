@@ -16,6 +16,23 @@
 6. Optional TLS probe with `-CheckSsl` on `https://localhost:5341/health`
 7. Scans AppHost log tail for error-like lines (`scan-run-log.ps1`)
 8. Prints service URL list
+9. Writes **`LastRunInfo.html`** at repo root with three tables: execution results, service URLs, port map (`write-last-run-info.ps1`)
+
+## LastRunInfo.html
+
+After port allocation and run completion, open:
+
+```
+LastRunInfo.html
+```
+
+| Table | Content |
+|-------|---------|
+| **نتیجه اجرا** | Each run-all step (build, Flutter, SPA, AppHost, health, TLS, log scan) with OK / SKIP / FAIL / WARN |
+| **آدرس‌های سرویس** | Dashboard, API, health, Scalar, logs, Flutter emulator URL, etc. |
+| **تخصیص پورت‌ها** | Canonical map from `scripts/local-dev-ports.ps1` (5340–5349) |
+
+Regenerated on every `run-all.ps1` / `restart-all.ps1` completion (success or failure). File is gitignored.
 
 ## Restart
 

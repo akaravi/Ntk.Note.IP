@@ -1,0 +1,38 @@
+.app-footer {
+  text-align: center;
+  padding: 1.5rem var(--pico-block-spacing-horizontal) 2rem;
+  color: var(--ip-text-muted, var(--pico-muted-color));
+  border-top: 1px solid var(--ip-border, var(--pico-muted-border-color));
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.app-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1rem;
+
+  a {
+    color: var(--ip-text-muted, var(--pico-muted-color));
+    text-decoration: none;
+    font-size: 0.92rem;
+
+    &:hover {
+      color: var(--ip-accent, var(--pico-primary));
+    }
+  }
+}
+
+.app-footer__copy {
+  font-size: 0.88rem;
+}
+
+@media (max-width: 576px) {
+  .app-footer__nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

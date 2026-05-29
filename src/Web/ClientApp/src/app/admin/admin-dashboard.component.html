@@ -1,0 +1,16 @@
+<article class="admin-card">
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  } @else if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else if (stats(); as s) {
+    <div class="admin-stats">
+      <div class="admin-stat"><strong>{{ s.userCount }}</strong><span>{{ i18n.t('ADMIN.STAT.USERS') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.ipNoteCount }}</strong><span>{{ i18n.t('ADMIN.STAT.NOTES') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.ipLookupRecordCount }}</strong><span>{{ i18n.t('ADMIN.STAT.LOOKUPS') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.pushDeviceCount }}</strong><span>{{ i18n.t('ADMIN.STAT.PUSH') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.outboxPendingCount }}</strong><span>{{ i18n.t('ADMIN.STAT.OUTBOX_PENDING') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.ipSnapshotCount }}</strong><span>{{ i18n.t('ADMIN.STAT.SNAPSHOTS') }}</span></div>
+    </div>
+  }
+</article>

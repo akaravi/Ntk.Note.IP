@@ -3,7 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.Common.Options;
-using Ntk.Note.IP.Infrastructure.Data;
+using Ntk.Note.IP.Domain.Constants;
 using Ntk.Note.IP.Infrastructure.Dns;
 using Ntk.Note.IP.Infrastructure.DnsResolution;
 using Ntk.Note.IP.Infrastructure.Blacklist;
@@ -15,11 +15,13 @@ using Ntk.Note.IP.Shared;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Hangfire.PostgreSql;
+using Hangfire.SqlServer;
 using Microsoft.Extensions.Caching.Distributed;
 using HealthChecks.Redis;
 using Ntk.Note.IP.Infrastructure.NetworkTools;
 using Ntk.Note.IP.Infrastructure.Push;
 using Ntk.Note.IP.Infrastructure.Whois;
+using Ntk.Note.IP.Infrastructure.Data;
 using Ntk.Note.IP.Infrastructure.Data.Interceptors;
 using Ntk.Note.IP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +29,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +47,7 @@ public static class DependencyInjection
         var databaseProvider = builder.Configuration.GetValue<string>($"{DatabaseOptions.SectionName}:Provider") ?? "Sqlite";
 
         var usePostgreSql = DatabaseProviderConfiguration.IsPostgreSql(databaseProvider);
+        var useSqlServer = DatabaseProviderConfiguration.IsSqlServer(databaseProvider);
 
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
             DatabaseProviderConfiguration.ConfigureDbContext(options, databaseProvider, connectionString, sp));
@@ -71,7 +75,8 @@ public static class DependencyInjection
 
         builder.Services.AddIpNoteAuthentication(builder.Configuration);
 
-        builder.Services.AddAuthorizationBuilder();
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(Policies.RequireAdministrator, policy => policy.RequireRole(Roles.Administrator));
 
         builder.Services
             .AddIdentityCore<ApplicationUser>()
@@ -83,6 +88,7 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+        builder.Services.AddTransient<IAdminUserService, AdminUserService>();
 
         builder.Services.AddSingleton<IDnsLookupService, SystemDnsLookupService>();
 
@@ -115,6 +121,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<ICacheService>(sp => new TwoTierCacheService(
             sp.GetRequiredService<IMemoryCache>(),
             sp.GetRequiredService<IOptions<CacheOptions>>(),
+            sp.GetRequiredService<ILogger<TwoTierCacheService>>(),
             sp.GetService<IDistributedCache>()));
 
         builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection(OutboxOptions.SectionName));
@@ -126,7 +133,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IGeoIpDatabase>(sp =>
         {
             var geoOptions = sp.GetRequiredService<IOptions<GeoIpOptions>>().Value;
-            if (string.Equals(geoOptions.Provider, "Mmdb", StringComparison.OrdinalIgnoreCase))
+            if (IsOfflineGeoProvider(geoOptions.Provider))
             {
                 var mmdb = sp.GetRequiredService<MmdbGeoIpDatabase>();
                 if (mmdb.IsAvailable)
@@ -149,6 +156,14 @@ public static class DependencyInjection
                         SchemaName = "hangfire"
                     });
             }
+            else if (useSqlServer)
+            {
+                configuration.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+                {
+                    SchemaName = "HangFire",
+                    PrepareSchemaIfNecessary = true,
+                });
+            }
             else
             {
                 configuration.UseMemoryStorage();
@@ -166,15 +181,20 @@ public static class DependencyInjection
         {
             client.Timeout = TimeSpan.FromSeconds(15);
         });
+        builder.Services.AddHttpClient<IpWhoIsLookupProvider>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
         builder.Services.AddSingleton<FakeIpLookupProvider>();
         builder.Services.AddScoped<IIpLookupProvider>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<IpLookupOptions>>().Value;
-            IIpLookupProvider inner = string.Equals(options.Provider, "IpApi", StringComparison.OrdinalIgnoreCase)
-                ? sp.GetRequiredService<IpApiLookupProvider>()
-                : sp.GetRequiredService<FakeIpLookupProvider>();
+            IIpLookupProvider inner = ResolveIpLookupProvider(sp, options.Provider);
 
-            inner = new GeoEnrichedIpLookupProvider(inner, sp.GetRequiredService<IGeoIpDatabase>());
+            inner = new GeoEnrichedIpLookupProvider(
+                inner,
+                sp.GetRequiredService<IGeoIpDatabase>(),
+                sp.GetRequiredService<ILogger<GeoEnrichedIpLookupProvider>>());
 
             return new CachedIpLookupProvider(
                 inner,
@@ -242,5 +262,24 @@ public static class DependencyInjection
                 : sp.GetRequiredService<NoOpPushSender>();
         });
         builder.Services.AddScoped<IUserPushNotificationService, UserPushNotificationService>();
+    }
+
+    private static bool IsOfflineGeoProvider(string? provider) =>
+        string.Equals(provider, "Mmdb", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(provider, "MaxMind", StringComparison.OrdinalIgnoreCase);
+
+    private static IIpLookupProvider ResolveIpLookupProvider(IServiceProvider sp, string? provider)
+    {
+        if (string.Equals(provider, "IpApi", StringComparison.OrdinalIgnoreCase))
+        {
+            return sp.GetRequiredService<IpApiLookupProvider>();
+        }
+
+        if (string.Equals(provider, "IpWhoIs", StringComparison.OrdinalIgnoreCase))
+        {
+            return sp.GetRequiredService<IpWhoIsLookupProvider>();
+        }
+
+        return sp.GetRequiredService<FakeIpLookupProvider>();
     }
 }

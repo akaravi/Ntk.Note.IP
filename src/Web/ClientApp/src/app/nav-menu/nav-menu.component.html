@@ -1,30 +1,83 @@
 <header>
-  <nav>
-    <ul>
-      <li><a class="nav-brand" [routerLink]="['/']"><img class="nav-brand-icon" src="favicon.png" width="28" height="28" alt="" /> IPNote.ir</a></li>
-    </ul>
-    <ul>
-      <li><a [routerLink]="['/ip-lookup']" [routerLinkActive]="['pico-active']" [routerLinkActiveOptions]="{ exact: true }">{{ i18n.t('NAV.IP_LOOKUP') }}</a></li>
-      <li><a [routerLink]="['/tools']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.TOOLS') }}</a></li>
-      @if (isAuthenticated$ | async) {
-        <li><a [routerLink]="['/dashboard']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.DASHBOARD') }}</a></li>
-      }
-      <li><a [routerLink]="['/ip-notes']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.IP_NOTES') }}</a></li>
-    </ul>
-    <ul>
-      @if (isAuthenticated$ | async) {
-        <li><a href="#" data-testid="nav-logout" (click)="logout($event)">{{ i18n.t('AUTH.LOGOUT') }}</a></li>
-      } @else {
-        <li><a [routerLink]="['/login']" [routerLinkActive]="['pico-active']">{{ i18n.t('AUTH.LOGIN') }}</a></li>
-        <li><a [routerLink]="['/register']" [routerLinkActive]="['pico-active']">{{ i18n.t('AUTH.REGISTER') }}</a></li>
-      }
-      <li>
-        <button type="button" class="outline nav-lang" (click)="toggleLanguage()" [attr.aria-label]="i18n.t('LANG.SWITCH')">
-          {{ i18n.locale() === 'fa' ? 'EN' : 'فا' }}
-        </button>
-      </li>
-      <li aria-hidden="true" class="nav-separator"></li>
-      <li><app-theme-toggle /></li>
-    </ul>
+  <nav class="nav-shell">
+    <div class="nav-top">
+      <a class="nav-brand" [routerLink]="['/']" (click)="closeMenu()">
+        <img class="nav-brand-icon" src="favicon.png" width="40" height="40" alt="IPNote.ir" />
+        IPNote.ir
+      </a>
+      <button
+        type="button"
+        class="nav-toggle"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="nav-menu-panel"
+        [attr.aria-label]="menuOpen() ? i18n.t('NAV.CLOSE_MENU') : i18n.t('NAV.OPEN_MENU')">
+        <lucide-icon [name]="menuOpen() ? 'X' : 'Menu'" [size]="24" [strokeWidth]="2"></lucide-icon>
+      </button>
+    </div>
+
+    <div
+      id="nav-menu-panel"
+      class="nav-panel"
+      [class.nav-panel--open]="menuOpen()"
+      (click)="onPanelClick($event)">
+      <ul class="nav-links">
+        <li>
+          <a [routerLink]="['/ip-lookup']" [routerLinkActive]="['pico-active']" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            {{ i18n.t('NAV.IP_LOOKUP') }}
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/tools']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+            {{ i18n.t('NAV.TOOLS') }}
+          </a>
+        </li>
+        @if (isAuthenticated$ | async) {
+          <li>
+            <a [routerLink]="['/dashboard']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+              {{ i18n.t('NAV.DASHBOARD') }}
+            </a>
+          </li>
+          @if (isAdministrator$ | async) {
+            <li>
+              <a [routerLink]="['/admin']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+                {{ i18n.t('NAV.ADMIN') }}
+              </a>
+            </li>
+          }
+        }
+        <li>
+          <a [routerLink]="['/ip-notes']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+            {{ i18n.t('NAV.IP_NOTES') }}
+          </a>
+        </li>
+      </ul>
+
+      <ul class="nav-utilities">
+        @if (isAuthenticated$ | async) {
+          <li>
+            <a href="#" data-testid="nav-logout" (click)="logout($event)">{{ i18n.t('AUTH.LOGOUT') }}</a>
+          </li>
+        } @else {
+          <li>
+            <a [routerLink]="['/login']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+              {{ i18n.t('AUTH.LOGIN') }}
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/register']" [routerLinkActive]="['pico-active']" (click)="closeMenu()">
+              {{ i18n.t('AUTH.REGISTER') }}
+            </a>
+          </li>
+        }
+        <li>
+          <button type="button" class="outline nav-lang" (click)="toggleLanguage()" [attr.aria-label]="i18n.t('LANG.SWITCH')">
+            {{ i18n.locale() === 'fa' ? 'EN' : 'فا' }}
+          </button>
+        </li>
+        <li aria-hidden="true" class="nav-separator"></li>
+        <li><app-theme-toggle /></li>
+      </ul>
+    </div>
   </nav>
 </header>

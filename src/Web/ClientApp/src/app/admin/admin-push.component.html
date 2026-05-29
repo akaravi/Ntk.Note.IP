@@ -1,0 +1,40 @@
+<article class="admin-card">
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else if (devices().length === 0) {
+    <p>{{ i18n.t('ADMIN.EMPTY') }}</p>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>{{ i18n.t('ADMIN.COL.PLATFORM') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.TOKEN') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.OWNER') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.CREATED') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.ACTIONS') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (device of devices(); track device.id) {
+            <tr>
+              <td>{{ device.platform }}</td>
+              <td><code>{{ tokenPreview(device.deviceToken) }}</code></td>
+              <td><code>{{ device.ownerId || '—' }}</code></td>
+              <td>{{ device.created | date: 'short' }}</td>
+              <td>
+                <button type="button" class="outline secondary" (click)="deleteDevice(device.id)">
+                  {{ i18n.t('COMMON.DELETE') }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

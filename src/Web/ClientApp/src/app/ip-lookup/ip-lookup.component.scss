@@ -320,4 +320,30 @@
       width: 100%;
     }
   }
+
+  .ip-lookup__plain-actions {
+    flex-direction: column;
+  }
+
+  .ip-lookup__details dl {
+    grid-template-columns: 1fr;
+    gap: 0.25rem 0;
+  }
+
+  .ip-lookup__details dt {
+    margin-top: 0.5rem;
+  }
+
+  .ip-lookup__mini-dl {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+
+    dt {
+      margin-top: 0.35rem;
+    }
+  }
+
+  .ip-lookup__hero-card--primary {
+    padding: 1.5rem 1rem;
+  }
 }

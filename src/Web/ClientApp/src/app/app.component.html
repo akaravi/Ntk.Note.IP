@@ -3,5 +3,11 @@
   <router-outlet></router-outlet>
 </main>
 <footer class="app-footer">
-  <small>IPNote.ir — {{ year }}</small>
+  <nav class="app-footer__nav" [attr.aria-label]="i18n.t('FOOTER.TAGLINE')">
+    <a routerLink="/about">{{ i18n.t('FOOTER.ABOUT') }}</a>
+    <a routerLink="/copyright">{{ i18n.t('FOOTER.COPYRIGHT') }}</a>
+    <a href="/changelog.html">{{ i18n.t('FOOTER.CHANGELOG') }}</a>
+    <a href="/status.html">{{ i18n.t('FOOTER.STATUS') }}</a>
+  </nav>
+  <small class="app-footer__copy">IPNote.ir — {{ year }}</small>
 </footer>

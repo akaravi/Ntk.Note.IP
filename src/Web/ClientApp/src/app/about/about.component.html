@@ -1,0 +1,61 @@
+<section class="static-page" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="static-page__hero">
+    <h1>{{ i18n.t('ABOUT.TITLE') }}</h1>
+    <p class="static-page__tagline">{{ i18n.t('ABOUT.SUBTITLE') }}</p>
+  </header>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('ABOUT.PRODUCT_TITLE') }}</h2>
+    <p>{{ i18n.t('ABOUT.PRODUCT_BODY') }}</p>
+    <ul>
+      <li>{{ i18n.t('ABOUT.FEATURE_LOOKUP') }}</li>
+      <li>{{ i18n.t('ABOUT.FEATURE_NOTES') }}</li>
+      <li>{{ i18n.t('ABOUT.FEATURE_TOOLS') }}</li>
+      <li>{{ i18n.t('ABOUT.FEATURE_PWA') }}</li>
+    </ul>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('ABOUT.NTK_TITLE') }}</h2>
+    <p>{{ i18n.t('ABOUT.NTK_BODY') }}</p>
+    <nav class="static-page__links" aria-label="NTK">
+      <a href="https://ntk.ir/" target="_blank" rel="noopener noreferrer">ntk.ir</a>
+      <a href="https://ntkhost.com/" target="_blank" rel="noopener noreferrer">ntkhost.com</a>
+    </nav>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('ABOUT.AUTHOR_TITLE') }}</h2>
+    <p>{{ i18n.t('ABOUT.AUTHOR_BODY') }}</p>
+    <ul>
+      <li>{{ i18n.t('ABOUT.AUTHOR_SKILL_1') }}</li>
+      <li>{{ i18n.t('ABOUT.AUTHOR_SKILL_2') }}</li>
+      <li>{{ i18n.t('ABOUT.AUTHOR_SKILL_3') }}</li>
+    </ul>
+    <nav class="static-page__links" aria-label="Author">
+      <a href="https://alikaravi.com/" target="_blank" rel="noopener noreferrer">alikaravi.com</a>
+      <a href="https://github.com/akaravi" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.linkedin.com/in/karavi" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </nav>
+    <div class="static-page__contact">
+      <a href="mailto:karavi.alireza@gmail.com">karavi.alireza@gmail.com</a>
+      <span class="static-page__muted">{{ i18n.t('ABOUT.CONTACT_REGION') }}</span>
+    </div>
+  </article>
+
+  <article class="static-page__card">
+    <h2>{{ i18n.t('ABOUT.ECOSYSTEM_TITLE') }}</h2>
+    <p class="static-page__muted">{{ i18n.t('ABOUT.ECOSYSTEM_HINT') }}</p>
+    <nav class="static-page__links" aria-label="Ecosystem">
+      <a href="https://karavi.ca/" target="_blank" rel="noopener noreferrer">karavi.ca</a>
+      <a href="https://alonak.com/" target="_blank" rel="noopener noreferrer">alonak.com</a>
+      <a href="https://alonak.ae/" target="_blank" rel="noopener noreferrer">alonak.ae</a>
+    </nav>
+  </article>
+
+  <p class="static-page__back">
+    <a routerLink="/ip-lookup">{{ i18n.t('ABOUT.BACK') }}</a>
+    ·
+    <a routerLink="/copyright">{{ i18n.t('FOOTER.COPYRIGHT') }}</a>
+  </p>
+</section>

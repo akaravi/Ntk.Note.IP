@@ -1,0 +1,26 @@
+<section class="admin-shell" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="admin-shell__header">
+    <div>
+      <h1>{{ i18n.t('ADMIN.TITLE') }}</h1>
+      <p class="admin-shell__muted">{{ i18n.t('ADMIN.SUBTITLE') }}</p>
+    </div>
+    <a routerLink="/dashboard" class="outline secondary">{{ i18n.t('ADMIN.BACK_TO_APP') }}</a>
+  </header>
+
+  <div class="admin-shell__body">
+    <nav class="admin-shell__nav" aria-label="Admin">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="['/admin', item.path]"
+          routerLinkActive="admin-shell__nav-link--active"
+          class="admin-shell__nav-link">
+          {{ i18n.t(item.key) }}
+        </a>
+      }
+    </nav>
+
+    <div class="admin-shell__content">
+      <router-outlet />
+    </div>
+  </div>
+</section>

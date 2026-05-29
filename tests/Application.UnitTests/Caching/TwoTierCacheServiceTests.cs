@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using Ntk.Note.IP.Application.Common.Options;
 using Ntk.Note.IP.Infrastructure.Caching;
 using NUnit.Framework;
@@ -15,6 +17,7 @@ public class TwoTierCacheServiceTests
         var cache = new TwoTierCacheService(
             new MemoryCache(new MemoryCacheOptions()),
             Options.Create(new CacheOptions()),
+            Mock.Of<ILogger<TwoTierCacheService>>(),
             distributedCache: null);
 
         await cache.SetAsync("k1", new SamplePayload { Value = "cached" }, TimeSpan.FromMinutes(5));

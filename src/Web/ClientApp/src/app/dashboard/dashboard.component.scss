@@ -194,3 +194,19 @@
   border: 1px solid var(--ip-border, var(--pico-muted-border-color));
   color: var(--ip-text-muted, var(--pico-muted-color));
 }
+
+@media (max-width: 576px) {
+  .dashboard__export {
+    flex-direction: column;
+
+    button,
+    a[role="button"] {
+      width: 100%;
+    }
+  }
+
+  .dashboard__timeline-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

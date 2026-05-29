@@ -1,0 +1,50 @@
+<article class="admin-card">
+  <div class="admin-toolbar">
+    <label>
+      <input type="checkbox" [(ngModel)]="pendingOnly" (change)="load()" />
+      {{ i18n.t('ADMIN.FILTER_PENDING_ONLY') }}
+    </label>
+    <button type="button" (click)="load()">{{ i18n.t('DASHBOARD.REFRESH') }}</button>
+  </div>
+
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else if (messages().length === 0) {
+    <p>{{ i18n.t('ADMIN.EMPTY') }}</p>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>{{ i18n.t('ADMIN.COL.TYPE') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.OCCURRED') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.PROCESSED') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.ERROR') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.SIZE') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (msg of messages(); track msg.id) {
+            <tr>
+              <td><code>{{ msg.type }}</code></td>
+              <td>{{ msg.occurredOn | date: 'short' }}</td>
+              <td>
+                @if (msg.processedOn) {
+                  {{ msg.processedOn | date: 'short' }}
+                } @else {
+                  <span class="admin-badge admin-badge--warn">{{ i18n.t('ADMIN.STATUS.PENDING') }}</span>
+                }
+              </td>
+              <td>{{ msg.error || '—' }}</td>
+              <td>{{ msg.contentLength }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

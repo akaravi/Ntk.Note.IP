@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حقوق نشر — IPNote.ir</title>
+  <meta name="description" content="حقوق نشر و شرایط استفاده IPNote.ir" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #6d28d9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --border: #334155;
+        --accent: #a78bfa;
+      }
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 2rem 1rem 3rem;
+    }
+    .wrap { max-width: 42rem; margin: 0 auto; }
+    h1 { font-size: 1.6rem; margin: 0 0 0.35rem; }
+    h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+    .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .links { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.75rem; }
+    .links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    ul { margin: 0.5rem 0 0; padding-inline-start: 1.25rem; }
+    footer.site-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    footer.site-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem 1.25rem; margin-bottom: 0.5rem; }
+    footer.site-footer a { color: var(--muted); text-decoration: none; }
+    footer.site-footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>حقوق نشر و شرایط استفاده</h1>
+    <p class="sub">اطلاعات حقوقی IPNote.ir</p>
+
+    <div class="card">
+      <h2>مالکیت</h2>
+      <p>© <span id="y"></span> — تمام حقوق IPNote.ir، برند NTK، رابط کاربری، کد و محتوا متعلق به NTK / علیرضا کراوی است. کپی یا استفاده تجاری بدون مجوز کتبی ممنوع است.</p>
+    </div>
+
+    <div class="card">
+      <h2>مجوز استفاده</h2>
+      <ul>
+        <li>استفاده شخصی از سرویس‌های عمومی مجاز است.</li>
+        <li>استفاده برای فعالیت غیرقانونی یا حمله به شبکه ممنوع است.</li>
+        <li>یادداشت‌های IP متعلق به صاحب حساب کاربری است.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>سرویس‌های شخص ثالث</h2>
+      <p>داده Geo/ASN از ipwho.is، ip-api یا MMDB؛ نقشه از OpenStreetMap؛ DNS/WHOIS از زیرساخت عمومی.</p>
+    </div>
+
+    <div class="card">
+      <h2>تماس</h2>
+      <nav class="links">
+        <a href="mailto:karavi.alireza@gmail.com">karavi.alireza@gmail.com</a>
+        <a href="https://ntk.ir/">ntk.ir</a>
+        <a href="https://alikaravi.com/">alikaravi.com</a>
+        <a href="https://github.com/akaravi">GitHub</a>
+      </nav>
+    </div>
+
+    <p class="sub"><a href="/about.html">درباره ما</a> · <a href="/">بازگشت به IPNote.ir</a></p>
+  </div>
+  <footer class="site-footer">
+    <nav>
+      <a href="/about.html">درباره ما</a>
+      <a href="/copyright.html">حقوق نشر</a>
+      <a href="/changelog.html">تغییرات</a>
+      <a href="/status.html">وضعیت سرویس</a>
+    </nav>
+    <small>© <span id="y2"></span> IPNote.ir — NTK</small>
+  </footer>
+  <script>
+    var y = new Date().getFullYear();
+    document.getElementById('y').textContent = y;
+    document.getElementById('y2').textContent = y;
+  </script>
+</body>
+</html>

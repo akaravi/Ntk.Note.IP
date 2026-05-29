@@ -35,7 +35,10 @@
     "IP_LOOKUP": "IP lookup",
     "DASHBOARD": "Dashboard",
     "IP_NOTES": "Notes",
-    "TOOLS": "Tools"
+    "TOOLS": "Tools",
+    "ADMIN": "Admin",
+    "OPEN_MENU": "Open menu",
+    "CLOSE_MENU": "Close menu"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -191,5 +194,105 @@
   "MESSAGE": {
     "NETWORK_ERROR": "Network connection error",
     "VALIDATION_ERROR": "The submitted data is not valid"
+  },
+  "ADMIN": {
+    "TITLE": "Admin panel",
+    "SUBTITLE": "Manage users, notes, lookups, and infrastructure",
+    "BACK_TO_APP": "Back to app",
+    "EMPTY": "Nothing to show yet.",
+    "SEARCH_PLACEHOLDER": "Search notes…",
+    "SEARCH_IP_PLACEHOLDER": "Search IP or city…",
+    "FILTER_PENDING_ONLY": "Pending only",
+    "CONFIRM_DELETE": "Are you sure you want to delete this item?",
+    "EDIT_ROLES": "Edit roles",
+    "ROLES_HINT": "Administrator, …",
+    "NAV": {
+      "DASHBOARD": "Dashboard",
+      "USERS": "Users",
+      "IP_NOTES": "Notes",
+      "IP_LOOKUPS": "Lookups",
+      "PUSH": "Push",
+      "OUTBOX": "Outbox"
+    },
+    "STAT": {
+      "USERS": "Users",
+      "NOTES": "Notes",
+      "LOOKUPS": "Lookups",
+      "PUSH": "Push devices",
+      "OUTBOX_PENDING": "Pending outbox",
+      "SNAPSHOTS": "IP snapshots"
+    },
+    "COL": {
+      "ROLES": "Roles",
+      "STATUS": "Status",
+      "ACTIONS": "Actions",
+      "OWNER": "Owner",
+      "CREATED": "Created",
+      "LOCATION": "Location",
+      "ISP": "ISP",
+      "PLATFORM": "Platform",
+      "TOKEN": "Token",
+      "TYPE": "Type",
+      "OCCURRED": "Occurred",
+      "PROCESSED": "Processed",
+      "ERROR": "Error",
+      "SIZE": "Size"
+    },
+    "STATUS": {
+      "CONFIRMED": "Confirmed",
+      "PENDING": "Pending",
+      "LOCKED": "Locked"
+    }
+  },
+  "FOOTER": {
+    "ABOUT": "About",
+    "COPYRIGHT": "Copyright",
+    "CHANGELOG": "Changelog",
+    "STATUS": "Service status",
+    "TAGLINE": "IPNote.ir — IP notes & tools"
+  },
+  "ABOUT": {
+    "TITLE": "About us",
+    "SUBTITLE": "IPNote.ir — an NTK product for IP lookup, notes, and network tools",
+    "PRODUCT_TITLE": "What is IPNote.ir?",
+    "PRODUCT_BODY": "IPNote.ir helps you inspect your public IP, network details, personal IP notes, and DNS/WHOIS utilities. It is built for technicians, network admins, and developers on web and mobile (PWA).",
+    "FEATURE_LOOKUP": "IP lookup with geo, ASN, PTR, and approximate map",
+    "FEATURE_NOTES": "Personal IP notes with device and network snapshot metadata",
+    "FEATURE_TOOLS": "DNS, WHOIS, port check, SSL, subnet, and compare tools",
+    "FEATURE_PWA": "Installable PWA with light/dark theme support",
+    "NTK_TITLE": "NTK",
+    "NTK_BODY": "NTK (ntk.ir) has operated since 2008 in software development, network security, and web hosting. IPNote.ir is part of the NTK / karavi.ca ecosystem focused on practical IT and digital solutions.",
+    "AUTHOR_TITLE": "Alireza Karavi — developer",
+    "AUTHOR_BODY": "Alireza Karavi is a web and application developer with a strong focus on networking and security. Education: BEng, MEng, MBA. Long track record in CMS, .NET, Angular, MikroTik, VoIP, and hosting.",
+    "AUTHOR_SKILL_1": "Full-stack: .NET Core, Angular, TypeScript, Flutter",
+    "AUTHOR_SKILL_2": "Network & security: MikroTik (MTCNA/MTCWE), VoIP, monitoring",
+    "AUTHOR_SKILL_3": "Product and project leadership across NTK, ntkhost, and related ventures",
+    "CONTACT_REGION": "United Arab Emirates (UAE)",
+    "ECOSYSTEM_TITLE": "Related projects",
+    "ECOSYSTEM_HINT": "Selected brands and services in the NTK / Karavi ecosystem:",
+    "BACK": "Back to IP lookup"
+  },
+  "COPYRIGHT": {
+    "TITLE": "Copyright & terms",
+    "SUBTITLE": "Legal information for IPNote.ir",
+    "OWNERSHIP_TITLE": "Ownership",
+    "OWNERSHIP_BODY": "All rights to IPNote.ir, the NTK brand, UI, source code, content, and design are owned by NTK / Alireza Karavi. Copying, redistribution, or commercial use without written permission is prohibited.",
+    "LICENSE_TITLE": "License to use",
+    "LICENSE_BODY": "Personal, non-commercial use of public site features is permitted. By using IPNote.ir you agree that you will not:",
+    "LICENSE_ITEM_1": "Use the service for unlawful activity, network abuse, or privacy violations",
+    "LICENSE_ITEM_2": "Overload APIs or endpoints beyond published rate limits",
+    "LICENSE_ITEM_3": "Claim ownership of another user's authenticated notes (notes belong to the account holder)",
+    "TRADEMARKS_TITLE": "Trademarks",
+    "TRADEMARKS_BODY": "IPNote.ir, NTK, ntk.ir, and the IP logo are trade names or marks associated with NTK. Other names and logos belong to their respective owners.",
+    "THIRD_PARTY_TITLE": "Third-party services",
+    "THIRD_PARTY_BODY": "Some data is fetched from external providers. IPNote.ir is not responsible for their accuracy, availability, or policies:",
+    "THIRD_PARTY_ITEM_1": "Geo/ASN lookup (ipwho.is, ip-api, MMDB databases)",
+    "THIRD_PARTY_ITEM_2": "OpenStreetMap tiles and related map services",
+    "THIRD_PARTY_ITEM_3": "Public DNS/WHOIS/RDAP infrastructure",
+    "PRIVACY_TITLE": "Privacy",
+    "PRIVACY_BODY": "Your public IP is used to provide lookup services. IP notes are visible only to the authenticated owner. Contact support by email to request data removal.",
+    "CONTACT_TITLE": "Legal contact",
+    "CONTACT_BODY": "For commercial licensing, DMCA, or legal inquiries:",
+    "BACK": "Back to site"
   }
 }

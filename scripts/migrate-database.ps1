@@ -7,10 +7,26 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
 Set-Location $root
 
-Write-Host "Applying EF Core migrations (startup: Web, project: Infrastructure)..." -ForegroundColor Cyan
+Write-Host "Applying EF Core migrations..." -ForegroundColor Cyan
+
+$provider = $env:Database__Provider
+if (-not $provider) {
+    $provider = "Sqlite"
+    if ($env:ASPNETCORE_ENVIRONMENT -eq "Production") {
+        $provider = "SqlServer"
+    }
+}
+
+$migrationsProject = if ($provider -match "^(SqlServer|MSSQL)$") {
+    "src\Infrastructure.SqlServer\Infrastructure.SqlServer.csproj"
+} else {
+    "src\Infrastructure\Infrastructure.csproj"
+}
+
+Write-Host "Provider: $provider | Migrations project: $migrationsProject" -ForegroundColor DarkCyan
 
 dotnet ef database update `
-    --project "src\Infrastructure\Infrastructure.csproj" `
+    --project $migrationsProject `
     --startup-project "src\Web\Web.csproj" `
     --configuration $Configuration
 

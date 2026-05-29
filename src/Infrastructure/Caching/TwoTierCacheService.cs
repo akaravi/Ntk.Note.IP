@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.Common.Options;
@@ -10,6 +11,7 @@ namespace Ntk.Note.IP.Infrastructure.Caching;
 public sealed class TwoTierCacheService(
     IMemoryCache memoryCache,
     IOptions<CacheOptions> options,
+    ILogger<TwoTierCacheService> logger,
     IDistributedCache? distributedCache = null) : ICacheService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
@@ -27,19 +29,27 @@ public sealed class TwoTierCacheService(
             return null;
         }
 
-        var bytes = await distributedCache.GetAsync(PrefixedKey(key), cancellationToken);
-        if (bytes is null || bytes.Length == 0)
+        try
         {
+            var bytes = await distributedCache.GetAsync(PrefixedKey(key), cancellationToken);
+            if (bytes is null || bytes.Length == 0)
+            {
+                return null;
+            }
+
+            var value = JsonSerializer.Deserialize<T>(bytes, JsonOptions);
+            if (value is not null)
+            {
+                memoryCache.Set(key, value, TimeSpan.FromMinutes(1));
+            }
+
+            return value;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "Distributed cache read failed for key {CacheKey}", key);
             return null;
         }
-
-        var value = JsonSerializer.Deserialize<T>(bytes, JsonOptions);
-        if (value is not null)
-        {
-            memoryCache.Set(key, value, TimeSpan.FromMinutes(1));
-        }
-
-        return value;
     }
 
     public async Task SetAsync<T>(
@@ -56,12 +66,19 @@ public sealed class TwoTierCacheService(
             return;
         }
 
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions);
-        await distributedCache.SetAsync(
-            PrefixedKey(key),
-            bytes,
-            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = absoluteExpiration },
-            cancellationToken);
+        try
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions);
+            await distributedCache.SetAsync(
+                PrefixedKey(key),
+                bytes,
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = absoluteExpiration },
+                cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "Distributed cache write failed for key {CacheKey}", key);
+        }
     }
 
     private string PrefixedKey(string key) => $"{options.Value.RedisInstanceName}{key}";

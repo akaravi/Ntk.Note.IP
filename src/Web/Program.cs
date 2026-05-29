@@ -1,6 +1,7 @@
 using Hangfire;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
+using Ntk.Note.IP.Application.Common.Options;
 using Ntk.Note.IP.Infrastructure.Data;
 using Ntk.Note.IP.Web.Endpoints;
 using Ntk.Note.IP.Web.Infrastructure;
@@ -18,11 +19,19 @@ builder.AddWebServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Skip DB init during OpenAPI document generation at build/publish time.
+var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
+var isOpenApiDocumentGeneration = entryAssembly.Contains("GetDocument", StringComparison.OrdinalIgnoreCase)
+    || entryAssembly.Contains("dotnet-getdocument", StringComparison.OrdinalIgnoreCase);
+
+var databaseOptions = app.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
+if (!isOpenApiDocumentGeneration && (app.Environment.IsDevelopment() || databaseOptions.ApplyMigrationsOnStartup))
 {
     await app.InitialiseDatabaseAsync();
+}
 
+if (app.Environment.IsDevelopment())
+{
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {
         Authorization = [new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter()]

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.Common.Options;
@@ -23,6 +24,7 @@ public class CachedIpLookupProviderTests
         var cacheService = new TwoTierCacheService(
             new MemoryCache(new MemoryCacheOptions()),
             Options.Create(new CacheOptions { IpLookupMinutes = 10 }),
+            Mock.Of<ILogger<TwoTierCacheService>>(),
             distributedCache: null);
         var cached = new CachedIpLookupProvider(
             inner.Object,

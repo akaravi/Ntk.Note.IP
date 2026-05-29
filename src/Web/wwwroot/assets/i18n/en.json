@@ -35,7 +35,10 @@
     "IP_LOOKUP": "IP lookup",
     "DASHBOARD": "Dashboard",
     "IP_NOTES": "Notes",
-    "TOOLS": "Tools"
+    "TOOLS": "Tools",
+    "ADMIN": "Admin",
+    "OPEN_MENU": "Open menu",
+    "CLOSE_MENU": "Close menu"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -191,5 +194,54 @@
   "MESSAGE": {
     "NETWORK_ERROR": "Network connection error",
     "VALIDATION_ERROR": "The submitted data is not valid"
+  },
+  "ADMIN": {
+    "TITLE": "Admin panel",
+    "SUBTITLE": "Manage users, notes, lookups, and infrastructure",
+    "BACK_TO_APP": "Back to app",
+    "EMPTY": "Nothing to show yet.",
+    "SEARCH_PLACEHOLDER": "Search notes…",
+    "SEARCH_IP_PLACEHOLDER": "Search IP or city…",
+    "FILTER_PENDING_ONLY": "Pending only",
+    "CONFIRM_DELETE": "Are you sure you want to delete this item?",
+    "EDIT_ROLES": "Edit roles",
+    "ROLES_HINT": "Administrator, …",
+    "NAV": {
+      "DASHBOARD": "Dashboard",
+      "USERS": "Users",
+      "IP_NOTES": "Notes",
+      "IP_LOOKUPS": "Lookups",
+      "PUSH": "Push",
+      "OUTBOX": "Outbox"
+    },
+    "STAT": {
+      "USERS": "Users",
+      "NOTES": "Notes",
+      "LOOKUPS": "Lookups",
+      "PUSH": "Push devices",
+      "OUTBOX_PENDING": "Pending outbox",
+      "SNAPSHOTS": "IP snapshots"
+    },
+    "COL": {
+      "ROLES": "Roles",
+      "STATUS": "Status",
+      "ACTIONS": "Actions",
+      "OWNER": "Owner",
+      "CREATED": "Created",
+      "LOCATION": "Location",
+      "ISP": "ISP",
+      "PLATFORM": "Platform",
+      "TOKEN": "Token",
+      "TYPE": "Type",
+      "OCCURRED": "Occurred",
+      "PROCESSED": "Processed",
+      "ERROR": "Error",
+      "SIZE": "Size"
+    },
+    "STATUS": {
+      "CONFIRMED": "Confirmed",
+      "PENDING": "Pending",
+      "LOCKED": "Locked"
+    }
   }
 }

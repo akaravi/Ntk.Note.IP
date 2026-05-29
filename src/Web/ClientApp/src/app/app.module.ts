@@ -2,7 +2,7 @@ import { APP_ID, NgModule, inject, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Sun, Moon, Laptop, Plus, Settings, MoreHorizontal } from 'lucide-angular';
+import { LucideAngularModule, Sun, Moon, Laptop, Plus, Settings, MoreHorizontal, Menu, X } from 'lucide-angular';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
@@ -20,6 +20,16 @@ import { IpNotesComponent } from './ip-notes/ip-notes.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ToolsComponent } from './tools/tools.component';
 import { I18nService } from './core/i18n.service';
+import { AdminLayoutComponent } from './admin/admin-layout.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard.component';
+import { AdminUsersComponent } from './admin/admin-users.component';
+import { AdminIpNotesComponent } from './admin/admin-ip-notes.component';
+import { AdminIpLookupsComponent } from './admin/admin-ip-lookups.component';
+import { AdminPushComponent } from './admin/admin-push.component';
+import { AdminOutboxComponent } from './admin/admin-outbox.component';
+import { AdminGuard } from './admin/admin.guard';
+import { AboutComponent } from './about/about.component';
+import { CopyrightComponent } from './copyright/copyright.component';
 import { PwaService } from './core/pwa.service';
 
 export function getApiBaseUrl(): string {
@@ -38,13 +48,22 @@ export function getApiBaseUrl(): string {
         IpLookupComponent,
         IpNotesComponent,
         DashboardComponent,
-        ToolsComponent
+        ToolsComponent,
+        AdminLayoutComponent,
+        AdminDashboardComponent,
+        AdminUsersComponent,
+        AdminIpNotesComponent,
+        AdminIpLookupsComponent,
+        AdminPushComponent,
+        AdminOutboxComponent,
+        AboutComponent,
+        CopyrightComponent
     ],
     bootstrap: [AppComponent],
     imports: [
         BrowserModule,
         FormsModule,
-        LucideAngularModule.pick({ Sun, Moon, Laptop, Plus, Settings, MoreHorizontal }),
+        LucideAngularModule.pick({ Sun, Moon, Laptop, Plus, Settings, MoreHorizontal, Menu, X }),
         RouterModule.forRoot([
             { path: '', pathMatch: 'full', redirectTo: 'ip-lookup' },
             { path: 'home', component: HomeComponent },
@@ -53,7 +72,23 @@ export function getApiBaseUrl(): string {
             { path: 'ip-notes', component: IpNotesComponent, canActivate: [AuthGuard] },
             { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'login', component: LoginComponent },
-            { path: 'register', component: RegisterComponent }
+            { path: 'register', component: RegisterComponent },
+            { path: 'about', component: AboutComponent },
+            { path: 'copyright', component: CopyrightComponent },
+            {
+                path: 'admin',
+                component: AdminLayoutComponent,
+                canActivate: [AuthGuard, AdminGuard],
+                children: [
+                    { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+                    { path: 'dashboard', component: AdminDashboardComponent },
+                    { path: 'users', component: AdminUsersComponent },
+                    { path: 'ip-notes', component: AdminIpNotesComponent },
+                    { path: 'ip-lookups', component: AdminIpLookupsComponent },
+                    { path: 'push', component: AdminPushComponent },
+                    { path: 'outbox', component: AdminOutboxComponent },
+                ],
+            },
         ])
     ],
     providers: [
