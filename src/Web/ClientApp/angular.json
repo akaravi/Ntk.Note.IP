@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "CleanArchitecture.Web": {
+    "Ntk.Note.IP.Web": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -25,14 +25,40 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "oidc-client"
+              "oidc-client",
+              "qrcode"
             ],
             "assets": [
               "src/assets",
               {
+                "glob": "manifest.webmanifest",
+                "input": "src/assets",
+                "output": "/"
+              },
+              {
+                "glob": "offline.html",
+                "input": "src/assets",
+                "output": "/"
+              },
+              {
+                "glob": "sw.js",
+                "input": "src/assets",
+                "output": "/"
+              },
+              {
                 "glob": "favicon.png",
                 "input": "src",
                 "output": "/"
+              },
+              {
+                "glob": "apple-touch-icon.png",
+                "input": "src",
+                "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/assets/icons"
               }
             ],
             "styles": [
@@ -50,8 +76,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "4kb",
+                  "maximumError": "6kb"
                 }
               ],
               "fileReplacements": [
@@ -75,11 +101,11 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "CleanArchitecture.Web:build:production"
+              "buildTarget": "Ntk.Note.IP.Web:build:production"
             },
             "development": {
               "proxyConfig": "proxy.conf.js",
-              "buildTarget": "CleanArchitecture.Web:build:development"
+              "buildTarget": "Ntk.Note.IP.Web:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -87,7 +113,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "CleanArchitecture.Web:build"
+            "buildTarget": "Ntk.Note.IP.Web:build"
           }
         },
         "test": {

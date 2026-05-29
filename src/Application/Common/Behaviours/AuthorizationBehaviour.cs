@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using CleanArchitecture.Application.Common.Exceptions;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Application.Common.Security;
+using System.Reflection;
+using Ntk.Note.IP.Application.Common.Exceptions;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.Common.Security;
 
-namespace CleanArchitecture.Application.Common.Behaviours;
+namespace Ntk.Note.IP.Application.Common.Behaviours;
 
 public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
     where TRequest : notnull

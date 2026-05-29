@@ -1,0 +1,95 @@
+<section class="ip-notes" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header>
+    <h1>{{ i18n.t('IP.NOTES_TITLE') }}</h1>
+    <p class="ip-notes__muted">{{ i18n.t('IP.NOTES_HINT') }}</p>
+  </header>
+
+  @if (error()) {
+    <article class="ip-notes__alert" role="alert">{{ error() }}</article>
+  }
+
+  <form class="ip-notes__card" (ngSubmit)="addNote()">
+    <h2>{{ i18n.t('IP.ADD_NOTE') }}</h2>
+    @if (snapshotReady()) {
+      <p class="ip-notes__snapshot-hint">{{ i18n.t('IP.NOTE_SNAPSHOT_READY') }}</p>
+    }
+    <label for="note-address">{{ i18n.t('IP.ADDRESS') }}</label>
+    <div class="ip-notes__address-row">
+      <input id="note-address" name="address" [(ngModel)]="form.address" required />
+      <button type="button" class="outline" (click)="fillMyIp()" [disabled]="loading()">
+        {{ i18n.t('IP.USE_MY_IP') }}
+      </button>
+    </div>
+
+    <label for="note-title">{{ i18n.t('IP.NOTE_TITLE') }}</label>
+    <input id="note-title" name="title" [(ngModel)]="form.title" />
+
+    <label for="note-body">{{ i18n.t('IP.NOTE_BODY') }}</label>
+    <textarea id="note-body" name="body" rows="3" [(ngModel)]="form.body"></textarea>
+
+    <label for="note-tags">{{ i18n.t('IP.NOTE_TAGS') }}</label>
+    <input id="note-tags" name="tags" [(ngModel)]="form.tags" [placeholder]="i18n.t('IP.NOTE_TAGS_HINT')" />
+
+    <button type="submit" [disabled]="loading()">{{ i18n.t('COMMON.SAVE') }}</button>
+  </form>
+
+  <article class="ip-notes__card">
+    @if (loading() && notes().length === 0) {
+      <p>{{ i18n.t('COMMON.LOADING') }}</p>
+    } @else if (notes().length === 0) {
+      <p>{{ i18n.t('IP.NOTES_EMPTY') }}</p>
+    } @else {
+      <ul class="ip-notes__list">
+        @for (note of notes(); track note.id) {
+          <li class="ip-notes__item">
+            <div class="ip-notes__row">
+              <button type="button" class="ip-notes__address" (click)="openLookup(note.address)">
+                {{ note.address }}
+              </button>
+              <button type="button" class="outline secondary" (click)="deleteNote(note.id)">
+                {{ i18n.t('COMMON.DELETE') }}
+              </button>
+            </div>
+            <small class="ip-notes__muted">{{ noteWhen(note) }}</small>
+            @if (locationLine(note) || note.deviceLabel) {
+              <p class="ip-notes__meta">
+                @if (locationLine(note)) {
+                  <span>{{ locationLine(note) }}</span>
+                }
+                @if (note.deviceLabel) {
+                  <span>{{ locationLine(note) ? ' · ' : '' }}{{ note.deviceLabel }}</span>
+                }
+                @if (note.localIpAddress) {
+                  <span> · {{ i18n.t('IP.LOCAL_IP') }}: {{ note.localIpAddress }}</span>
+                }
+              </p>
+            }
+            @if (note.isp || note.asn) {
+              <p class="ip-notes__meta ip-notes__meta--network">
+                @if (note.isp) {
+                  <span>{{ note.isp }}</span>
+                }
+                @if (note.asn) {
+                  <span>{{ note.isp ? ' · ' : '' }}{{ note.asn }}</span>
+                }
+              </p>
+            }
+            @if (note.title) {
+              <h3>{{ note.title }}</h3>
+            }
+            @if (note.body) {
+              <p>{{ note.body }}</p>
+            }
+            @if (tagList(note.tags).length) {
+              <div class="ip-notes__tags">
+                @for (tag of tagList(note.tags); track tag) {
+                  <span class="ip-notes__tag">{{ tag }}</span>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </article>
+</section>

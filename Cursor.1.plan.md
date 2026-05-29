@@ -31,7 +31,7 @@
     },
     "running": {
       "aspireDashboard": "https://127.0.0.1:17000",
-      "aspireDashboardLogin": "https://cleanarchitecture.dev.localhost:17000/login?t=a065d5d4da78db09f892cd95a72882a3",
+      "aspireDashboardLogin": "https://Ntk.Note.IP.dev.localhost:17000/login?t=a065d5d4da78db09f892cd95a72882a3",
       "webApiHttp": "http://127.0.0.1:5000",
       "webApiHttps": "https://127.0.0.1:5001",
       "scalar": "https://127.0.0.1:5001/scalar",
@@ -46,7 +46,7 @@
     ],
     "ssl": {
       "devCertTrusted": true,
-      "note": "Use 127.0.0.1 or trust dev cert; cleanarchitecture.dev.localhost may need hosts/DNS"
+      "note": "Use 127.0.0.1 or trust dev cert; Ntk.Note.IP.dev.localhost may need hosts/DNS"
     },
     "logs": {
       "errors": "none in AppHost console after start",

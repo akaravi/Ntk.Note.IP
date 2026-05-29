@@ -1,0 +1,63 @@
+name: PostgreSQL migrations
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/Infrastructure/Data/**'
+      - 'src/Infrastructure/DependencyInjection.cs'
+      - 'src/Infrastructure/Data/DatabaseProviderConfiguration.cs'
+      - 'Directory.Packages.props'
+      - 'scripts/verify-migrations-postgresql.ps1'
+      - 'scripts/migrate-database.ps1'
+      - '.github/workflows/postgresql-migrations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-postgresql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ipnote
+          POSTGRES_PASSWORD: ipnote
+          POSTGRES_DB: ipnote
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ipnote -d ipnote"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+
+      - name: Install dotnet-ef
+        run: dotnet tool install dotnet-ef --global
+
+      - name: Verify migrations on PostgreSQL
+        env:
+          ConnectionStrings__IPNoteDb: Host=127.0.0.1;Port=5432;Database=ipnote;Username=ipnote;Password=ipnote;
+        run: pwsh ./scripts/verify-migrations-postgresql.ps1 -WaitSeconds 90
+
+      - name: Generate idempotent migration script (PostgreSQL)
+        env:
+          ConnectionStrings__IPNoteDb: Host=127.0.0.1;Port=5432;Database=ipnote;Username=ipnote;Password=ipnote;
+          Database__Provider: PostgreSQL
+        run: pwsh ./scripts/migrate-idempotent.ps1 -OutputPath ./artifacts/migrate-idempotent-postgresql.sql
+
+      - name: Upload PostgreSQL migration script
+        uses: actions/upload-artifact@v5
+        with:
+          name: migrate-idempotent-postgresql-sql
+          path: artifacts/migrate-idempotent-postgresql.sql
+          retention-days: 14

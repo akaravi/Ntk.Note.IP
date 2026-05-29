@@ -1,21 +1,28 @@
 <header>
   <nav>
     <ul>
-      <li><a class="nav-brand" [routerLink]="['/']">Clean Architecture</a></li>
+      <li><a class="nav-brand" [routerLink]="['/']"><img class="nav-brand-icon" src="favicon.png" width="28" height="28" alt="" /> IPNote.ir</a></li>
     </ul>
     <ul>
-      <li><a [routerLink]="['/']" [routerLinkActive]="['pico-active']" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
-      <li><a [routerLink]="['/counter']" [routerLinkActive]="['pico-active']">Counter</a></li>
-      <li><a [routerLink]="['/weather']" [routerLinkActive]="['pico-active']">Weather</a></li>
-      <li><a [routerLink]="['/todo']" [routerLinkActive]="['pico-active']">Tasks</a></li>
+      <li><a [routerLink]="['/ip-lookup']" [routerLinkActive]="['pico-active']" [routerLinkActiveOptions]="{ exact: true }">{{ i18n.t('NAV.IP_LOOKUP') }}</a></li>
+      <li><a [routerLink]="['/tools']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.TOOLS') }}</a></li>
+      @if (isAuthenticated$ | async) {
+        <li><a [routerLink]="['/dashboard']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.DASHBOARD') }}</a></li>
+      }
+      <li><a [routerLink]="['/ip-notes']" [routerLinkActive]="['pico-active']">{{ i18n.t('NAV.IP_NOTES') }}</a></li>
     </ul>
     <ul>
       @if (isAuthenticated$ | async) {
-        <li><a href="#" (click)="logout($event)">Log out</a></li>
+        <li><a href="#" data-testid="nav-logout" (click)="logout($event)">{{ i18n.t('AUTH.LOGOUT') }}</a></li>
       } @else {
-        <li><a [routerLink]="['/login']" [routerLinkActive]="['pico-active']">Log in</a></li>
-        <li><a [routerLink]="['/register']" [routerLinkActive]="['pico-active']">Register</a></li>
+        <li><a [routerLink]="['/login']" [routerLinkActive]="['pico-active']">{{ i18n.t('AUTH.LOGIN') }}</a></li>
+        <li><a [routerLink]="['/register']" [routerLinkActive]="['pico-active']">{{ i18n.t('AUTH.REGISTER') }}</a></li>
       }
+      <li>
+        <button type="button" class="outline nav-lang" (click)="toggleLanguage()" [attr.aria-label]="i18n.t('LANG.SWITCH')">
+          {{ i18n.locale() === 'fa' ? 'EN' : 'فا' }}
+        </button>
+      </li>
       <li aria-hidden="true" class="nav-separator"></li>
       <li><app-theme-toggle /></li>
     </ul>

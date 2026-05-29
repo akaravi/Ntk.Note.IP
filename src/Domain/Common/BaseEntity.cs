@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CleanArchitecture.Domain.Common;
+namespace Ntk.Note.IP.Domain.Common;
 
 public abstract class BaseEntity
 {

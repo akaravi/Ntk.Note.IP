@@ -1,4 +1,4 @@
-using CleanArchitecture.Shared;
+using Ntk.Note.IP.Shared;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -10,6 +10,8 @@ var databaseServer = builder
 var web = builder.AddProject<Projects.Web>(Services.WebApi)
     .WithReference(databaseServer)
     .WaitFor(databaseServer)
+    .WithHttpEndpoint(port: 5340, name: "http")
+    .WithHttpsEndpoint(port: 5341, name: "https")
     .WithExternalHttpEndpoints()
     .WithAspNetCoreEnvironment()
     .WithUrlForEndpoint("http", url =>
@@ -18,13 +20,22 @@ var web = builder.AddProject<Projects.Web>(Services.WebApi)
         url.Url = "/scalar";
     });
 
+if (string.Equals(
+        Environment.GetEnvironmentVariable("IPNOTE_USE_REDIS_CONTAINER"),
+        "true",
+        StringComparison.OrdinalIgnoreCase))
+{
+    var redis = builder.AddRedis(Services.Redis);
+    web = web.WithReference(redis).WaitFor(redis);
+}
+
 if (builder.ExecutionContext.IsRunMode)
 {
     builder.AddJavaScriptApp(Services.WebFrontend, "./../Web/ClientApp")
         .WithRunScript("start")
         .WithReference(web)
         .WaitFor(web)
-        .WithHttpEndpoint(env: "PORT")
+        .WithHttpEndpoint(port: 5342, env: "PORT")
         .WithExternalHttpEndpoints();
 }
 

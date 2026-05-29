@@ -1,0 +1,15 @@
+**/.git
+**/.github
+**/artifacts
+**/bin
+**/obj
+**/node_modules
+**/.vs
+**/.cursor
+**/terminals
+**/*.md
+!src/Web/ClientApp/**/*.md
+tests/
+plan.prompt/
+Cursor.*.plan.md
+readmehistory.md

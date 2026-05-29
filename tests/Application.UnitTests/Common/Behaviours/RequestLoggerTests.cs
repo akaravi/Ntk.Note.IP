@@ -1,45 +1,54 @@
-﻿using CleanArchitecture.Application.Common.Behaviours;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Application.TodoItems.Commands.CreateTodoItem;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Ntk.Note.IP.Application.Common.Behaviours;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.IpNotes.Commands.AddIpNote;
 using NUnit.Framework;
 
-namespace CleanArchitecture.Application.UnitTests.Common.Behaviours;
+namespace Ntk.Note.IP.Application.UnitTests.Common.Behaviours;
 
 public class RequestLoggerTests
 {
-    private Mock<ILogger<CreateTodoItemCommand>> _logger = null!;
+    private Mock<ILogger<AddIpNoteCommand>> _logger = null!;
     private Mock<IUser> _user = null!;
     private Mock<IIdentityService> _identityService = null!;
 
     [SetUp]
     public void Setup()
     {
-        _logger = new Mock<ILogger<CreateTodoItemCommand>>();
+        _logger = new Mock<ILogger<AddIpNoteCommand>>();
         _user = new Mock<IUser>();
         _identityService = new Mock<IIdentityService>();
     }
 
     [Test]
-    public async Task ShouldCallGetUserNameAsyncOnceIfAuthenticated()
+    public async Task ShouldLogRequestWhenUserIsNull()
     {
-        _user.Setup(x => x.Id).Returns(Guid.NewGuid().ToString());
+        var requestLogger = new LoggingBehaviour<AddIpNoteCommand>(_logger.Object, _user.Object, _identityService.Object);
 
-        var requestLogger = new LoggingBehaviour<CreateTodoItemCommand>(_logger.Object, _user.Object, _identityService.Object);
+        await requestLogger.Process(new AddIpNoteCommand { Address = "8.8.8.8", Title = "test" }, new CancellationToken());
 
-        await requestLogger.Process(new CreateTodoItemCommand { ListId = 1, Title = "title" }, new CancellationToken());
-
-        _identityService.Verify(i => i.GetUserNameAsync(It.IsAny<string>()), Times.Once);
+        _logger.Verify(x => x.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 
     [Test]
-    public async Task ShouldNotCallGetUserNameAsyncOnceIfUnauthenticated()
+    public async Task ShouldLogRequestWhenUserIsNotNull()
     {
-        var requestLogger = new LoggingBehaviour<CreateTodoItemCommand>(_logger.Object, _user.Object, _identityService.Object);
+        _user.SetupGet(x => x.Id).Returns("user-1");
+        var requestLogger = new LoggingBehaviour<AddIpNoteCommand>(_logger.Object, _user.Object, _identityService.Object);
 
-        await requestLogger.Process(new CreateTodoItemCommand { ListId = 1, Title = "title" }, new CancellationToken());
+        await requestLogger.Process(new AddIpNoteCommand { Address = "8.8.8.8", Title = "test" }, new CancellationToken());
 
-        _identityService.Verify(i => i.GetUserNameAsync(It.IsAny<string>()), Times.Never);
+        _logger.Verify(x => x.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Shared;
+namespace Ntk.Note.IP.Shared;
 
 public static class Services
 {
@@ -24,5 +24,10 @@ public static class Services
     /// The name of the Database.
     /// This is the name of the database that will be created and used by the application.
     /// </summary>
-    public const string Database = "CleanArchitectureDb";
+    public const string Database = "IPNoteDb";
+
+    /// <summary>
+    /// Redis cache resource (Aspire / ConnectionStrings:redis).
+    /// </summary>
+    public const string Redis = "redis";
 }

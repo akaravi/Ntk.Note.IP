@@ -1,14 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CleanArchitecture.Application.FunctionalTests;
+namespace Ntk.Note.IP.Application.FunctionalTests;
 
 [SetUpFixture]
 public class FunctionalTestSetup
 {
     internal static IServiceScopeFactory ScopeFactory { get; private set; } = null!;
     internal static DatabaseResetter? DbResetter { get; private set; }
+    internal static string ConnectionString { get; private set; } = null!;
 
     private static WebApiFactory? _factory;
+
+    internal static HttpClient HttpClient => _factory!.CreateClient();
     private static DistributedApplication? _app;
 
     [OneTimeSetUp]
@@ -38,11 +41,13 @@ public class FunctionalTestSetup
         await _app.ResourceNotifications.WaitForResourceHealthyAsync(
             Services.Database, cancellationToken);
 
-        var connectionString = (await _app.GetConnectionStringAsync(Services.Database))!;
+        ConnectionString = (await _app.GetConnectionStringAsync(Services.Database))!;
 
-        _factory = new WebApiFactory(connectionString);
+        await TestDatabaseMigrator.EnsureLatestSchemaAsync(ConnectionString, cancellationToken);
+
+        _factory = new WebApiFactory(ConnectionString);
         ScopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
-        DbResetter = await DatabaseResetter.CreateAsync(connectionString);
+        DbResetter = await DatabaseResetter.CreateAsync(ConnectionString);
     }
 
     [OneTimeTearDown]

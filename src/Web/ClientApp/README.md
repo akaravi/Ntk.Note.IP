@@ -1,10 +1,10 @@
-# CleanArchitecture.Web
+# Ntk.Note.IP.Web
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 21.1.5.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server. Navigate to `http://localhost:5342/` (Aspire sets `PORT=5342`). The application will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 

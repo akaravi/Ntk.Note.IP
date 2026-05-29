@@ -1,0 +1,53 @@
+name: Load smoke (k6)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/load/**'
+      - 'src/Web/**'
+      - 'scripts/run-k6-smoke.ps1'
+      - '.github/workflows/load-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  k6-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+
+      - name: Build Web
+        run: dotnet build src/Web/Web.csproj -c Release
+
+      - uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 smoke against local API
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          ASPNETCORE_URLS: http://127.0.0.1:5340
+          BASE_URL: http://127.0.0.1:5340
+        run: |
+          dotnet run --project src/Web/Web.csproj -c Release --no-build &
+          web_pid=$!
+          cleanup() { kill "$web_pid" 2>/dev/null || true; }
+          trap cleanup EXIT
+          for i in $(seq 1 45); do
+            if curl -sf "${BASE_URL}/health"; then
+              echo "API ready"
+              break
+            fi
+            if [ "$i" -eq 45 ]; then
+              echo "API did not become healthy in time"
+              exit 1
+            fi
+            sleep 2
+          done
+          k6 run tests/load/smoke.js

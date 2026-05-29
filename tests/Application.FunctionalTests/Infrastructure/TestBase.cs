@@ -1,4 +1,4 @@
-namespace CleanArchitecture.Application.FunctionalTests.Infrastructure;
+namespace Ntk.Note.IP.Application.FunctionalTests.Infrastructure;
 
 public abstract class TestBase
 {

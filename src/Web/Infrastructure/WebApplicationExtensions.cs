@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace CleanArchitecture.Web.Infrastructure;
+namespace Ntk.Note.IP.Web.Infrastructure;
 
 public static class WebApplicationExtensions
 {
@@ -19,7 +19,7 @@ public static class WebApplicationExtensions
         {
             var groupName = type.Name;
             var routePrefix = type.GetProperty(nameof(IEndpointGroup.RoutePrefix))
-                ?.GetValue(null) as string ?? $"/api/{groupName}";
+                ?.GetValue(null) as string ?? ApiRoutes.Group(groupName);
             var group = app.MapGroup(routePrefix).WithTags(groupName);
             type.GetMethod(nameof(IEndpointGroup.Map))!.Invoke(null, [group]);
         }

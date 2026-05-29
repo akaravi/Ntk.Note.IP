@@ -1,6 +1,6 @@
-﻿using CleanArchitecture.Application.Common.Models;
+using Ntk.Note.IP.Application.Common.Models;
 
-namespace CleanArchitecture.Application.Common.Interfaces;
+namespace Ntk.Note.IP.Application.Common.Interfaces;
 
 public interface IIdentityService
 {

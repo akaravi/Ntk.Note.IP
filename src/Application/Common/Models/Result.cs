@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.Common.Models;
+namespace Ntk.Note.IP.Application.Common.Models;
 
 public class Result
 {

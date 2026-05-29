@@ -1,7 +1,8 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { firstValueFrom } from 'rxjs';
+import { I18nService } from 'src/app/core/i18n.service';
 
 @Component({
   standalone: false,
@@ -9,6 +10,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
+  readonly i18n = inject(I18nService);
   email = '';
   password = '';
   invalid = false;
@@ -24,7 +26,7 @@ export class LoginComponent {
     this.invalid = false;
     try {
       await firstValueFrom(this.authService.login(this.email, this.password));
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
       await this.router.navigateByUrl(returnUrl);
     } catch {
       this.invalid = true;

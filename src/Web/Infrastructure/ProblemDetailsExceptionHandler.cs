@@ -1,8 +1,8 @@
-using CleanArchitecture.Application.Common.Exceptions;
+using Ntk.Note.IP.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanArchitecture.Web.Infrastructure;
+namespace Ntk.Note.IP.Web.Infrastructure;
 
 /// <summary>
 /// Converts well-known application exceptions into RFC 9110-compliant <see cref="ProblemDetails"/> responses,
@@ -44,6 +44,8 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
         };
 
         if (problemDetails is null) return false;
+
+        problemDetails.Instance = httpContext.Request.Path;
 
         httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

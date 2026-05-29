@@ -1,10 +1,10 @@
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Application.Common.Models;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanArchitecture.Infrastructure.Identity;
+namespace Ntk.Note.IP.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {

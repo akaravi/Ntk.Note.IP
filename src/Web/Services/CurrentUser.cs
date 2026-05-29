@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
-using CleanArchitecture.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.Common.Interfaces;
 
-namespace CleanArchitecture.Web.Services;
+namespace Ntk.Note.IP.Web.Services;
 
 public class CurrentUser : IUser
 {

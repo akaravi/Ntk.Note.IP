@@ -56,11 +56,47 @@ jobs:
 
     - name: Build solution
       run: dotnet build --no-restore --configuration Release
+
+    - name: Install dotnet-ef
+      run: dotnet tool install dotnet-ef --global
+
+    - name: Verify EF migrations apply
+      run: pwsh ./scripts/verify-migrations.ps1
+
+    - name: Generate idempotent migration script
+      run: pwsh ./scripts/migrate-idempotent.ps1
+
+    - name: Upload migration script artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: migrate-idempotent-sql
+        path: artifacts/migrate-idempotent.sql
+        retention-days: 14
+
+    - name: Backend coverage gate
+      run: pwsh ./scripts/coverage.ps1 -Configuration Release -SkipBuild -MinLinePercent 40
       
     #if (!UseApiOnly)
     - name: Install Playwright browsers
       run: pwsh artifacts/bin/Web.AcceptanceTests/release/playwright.ps1 install --with-deps chromium
     #endif
 
-    - name: Test solution
-      run: dotnet test --no-build --configuration Release
+    - name: E2E tests
+      run: dotnet test tests/Web.AcceptanceTests/Web.AcceptanceTests.csproj --no-build --configuration Release
+
+    - name: Dependency audit (informational)
+      continue-on-error: true
+      run: pwsh ./scripts/security-audit.ps1
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks scan (informational)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

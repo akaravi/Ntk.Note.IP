@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Domain.Common;
+namespace Ntk.Note.IP.Domain.Common;
 
 public abstract class BaseAuditableEntity : BaseEntity
 {

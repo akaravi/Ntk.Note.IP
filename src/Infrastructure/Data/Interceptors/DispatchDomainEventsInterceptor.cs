@@ -1,17 +1,23 @@
-﻿using CleanArchitecture.Domain.Common;
+using Ntk.Note.IP.Application.Common.Options;
+using Ntk.Note.IP.Domain.Common;
+using Ntk.Note.IP.Domain.Entities;
+using Ntk.Note.IP.Infrastructure.Outbox;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
-namespace CleanArchitecture.Infrastructure.Data.Interceptors;
+namespace Ntk.Note.IP.Infrastructure.Data.Interceptors;
 
 public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
 {
     private readonly IMediator _mediator;
+    private readonly IOptions<OutboxOptions> _outboxOptions;
 
-    public DispatchDomainEventsInterceptor(IMediator mediator)
+    public DispatchDomainEventsInterceptor(IMediator mediator, IOptions<OutboxOptions> outboxOptions)
     {
         _mediator = mediator;
+        _outboxOptions = outboxOptions;
     }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -44,7 +50,36 @@ public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
 
         entities.ToList().ForEach(e => e.ClearDomainEvents());
 
+        if (!_outboxOptions.Value.Enabled)
+        {
+            foreach (var domainEvent in domainEvents)
+            {
+                await _mediator.Publish(domainEvent);
+            }
+
+            return;
+        }
+
+        if (context is not ApplicationDbContext dbContext)
+        {
+            foreach (var domainEvent in domainEvents)
+            {
+                await _mediator.Publish(domainEvent);
+            }
+
+            return;
+        }
+
         foreach (var domainEvent in domainEvents)
-            await _mediator.Publish(domainEvent);
+        {
+            var (type, content) = OutboxDomainEventSerializer.Serialize(domainEvent);
+            dbContext.OutboxMessages.Add(new OutboxMessage
+            {
+                Id = Guid.NewGuid(),
+                Type = type,
+                Content = content,
+                OccurredOn = DateTimeOffset.UtcNow
+            });
+        }
     }
 }

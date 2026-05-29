@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>CleanArchitecture.Shared</RootNamespace>
-    <AssemblyName>CleanArchitecture.Shared</AssemblyName>
+    <RootNamespace>Ntk.Note.IP.Shared</RootNamespace>
+    <AssemblyName>Ntk.Note.IP.Shared</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>

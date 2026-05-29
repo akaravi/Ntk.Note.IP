@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace>CleanArchitecture.Domain.UnitTests</RootNamespace>
-        <AssemblyName>CleanArchitecture.Domain.UnitTests</AssemblyName>
+        <RootNamespace>Ntk.Note.IP.Domain.UnitTests</RootNamespace>
+        <AssemblyName>Ntk.Note.IP.Domain.UnitTests</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

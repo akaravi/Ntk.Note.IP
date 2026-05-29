@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
 using AutoMapper;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Application.TodoLists.Queries.GetTodos;
-using CleanArchitecture.Domain.Entities;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.IpNotes;
+using Ntk.Note.IP.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
-namespace CleanArchitecture.Application.UnitTests.Common.Mappings;
+namespace Ntk.Note.IP.Application.UnitTests.Common.Mappings;
 
 public class MappingTests
 {
@@ -17,7 +17,6 @@ public class MappingTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        // Minimal logger factory for tests
         _loggerFactory = LoggerFactory.Create(b => b.AddDebug().SetMinimumLevel(LogLevel.Debug));
 
         _configuration = new MapperConfiguration(cfg =>
@@ -34,8 +33,7 @@ public class MappingTests
     }
 
     [Test]
-    [TestCase(typeof(TodoList), typeof(TodoListDto))]
-    [TestCase(typeof(TodoItem), typeof(TodoItemDto))]
+    [TestCase(typeof(IpNote), typeof(IpNoteDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);
@@ -48,10 +46,8 @@ public class MappingTests
         if (type.GetConstructor(Type.EmptyTypes) != null)
             return Activator.CreateInstance(type)!;
 
-        // Type without parameterless constructor
         return RuntimeHelpers.GetUninitializedObject(type);
     }
-
 
     [OneTimeTearDown]
     public void OneTimeTearDown()

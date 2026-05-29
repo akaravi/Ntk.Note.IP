@@ -1,0 +1,323 @@
+.ip-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ip-lookup__hero h1 {
+  margin-bottom: 0.25rem;
+}
+
+.ip-lookup__tagline {
+  color: var(--pico-muted-color);
+  margin: 0;
+}
+
+.ip-lookup__card {
+  padding: 1.25rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-card-background-color, var(--pico-background-color));
+}
+
+.ip-lookup__hero-card {
+  text-align: center;
+}
+
+.ip-lookup__hero-card--primary {
+  padding: 2rem 1.25rem 1.5rem;
+}
+
+.ip-lookup__hero-ip-display {
+  font-family: var(--pico-font-family-monospace);
+  font-size: clamp(2rem, 9vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.35rem;
+  word-break: break-all;
+  color: var(--ip-text);
+  background: var(--ip-hero-mono);
+  padding: 1rem 1.25rem;
+  border-radius: var(--pico-border-radius);
+  direction: ltr;
+  line-height: 1.15;
+}
+
+.ip-lookup__hero-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: var(--ip-text-muted);
+}
+
+.ip-lookup__note-btn {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.9rem;
+  margin: 0.25rem auto 0.85rem;
+  display: inline-block;
+  min-height: unset;
+}
+
+.ip-lookup__hero-ip {
+  font-family: var(--pico-font-family-monospace);
+  font-size: clamp(1.5rem, 5vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0.5rem 0;
+  word-break: break-all;
+  color: var(--ip-text);
+  background: var(--ip-hero-mono);
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  direction: ltr;
+}
+
+.ip-lookup__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.ip-lookup__badge {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--ip-accent-soft);
+  color: var(--ip-accent);
+}
+
+.ip-lookup__badge--muted {
+  background: transparent;
+  border: 1px solid var(--ip-border);
+  color: var(--ip-text-muted);
+}
+
+.ip-lookup__local {
+  margin: 0.5rem 0;
+  color: var(--ip-text-muted);
+}
+
+.ip-lookup__muted {
+  font-size: 0.9rem;
+  color: var(--ip-text-muted);
+  margin: 0.5rem 0;
+}
+
+.ip-lookup__qr {
+  display: block;
+  margin: 1rem auto 0;
+  border-radius: var(--pico-border-radius);
+  border: 1px solid var(--ip-border);
+}
+
+.ip-lookup__plain-actions {
+  margin-top: 0.75rem;
+  justify-content: center;
+}
+
+.ip-lookup__mini-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+
+  dt {
+    color: var(--ip-text-muted);
+    margin: 0;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.ip-lookup__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0;
+}
+
+.ip-lookup__tab {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  margin: 0;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--ip-border);
+  color: var(--ip-text-muted);
+  cursor: pointer;
+
+  &--active {
+    background: var(--ip-accent-soft);
+    border-color: var(--ip-accent);
+    color: var(--ip-accent);
+  }
+}
+
+.ip-lookup__code {
+  font-family: var(--pico-font-family-monospace);
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-hero-mono);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+}
+
+.ip-lookup__map-link {
+  display: block;
+  border-radius: var(--pico-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--ip-border);
+}
+
+.ip-lookup__map-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ip-lookup__history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.ip-lookup__history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  li {
+    display: flex;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+}
+
+.ip-lookup__history-item {
+  flex: 1;
+  text-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-surface-elevated);
+  cursor: pointer;
+
+  small {
+    color: var(--ip-text-muted);
+  }
+
+  &:hover {
+    border-color: var(--ip-accent);
+  }
+}
+
+.ip-lookup__history-remove {
+  min-width: 2.25rem;
+  padding: 0;
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ip-lookup__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+
+  input {
+    flex: 1 1 12rem;
+    margin-bottom: 0;
+    direction: ltr;
+    text-align: left;
+  }
+
+  button {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+}
+
+.ip-lookup__mono {
+  font-family: var(--pico-font-family-monospace);
+  word-break: break-all;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+.ip-lookup__muted {
+  color: var(--pico-muted-color);
+  font-size: 0.9em;
+}
+
+.ip-lookup__alert {
+  border-color: var(--pico-del-color);
+  color: var(--pico-del-color);
+}
+
+.ip-lookup__details dl {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.ip-lookup__details dt {
+  font-weight: 600;
+  color: var(--pico-muted-color);
+}
+
+.ip-lookup__details dd {
+  margin: 0;
+}
+
+.ip-lookup__table-wrap {
+  overflow-x: auto;
+}
+
+.ip-lookup__table-wrap table {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.ip-lookup__status--ok {
+  color: var(--pico-ins-color);
+  font-weight: 600;
+}
+
+.ip-lookup__status--warn {
+  color: var(--pico-del-color);
+  font-weight: 600;
+}
+
+@media (max-width: 576px) {
+  .ip-lookup__row {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}

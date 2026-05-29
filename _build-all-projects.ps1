@@ -1,0 +1,413 @@
+<#
+.SYNOPSIS
+  Full IPNote.ir build orchestrator (solution, tests, SPA, optional release package, optional dev stack).
+
+.DESCRIPTION
+  Modeled after Karavi.Thesis _build-all-projects.ps1. Reuses build.ps1 and scripts/*.ps1.
+
+  Quick dev (build + tests + i18n, no ZIP, start Aspire):
+    .\_build-all-projects.ps1 -SkipPackage
+
+  Release artifact ZIP (Web publish + Flutter Android + SPA in wwwroot):
+    .\_build-all-projects.ps1 -Configuration Release
+
+  Build only (no dev servers):
+    .\_build-all-projects.ps1 -SkipPackage -SkipDevServers
+
+  Package ZIP only (no AppHost):
+    .\_build-all-projects.ps1 -Configuration Release -PackageOnly
+#>
+param(
+    [ValidateSet("Debug", "Release")]
+    [string]$Configuration = "Debug",
+
+    [switch]$SkipRestore,
+    [switch]$SkipStopRunningProjects,
+    [switch]$SkipTests,
+    [switch]$Coverage,
+
+    [switch]$SkipPackage,
+    [string]$ZipOutputDirectory = "",
+    [switch]$PackageOnly,
+    [switch]$NonInteractive,
+
+    [switch]$SkipFlutter,
+    [switch]$SkipFlutterAnalyze,
+    [switch]$SkipFlutterAndroid,
+    [ValidateSet("apk", "appbundle", "all")]
+    [string]$AndroidArtifact = "appbundle",
+    [string]$ApiBaseUrl = "https://api.ipnote.ir",
+
+    [switch]$SkipSpa,
+    [switch]$SkipDevServers,
+    [switch]$UseRedisContainer,
+
+    [switch]$OfflinePubGet,
+    [switch]$UseFlutterIoCnMirror,
+    [string]$PubHostedUrl = "",
+    [string]$FlutterStorageBaseUrl = ""
+)
+
+$ErrorActionPreference = "Stop"
+
+$root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$solutionPath = Join-Path $root "Ntk.Note.IP.sln"
+$webProj = Join-Path $root "src\Web\Web.csproj"
+$appHostProj = Join-Path $root "src\AppHost\AppHost.csproj"
+$flutterAppPath = Join-Path $root "src\Mobile\ntk_note_ip_app"
+$publishWebDir = Join-Path $root "artifacts\publish\web"
+$androidPublishDir = Join-Path $root "publish\flutter\android"
+
+Set-Location $root
+
+function Assert-PathExists {
+    param(
+        [Parameter(Mandatory = $true)][string]$PathToCheck,
+        [Parameter(Mandatory = $true)][string]$Label
+    )
+
+    if (-not (Test-Path -LiteralPath $PathToCheck)) {
+        throw "$Label was not found: $PathToCheck"
+    }
+}
+
+function Resolve-CommandPath {
+    param(
+        [Parameter(Mandatory = $true)][string]$CommandName,
+        [string[]]$CandidatePaths = @()
+    )
+
+    $cmd = Get-Command $CommandName -ErrorAction SilentlyContinue
+    if ($cmd) {
+        return $cmd.Source
+    }
+
+    foreach ($candidate in $CandidatePaths) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) { continue }
+        $expanded = [Environment]::ExpandEnvironmentVariables($candidate)
+        if (Test-Path -LiteralPath $expanded) {
+            return $expanded
+        }
+    }
+
+    return $null
+}
+
+function Stop-IpNoteRunningProcesses {
+    $names = @(
+        "Ntk.Note.IP.AppHost",
+        "Ntk.Note.IP.Web"
+    )
+
+    foreach ($name in $names) {
+        $running = Get-Process -Name $name -ErrorAction SilentlyContinue
+        if (-not $running) { continue }
+
+        foreach ($proc in $running) {
+            try {
+                Stop-Process -Id $proc.Id -Force -ErrorAction Stop
+                Write-Host "Stopped: $name (PID $($proc.Id))" -ForegroundColor DarkYellow
+            }
+            catch {
+                Write-Warning "Could not stop $name (PID $($proc.Id)): $($_.Exception.Message)"
+            }
+        }
+    }
+
+    Get-Process -Name "dotnet" -ErrorAction SilentlyContinue |
+        Where-Object { $_.Path -like "*Ntk.Note.IP*" } |
+        ForEach-Object {
+            try {
+                Stop-Process -Id $_.Id -Force -ErrorAction Stop
+                Write-Host "Stopped dotnet child (PID $($_.Id))" -ForegroundColor DarkYellow
+            }
+            catch {
+                Write-Warning "Could not stop dotnet PID $($_.Id): $($_.Exception.Message)"
+            }
+        }
+
+    Start-Sleep -Seconds 1
+}
+
+function Resolve-ExistingOrNewDirectory {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return (New-Item -ItemType Directory -Path $Path -Force).FullName
+    }
+
+    return (Resolve-Path -LiteralPath $Path).Path
+}
+
+function Set-FlutterMirrorEnvironment {
+    if ($UseFlutterIoCnMirror) {
+        if ([string]::IsNullOrWhiteSpace($PubHostedUrl)) {
+            $script:PubHostedUrl = "https://pub.flutter-io.cn"
+        }
+        if ([string]::IsNullOrWhiteSpace($FlutterStorageBaseUrl)) {
+            $script:FlutterStorageBaseUrl = "https://storage.flutter-io.cn"
+        }
+        Write-Host "Flutter mirror: flutter-io.cn" -ForegroundColor DarkCyan
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($PubHostedUrl)) {
+        $env:PUB_HOSTED_URL = $PubHostedUrl
+    }
+    if (-not [string]::IsNullOrWhiteSpace($FlutterStorageBaseUrl)) {
+        $env:FLUTTER_STORAGE_BASE_URL = $FlutterStorageBaseUrl
+    }
+}
+
+function Invoke-DotNetRestore {
+    Write-Host "dotnet restore ($Configuration) ..." -ForegroundColor Cyan
+    dotnet restore $solutionPath
+    if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed" }
+}
+
+function Invoke-CoreBuildAndTest {
+    Write-Host "=== Core .NET build + tests (build.ps1) ===" -ForegroundColor Cyan
+    & (Join-Path $root "build.ps1") `
+        -Configuration $Configuration `
+        -SkipRestore `
+        -SkipStopRunningProjects:($SkipStopRunningProjects) `
+        -SkipTests:$SkipTests `
+        -Coverage:$Coverage
+    if ($LASTEXITCODE -ne 0) { throw "build.ps1 failed" }
+}
+
+function Invoke-SpaPublish {
+    if ($SkipSpa) {
+        Write-Host "SKIP Angular SPA -> wwwroot (-SkipSpa)" -ForegroundColor DarkYellow
+        return
+    }
+
+    Write-Host "=== Angular SPA -> wwwroot ===" -ForegroundColor Cyan
+    & (Join-Path $root "scripts\build-spa-to-wwwroot.ps1")
+    if ($LASTEXITCODE -ne 0) { throw "build-spa-to-wwwroot.ps1 failed" }
+}
+
+function Invoke-WebPublish {
+    Write-Host "=== Publish Web API ($Configuration) ===" -ForegroundColor Cyan
+    & (Join-Path $root "scripts\publish-api.ps1") -Configuration $Configuration -OutputPath $publishWebDir
+    if ($LASTEXITCODE -ne 0) { throw "publish-api.ps1 failed" }
+}
+
+function Invoke-FlutterCi {
+    if ($SkipFlutter) {
+        Write-Host "SKIP Flutter CI (-SkipFlutter)" -ForegroundColor DarkYellow
+        return
+    }
+
+    Set-FlutterMirrorEnvironment
+
+    if ($SkipFlutterAnalyze) {
+        Write-Host "Flutter: pub get + test only (-SkipFlutterAnalyze)" -ForegroundColor Cyan
+        $flutter = Resolve-CommandPath -CommandName "flutter"
+        if (-not $flutter) { throw "Flutter SDK not found on PATH." }
+
+        Push-Location $flutterAppPath
+        try {
+            $pubArgs = @("pub", "get")
+            if ($OfflinePubGet) { $pubArgs += "--offline" }
+            & $flutter @pubArgs
+            if ($LASTEXITCODE -ne 0) { throw "flutter pub get failed" }
+
+            if (-not $SkipTests) {
+                & $flutter test
+                if ($LASTEXITCODE -ne 0) { throw "flutter test failed" }
+            }
+        }
+        finally {
+            Pop-Location
+        }
+        return
+    }
+
+    $flutterCiArgs = @()
+    if ($OfflinePubGet) {
+        # flutter-ci has no OfflinePubGet; env mirror + manual pub get handled above when SkipFlutterAnalyze
+    }
+    if (-not $SkipRestore) {
+        # build.ps1 path already restored .NET; flutter-ci runs pub get
+    }
+    else {
+        $flutterCiArgs += "-SkipPubGet"
+    }
+
+    & (Join-Path $root "scripts\flutter-ci.ps1") @flutterCiArgs
+    if ($LASTEXITCODE -ne 0) { throw "flutter-ci.ps1 failed" }
+}
+
+function Invoke-FlutterAndroidRelease {
+    if ($SkipFlutter -or $SkipFlutterAndroid) {
+        Write-Host "SKIP Flutter Android release (-SkipFlutter / -SkipFlutterAndroid)" -ForegroundColor DarkYellow
+        return
+    }
+
+    $target = switch ($AndroidArtifact) {
+        "apk" { "apk" }
+        "appbundle" { "appbundle" }
+        "all" { "all" }
+    }
+
+    New-Item -ItemType Directory -Force -Path $androidPublishDir | Out-Null
+
+    Write-Host "=== Flutter Android release ($target) ===" -ForegroundColor Cyan
+    & (Join-Path $root "scripts\flutter-release-build.ps1") `
+        -Target $target `
+        -ApiBaseUrl $ApiBaseUrl `
+        -SkipCi
+    if ($LASTEXITCODE -ne 0) { throw "flutter-release-build.ps1 failed" }
+
+    $outputs = Join-Path $flutterAppPath "build\app\outputs"
+    if (Test-Path -LiteralPath $outputs) {
+        Get-ChildItem -Path $outputs -Recurse -Include *.apk, *.aab -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                Copy-Item -Force $_.FullName (Join-Path $androidPublishDir $_.Name)
+            }
+        Write-Host "Android artifacts copied -> $androidPublishDir" -ForegroundColor Green
+    }
+}
+
+function Invoke-DeployZip {
+    param([Parameter(Mandatory = $true)][string]$ZipDirectory)
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    $resolvedZipDir = Resolve-ExistingOrNewDirectory -Path $ZipDirectory
+    $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $zipName = "IPNote_ir_Build_$stamp.zip"
+    $zipFullPath = Join-Path $resolvedZipDir $zipName
+
+    $stageRoot = Join-Path $root "publish\deploy-staging"
+    if (Test-Path -LiteralPath $stageRoot) {
+        Remove-Item -Recurse -Force $stageRoot
+    }
+    New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
+
+    Write-Host "Staging deploy ZIP under $stageRoot ..." -ForegroundColor Cyan
+
+    if (Test-Path -LiteralPath $publishWebDir) {
+        Copy-Item -Recurse -Force $publishWebDir (Join-Path $stageRoot "web_publish")
+    }
+    else {
+        throw "Web publish folder missing: $publishWebDir"
+    }
+
+    $wwwRoot = Join-Path $root "src\Web\wwwroot"
+    if (Test-Path -LiteralPath (Join-Path $wwwRoot "index.html")) {
+        Copy-Item -Recurse -Force $wwwRoot (Join-Path $stageRoot "wwwroot_spa")
+    }
+
+    if (Test-Path -LiteralPath $androidPublishDir) {
+        $androidFiles = @(
+            Get-ChildItem -Path $androidPublishDir -File -Filter "*.apk" -ErrorAction SilentlyContinue
+            Get-ChildItem -Path $androidPublishDir -File -Filter "*.aab" -ErrorAction SilentlyContinue
+        )
+        if ($androidFiles.Count -gt 0) {
+            $androidStage = Join-Path $stageRoot "mobile_android"
+            New-Item -ItemType Directory -Path $androidStage -Force | Out-Null
+            foreach ($f in $androidFiles) {
+                Copy-Item -Force $f.FullName (Join-Path $androidStage $f.Name)
+            }
+        }
+    }
+
+    if (Test-Path -LiteralPath $zipFullPath) {
+        Remove-Item -Force $zipFullPath
+    }
+
+    [System.IO.Compression.ZipFile]::CreateFromDirectory(
+        $stageRoot,
+        $zipFullPath,
+        [System.IO.Compression.CompressionLevel]::Optimal,
+        $false)
+
+    Remove-Item -Recurse -Force $stageRoot
+
+    Write-Host ""
+    Write-Host "Deploy ZIP: $zipFullPath" -ForegroundColor Green
+}
+
+function Invoke-DevStack {
+    $runAllArgs = @("-SkipBuild")
+    if ($SkipFlutter) { $runAllArgs += "-SkipFlutter" }
+    if ($UseRedisContainer) { $runAllArgs += "-UseRedisContainer" }
+
+    Write-Host "=== Starting dev stack (run-all.ps1) ===" -ForegroundColor Cyan
+    & (Join-Path $root "scripts\run-all.ps1") @runAllArgs
+    if ($LASTEXITCODE -ne 0) { throw "run-all.ps1 failed" }
+}
+
+Assert-PathExists -PathToCheck $solutionPath -Label "Solution file"
+Assert-PathExists -PathToCheck $webProj -Label "Web project"
+Assert-PathExists -PathToCheck $appHostProj -Label "AppHost project"
+
+Write-Host ""
+Write-Host "=== IPNote.ir _build-all-projects ($Configuration) ===" -ForegroundColor Cyan
+Write-Host "Root: $root" -ForegroundColor DarkGray
+
+if (-not $SkipStopRunningProjects) {
+    Stop-IpNoteRunningProcesses
+}
+
+if (-not $SkipPackage) {
+    if ([string]::IsNullOrWhiteSpace($ZipOutputDirectory)) {
+        if ($NonInteractive) {
+            $ZipOutputDirectory = Join-Path $root "publish\github-release"
+            Write-Host "Non-interactive ZIP -> $ZipOutputDirectory" -ForegroundColor DarkGray
+        }
+        else {
+            Write-Host "مسیر پوشه برای ZIP خروجی استقرار را وارد کنید (Enter = publish\github-release):" -ForegroundColor Cyan
+            $inputPath = Read-Host "ZIP output folder"
+            if ([string]::IsNullOrWhiteSpace($inputPath)) {
+                $ZipOutputDirectory = Join-Path $root "publish\github-release"
+            }
+            else {
+                $ZipOutputDirectory = $inputPath
+            }
+        }
+    }
+
+    if (-not $SkipRestore) {
+        Invoke-DotNetRestore
+    }
+
+    Invoke-CoreBuildAndTest
+    Invoke-SpaPublish
+    Invoke-WebPublish
+    Invoke-FlutterCi
+    Invoke-FlutterAndroidRelease
+    Invoke-DeployZip -ZipDirectory $ZipOutputDirectory
+}
+else {
+    if (-not $SkipRestore) {
+        Invoke-DotNetRestore
+    }
+
+    Invoke-CoreBuildAndTest
+    Invoke-SpaPublish
+    Invoke-FlutterCi
+}
+
+if ($PackageOnly) {
+    Write-Host ""
+    Write-Host "Package-only: dev stack was not started (-PackageOnly)." -ForegroundColor Yellow
+    Write-Host "Done." -ForegroundColor Green
+    exit 0
+}
+
+if (-not $SkipDevServers) {
+    Invoke-DevStack
+}
+else {
+    Write-Host "SKIP dev stack (-SkipDevServers)." -ForegroundColor DarkYellow
+}
+
+Write-Host ""
+Write-Host "Done." -ForegroundColor Green
+Write-Host "Tips:" -ForegroundColor DarkYellow
+Write-Host "  -SkipPackage     daily dev build (default companion to run-all)" -ForegroundColor DarkGray
+Write-Host "  -Configuration Release -PackageOnly   release ZIP without AppHost" -ForegroundColor DarkGray
+Write-Host "  -SkipStopRunningProjects   skip killing AppHost/Web before build" -ForegroundColor DarkGray
+Write-Host "  -SkipFlutterAndroid   release ZIP without mobile artifacts" -ForegroundColor DarkGray

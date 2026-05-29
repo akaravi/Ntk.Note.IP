@@ -1,0 +1,64 @@
+name: Flutter Mobile
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/Mobile/**'
+      - '.github/workflows/flutter-mobile.yml'
+      - 'scripts/flutter-ci.ps1'
+      - 'scripts/sync-openapi-spec.ps1'
+      - 'src/Web/wwwroot/openapi/v1.json'
+  push:
+    branches: [main]
+    paths:
+      - 'src/Mobile/**'
+      - '.github/workflows/flutter-mobile.yml'
+      - 'scripts/flutter-ci.ps1'
+      - 'scripts/sync-openapi-spec.ps1'
+      - 'src/Web/wwwroot/openapi/v1.json'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Mobile/ntk_note_ip_app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify mobile OpenAPI spec matches Web
+        run: diff ../../Web/wwwroot/openapi/v1.json openapi/v1.json
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+      - name: Test
+        run: flutter test
+
+  deep-links-placeholders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Warn if Go-Live deep link placeholders remain
+        shell: pwsh
+        run: ./scripts/verify-deep-links-placeholders.ps1

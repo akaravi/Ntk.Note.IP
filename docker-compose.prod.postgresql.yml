@@ -1,0 +1,46 @@
+# Overlay: PostgreSQL + Hangfire schema (replaces SQLite volume on web/migrate).
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.prod.postgresql.yml up --build -d
+#
+# Optional with Redis:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.prod.postgresql.yml -f docker-compose.prod.redis.yml up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ipnote
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ipnote}
+      POSTGRES_DB: ipnote
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ipnote -d ipnote"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+    cpus: "1.0"
+
+  migrate:
+    environment:
+      ConnectionStrings__IPNoteDb: Host=postgres;Port=5432;Database=ipnote;Username=ipnote;Password=${POSTGRES_PASSWORD:-ipnote}
+      Database__Provider: PostgreSQL
+    volumes: !reset null
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    environment:
+      ConnectionStrings__IPNoteDb: Host=postgres;Port=5432;Database=ipnote;Username=ipnote;Password=${POSTGRES_PASSWORD:-ipnote}
+      Database__Provider: PostgreSQL
+    volumes: !reset null
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pg-data:

@@ -1,0 +1,55 @@
+name: Docker image
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - 'Dockerfile.migrate'
+      - 'docker-compose.prod.yml'
+      - '.dockerignore'
+      - 'src/**'
+      - 'Directory.Packages.props'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build Web image
+        run: docker build -t ipnote-web:ci -f Dockerfile .
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ipnote-web:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+  post-deploy-smoke:
+    runs-on: ubuntu-latest
+    needs: build-and-scan
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compose up (prod sample)
+        run: docker compose -f docker-compose.prod.yml up --build -d
+
+      - name: Post-deploy smoke
+        run: pwsh ./scripts/post-deploy-smoke.ps1 -WebBaseUrl http://localhost:8080 -WaitSeconds 120 -SkipK6
+
+      - name: Compose down
+        if: always()
+        run: docker compose -f docker-compose.prod.yml down -v

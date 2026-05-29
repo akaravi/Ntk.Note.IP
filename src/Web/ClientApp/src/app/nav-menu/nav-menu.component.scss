@@ -1,1 +1,12 @@
 // Styles handled globally in styles.scss
+
+:host ::ng-deep .nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:host ::ng-deep .nav-brand-icon {
+  border-radius: 6px;
+  vertical-align: middle;
+}

@@ -1,28 +1,28 @@
-<article>
-  <h2>Register</h2>
+<article [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <h2>{{ i18n.t('AUTH.REGISTER') }}</h2>
   @if (error) {
     <p class="error">{{ error }}</p>
   }
   <form (ngSubmit)="register()">
-    <label for="email">Email</label>
+    <label for="email">{{ i18n.t('AUTH.EMAIL') }}</label>
     <input type="email" id="email" name="email" [(ngModel)]="email"
       [attr.aria-invalid]="emailTouched ? !emailValid : null"
       aria-describedby="email-helper"
       autocomplete="username"
       (blur)="emailTouched = true" />
     <small id="email-helper">
-      {{ emailTouched && !emailValid ? 'Please enter a valid email address.' : '' }}
+      {{ emailTouched && !emailValid ? i18n.t('AUTH.EMAIL_INVALID') : '' }}
     </small>
-    <label for="password">Password</label>
+    <label for="password">{{ i18n.t('AUTH.PASSWORD') }}</label>
     <input type="password" id="password" name="password" [(ngModel)]="password"
       [attr.aria-invalid]="passwordTouched ? !passwordValid : null"
       aria-describedby="password-helper"
       autocomplete="new-password"
       (blur)="passwordTouched = true" />
     <small id="password-helper">
-      {{ passwordTouched && !passwordValid ? 'Password must be at least ' + minPasswordLength + ' characters.' : '' }}
+      {{ passwordTouched && !passwordValid ? i18n.t('AUTH.PASSWORD_INVALID') : '' }}
     </small>
-    <button type="submit">Register</button>
-    <p style="margin-top: 1rem">Already have an account? <a [routerLink]="['/login']">Log in</a></p>
+    <button type="submit">{{ i18n.t('AUTH.REGISTER') }}</button>
+    <p class="auth-switch">{{ i18n.t('AUTH.HAS_ACCOUNT') }} <a [routerLink]="['/login']">{{ i18n.t('AUTH.LOGIN') }}</a></p>
   </form>
 </article>

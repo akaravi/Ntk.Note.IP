@@ -1,6 +1,6 @@
 using Aspire.Hosting;
 
-namespace CleanArchitecture.Web.AcceptanceTests;
+namespace Ntk.Note.IP.Web.AcceptanceTests;
 
 [SetUpFixture]
 public class AspireSetup

@@ -1,19 +1,27 @@
-﻿using System.Reflection;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Infrastructure.Identity;
+using System.Reflection;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Domain.Entities;
+using Ntk.Note.IP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanArchitecture.Infrastructure.Data;
+namespace Ntk.Note.IP.Infrastructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-    public DbSet<TodoList> TodoLists => Set<TodoList>();
+    public DbSet<IpNote> IpNotes => Set<IpNote>();
 
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
+    public DbSet<IpLookupRecord> IpLookupRecords => Set<IpLookupRecord>();
+
+    public DbSet<IpRecord> IpRecords => Set<IpRecord>();
+
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+
+    public DbSet<PushDeviceRegistration> PushDeviceRegistrations => Set<PushDeviceRegistration>();
+
+    public DbSet<UserPublicIpSnapshot> UserPublicIpSnapshots => Set<UserPublicIpSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

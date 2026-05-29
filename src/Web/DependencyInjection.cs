@@ -1,8 +1,11 @@
+using System.Threading.RateLimiting;
 using Azure.Identity;
-using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Infrastructure.Data;
-using CleanArchitecture.Web.Services;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Infrastructure.Data;
+using Ntk.Note.IP.Web.Infrastructure;
+using Ntk.Note.IP.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +16,7 @@ public static class DependencyInjection
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddScoped<IUser, CurrentUser>();
+        builder.Services.AddScoped<IClientIpResolver, ClientIpResolver>();
 
         builder.Services.AddHttpContextAccessor();
 
@@ -28,12 +32,72 @@ public static class DependencyInjection
         {
             options.AddOperationTransformer<ApiExceptionOperationTransformer>();
             options.AddOperationTransformer<IdentityApiOperationTransformer>();
-#if (UseApiOnly)
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-#endif
         });
 
+        builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection(CorsOptions.SectionName));
         builder.Services.AddCors();
+
+        var guestPermitLimit = builder.Configuration.GetValue("RateLimiting:GuestPermitLimit", 60);
+        var guestWindowMinutes = builder.Configuration.GetValue("RateLimiting:GuestWindowMinutes", 1);
+        var authPermitLimit = builder.Configuration.GetValue("RateLimiting:AuthPermitLimit", 10);
+        var authWindowMinutes = builder.Configuration.GetValue("RateLimiting:AuthWindowMinutes", 5);
+
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddPolicy(GuestRateLimitPolicies.GuestApi, httpContext =>
+            {
+                if (httpContext.User.Identity?.IsAuthenticated == true)
+                {
+                    return RateLimitPartition.GetNoLimiter("authenticated");
+                }
+
+                var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = guestPermitLimit,
+                        Window = TimeSpan.FromMinutes(guestWindowMinutes),
+                        QueueLimit = 0
+                    });
+            });
+
+            options.AddPolicy(GuestRateLimitPolicies.AuthSensitive, httpContext =>
+            {
+                if (!IsAuthSensitiveRequest(httpContext))
+                {
+                    return RateLimitPartition.GetNoLimiter("auth-not-sensitive");
+                }
+
+                var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = authPermitLimit,
+                        Window = TimeSpan.FromMinutes(authWindowMinutes),
+                        QueueLimit = 0
+                    });
+            });
+        });
+    }
+
+    private static bool IsAuthSensitiveRequest(HttpContext httpContext)
+    {
+        if (!HttpMethods.IsPost(httpContext.Request.Method))
+        {
+            return false;
+        }
+
+        var path = httpContext.Request.Path.Value ?? string.Empty;
+        return path.EndsWith("/login", StringComparison.OrdinalIgnoreCase)
+            || path.EndsWith("/register", StringComparison.OrdinalIgnoreCase)
+            || path.EndsWith("/forgotPassword", StringComparison.OrdinalIgnoreCase)
+            || path.EndsWith("/resetPassword", StringComparison.OrdinalIgnoreCase);
     }
 
     public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)

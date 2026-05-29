@@ -1,0 +1,10 @@
+# Overlay: run pre-built Web image from GHCR (no local Web build).
+# Requires Docker Compose 2.23+ (!reset). migrate still builds from Dockerfile.migrate.
+#
+#   export IPNOTE_WEB_IMAGE=ghcr.io/akaravi/ntk.note.ip/ipnote-web:v1.0.0
+#   docker compose -f docker-compose.prod.yml -f docker-compose.prod.registry.yml up -d
+services:
+  web:
+    image: ${IPNOTE_WEB_IMAGE:?Set IPNOTE_WEB_IMAGE to ghcr.io/OWNER/REPO/ipnote-web:TAG}
+    pull_policy: always
+    build: !reset null

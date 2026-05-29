@@ -1,0 +1,102 @@
+name: Staging smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      web_base_url:
+        description: 'Deployed base URL (e.g. https://staging.ipnote.ir). Falls back to STAGING_WEB_BASE_URL secret when empty.'
+        required: false
+        type: string
+        default: ''
+      wait_seconds:
+        description: 'Seconds to wait for /health'
+        required: false
+        type: string
+        default: '60'
+      skip_k6:
+        description: 'Skip k6 load smoke (recommended for shared staging)'
+        required: false
+        type: boolean
+        default: true
+      skip_spa:
+        description: 'Skip SPA root check (API-only or CDN split origin)'
+        required: false
+        type: boolean
+        default: false
+      require_tls:
+        description: 'Fail if base URL is not https://'
+        required: false
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      web_base_url:
+        required: false
+        type: string
+        default: ''
+      wait_seconds:
+        required: false
+        type: string
+        default: '60'
+      skip_k6:
+        required: false
+        type: boolean
+        default: true
+      skip_spa:
+        required: false
+        type: boolean
+        default: false
+      require_tls:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      STAGING_WEB_BASE_URL:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  staging-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve base URL
+        id: url
+        env:
+          INPUT_URL: ${{ inputs.web_base_url }}
+          SECRET_URL: ${{ secrets.STAGING_WEB_BASE_URL }}
+        run: |
+          set -euo pipefail
+          base="${INPUT_URL:-}"
+          if [ -z "$base" ]; then
+            base="${SECRET_URL:-}"
+          fi
+          base="$(echo "$base" | sed 's:/*$::')"
+          if [ -z "$base" ]; then
+            echo "::error::Provide workflow input web_base_url or repository secret STAGING_WEB_BASE_URL."
+            exit 1
+          fi
+          echo "base_url=$base" >> "$GITHUB_OUTPUT"
+          echo "Target: $base"
+
+      - uses: grafana/setup-k6-action@v1
+        if: ${{ inputs.skip_k6 == false }}
+
+      - name: Staging smoke
+        shell: pwsh
+        env:
+          STAGING_WEB_BASE_URL: ${{ steps.url.outputs.base_url }}
+        run: |
+          $params = @{
+            WebBaseUrl  = $env:STAGING_WEB_BASE_URL
+            WaitSeconds = [int]'${{ inputs.wait_seconds }}'
+          }
+          if ('${{ inputs.skip_k6 }}' -eq 'true') { $params.SkipK6 = $true }
+          if ('${{ inputs.skip_spa }}' -eq 'true') { $params.SkipSpa = $true }
+          if ('${{ inputs.require_tls }}' -eq 'true') { $params.RequireTls = $true }
+          & ./scripts/staging-smoke.ps1 @params

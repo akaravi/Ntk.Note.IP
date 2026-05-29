@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Domain.Constants;
+namespace Ntk.Note.IP.Domain.Constants;
 
 public abstract class Roles
 {

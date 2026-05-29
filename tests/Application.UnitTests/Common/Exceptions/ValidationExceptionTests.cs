@@ -1,9 +1,9 @@
-﻿using CleanArchitecture.Application.Common.Exceptions;
+using Ntk.Note.IP.Application.Common.Exceptions;
 using FluentValidation.Results;
 using NUnit.Framework;
 using Shouldly;
 
-namespace CleanArchitecture.Application.UnitTests.Common.Exceptions;
+namespace Ntk.Note.IP.Application.UnitTests.Common.Exceptions;
 
 public class ValidationExceptionTests
 {

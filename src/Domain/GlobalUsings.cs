@@ -1,6 +1,6 @@
-﻿global using CleanArchitecture.Domain.Common;
-global using CleanArchitecture.Domain.Entities;
-global using CleanArchitecture.Domain.Enums;
-global using CleanArchitecture.Domain.Events;
-global using CleanArchitecture.Domain.Exceptions;
-global using CleanArchitecture.Domain.ValueObjects;
+global using Ntk.Note.IP.Domain.Common;
+global using Ntk.Note.IP.Domain.Entities;
+global using Ntk.Note.IP.Domain.Enums;
+global using Ntk.Note.IP.Domain.Events;
+global using Ntk.Note.IP.Domain.Exceptions;
+global using Ntk.Note.IP.Domain.ValueObjects;

@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsAspireSharedProject>true</IsAspireSharedProject>
-    <RootNamespace>CleanArchitecture.ServiceDefaults</RootNamespace>
-    <AssemblyName>CleanArchitecture.ServiceDefaults</AssemblyName>
+    <RootNamespace>Ntk.Note.IP.ServiceDefaults</RootNamespace>
+    <AssemblyName>Ntk.Note.IP.ServiceDefaults</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +16,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" />
   </ItemGroup>
 
 </Project>

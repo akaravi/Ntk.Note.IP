@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>CleanArchitecture.Domain</RootNamespace>
-    <AssemblyName>CleanArchitecture.Domain</AssemblyName>
+    <RootNamespace>Ntk.Note.IP.Domain</RootNamespace>
+    <AssemblyName>Ntk.Note.IP.Domain</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

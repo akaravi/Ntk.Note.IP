@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.Common.Interfaces;
+namespace Ntk.Note.IP.Application.Common.Interfaces;
 
 public interface IUser
 {

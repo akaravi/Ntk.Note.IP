@@ -8,9 +8,6 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { WeatherComponent } from './weather/weather.component';
-import { TasksComponent } from './todo/todo.component';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 import { API_BASE_URL } from './web-api-client';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
@@ -18,6 +15,12 @@ import { LoginComponent } from 'src/api-authorization/login/login.component';
 import { RegisterComponent } from 'src/api-authorization/register/register.component';
 import { AuthGuard } from 'src/api-authorization/auth.guard';
 import { AuthService } from 'src/api-authorization/auth.service';
+import { IpLookupComponent } from './ip-lookup/ip-lookup.component';
+import { IpNotesComponent } from './ip-notes/ip-notes.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ToolsComponent } from './tools/tools.component';
+import { I18nService } from './core/i18n.service';
+import { PwaService } from './core/pwa.service';
 
 export function getApiBaseUrl(): string {
   const url = document.getElementsByTagName('base')[0].href;
@@ -29,12 +32,13 @@ export function getApiBaseUrl(): string {
         AppComponent,
         NavMenuComponent,
         HomeComponent,
-        CounterComponent,
-        WeatherComponent,
-        TasksComponent,
         ThemeToggleComponent,
         LoginComponent,
-        RegisterComponent
+        RegisterComponent,
+        IpLookupComponent,
+        IpNotesComponent,
+        DashboardComponent,
+        ToolsComponent
     ],
     bootstrap: [AppComponent],
     imports: [
@@ -42,10 +46,12 @@ export function getApiBaseUrl(): string {
         FormsModule,
         LucideAngularModule.pick({ Sun, Moon, Laptop, Plus, Settings, MoreHorizontal }),
         RouterModule.forRoot([
-            { path: '', component: HomeComponent, pathMatch: 'full' },
-            { path: 'counter', component: CounterComponent },
-            { path: 'weather', component: WeatherComponent, canActivate: [AuthGuard] },
-            { path: 'todo', component: TasksComponent, canActivate: [AuthGuard] },
+            { path: '', pathMatch: 'full', redirectTo: 'ip-lookup' },
+            { path: 'home', component: HomeComponent },
+            { path: 'ip-lookup', component: IpLookupComponent },
+            { path: 'tools', component: ToolsComponent },
+            { path: 'ip-notes', component: IpNotesComponent, canActivate: [AuthGuard] },
+            { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent }
         ])
@@ -55,6 +61,13 @@ export function getApiBaseUrl(): string {
         { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },
         { provide: API_BASE_URL, useFactory: getApiBaseUrl, deps: [] },
         provideAppInitializer(() => inject(AuthService).initialize()),
+        provideAppInitializer(() => {
+          const i18n = inject(I18nService);
+          return i18n.load(i18n.getStoredLocale());
+        }),
+        provideAppInitializer(() => {
+          inject(PwaService).registerServiceWorker();
+        }),
         provideHttpClient(withInterceptorsFromDi())
     ]
 })

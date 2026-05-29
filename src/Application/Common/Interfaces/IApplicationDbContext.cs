@@ -1,12 +1,20 @@
-﻿using CleanArchitecture.Domain.Entities;
+using Ntk.Note.IP.Domain.Entities;
 
-namespace CleanArchitecture.Application.Common.Interfaces;
+namespace Ntk.Note.IP.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
-    DbSet<TodoList> TodoLists { get; }
+    DbSet<IpNote> IpNotes { get; }
 
-    DbSet<TodoItem> TodoItems { get; }
+    DbSet<IpLookupRecord> IpLookupRecords { get; }
+
+    DbSet<IpRecord> IpRecords { get; }
+
+    DbSet<OutboxMessage> OutboxMessages { get; }
+
+    DbSet<PushDeviceRegistration> PushDeviceRegistrations { get; }
+
+    DbSet<UserPublicIpSnapshot> UserPublicIpSnapshots { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -1,0 +1,12 @@
+# Sample Prometheus config for IPNote.ir (local / single-server).
+# Enable metrics on Web: OpenTelemetry__EnablePrometheusEndpoint=true
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+scrape_configs:
+  - job_name: ipnote-web
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:8080

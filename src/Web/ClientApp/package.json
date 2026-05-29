@@ -1,5 +1,5 @@
 {
-  "name": "cleanarchitecture.web",
+  "name": "Ntk.Note.IP.web",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -26,6 +26,7 @@
     "@angular/router": "^21.1.5",
     "@picocss/pico": "^2.0.0",
     "lucide-angular": "^1.0.0",
+    "qrcode": "^1.5.4",
     "run-script-os": "^1.1.6",
     "rxjs": "~7.8.1",
     "tslib": "^2.5.0",
@@ -37,6 +38,7 @@
     "@angular/compiler-cli": "^21.1.5",
     "@types/jasmine": "~6.0.0",
     "@types/node": "^24.0.0",
+    "@types/qrcode": "^1.5.5",
     "jasmine-core": "~6.1.0",
     "karma": "~6.4.2",
     "karma-chrome-launcher": "~3.2.0",

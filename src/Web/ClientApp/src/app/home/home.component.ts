@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { I18nService } from '../core/i18n.service';
 
 @Component({
   standalone: false,
@@ -6,4 +7,5 @@ import { Component } from '@angular/core';
   templateUrl: './home.component.html',
 })
 export class HomeComponent {
+  readonly i18n = inject(I18nService);
 }

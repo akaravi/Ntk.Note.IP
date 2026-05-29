@@ -1,15 +1,18 @@
-﻿using CleanArchitecture.Infrastructure.Identity;
+using Ntk.Note.IP.Infrastructure.Identity;
+using Ntk.Note.IP.Web.Infrastructure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
-namespace CleanArchitecture.Web.Endpoints;
+namespace Ntk.Note.IP.Web.Endpoints;
 
 public class Users : IEndpointGroup
 {
     public static void Map(RouteGroupBuilder groupBuilder)
     {
         groupBuilder.MapIdentityApi<ApplicationUser>();
+        groupBuilder.RequireRateLimiting(GuestRateLimitPolicies.AuthSensitive);
 
         groupBuilder.MapPost(Logout, "logout").RequireAuthorization();
     }

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace CleanArchitecture.Web.AcceptanceTests;
+namespace Ntk.Note.IP.Web.AcceptanceTests;
 
 [SetUpFixture]
 public class PlaywrightSetup

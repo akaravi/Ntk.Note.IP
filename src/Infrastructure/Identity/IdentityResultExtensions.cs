@@ -1,7 +1,7 @@
-﻿using CleanArchitecture.Application.Common.Models;
+using Ntk.Note.IP.Application.Common.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArchitecture.Infrastructure.Identity;
+namespace Ntk.Note.IP.Infrastructure.Identity;
 
 public static class IdentityResultExtensions
 {

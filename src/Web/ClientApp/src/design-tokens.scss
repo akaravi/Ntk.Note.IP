@@ -1,0 +1,20 @@
+// IPNote.ir semantic tokens (light/dark via Pico data-theme)
+:root,
+:root[data-theme="light"] {
+  --ip-surface: var(--pico-card-background-color, var(--pico-background-color));
+  --ip-surface-elevated: color-mix(in srgb, var(--pico-background-color) 92%, var(--pico-primary));
+  --ip-text: var(--pico-color);
+  --ip-text-muted: var(--pico-muted-color);
+  --ip-border: var(--pico-muted-border-color);
+  --ip-accent: var(--pico-primary);
+  --ip-accent-soft: color-mix(in srgb, var(--pico-primary) 18%, transparent);
+  --ip-success: var(--pico-ins-color, #2e7d32);
+  --ip-warning: var(--pico-mark-color, #ed6c02);
+  --ip-danger: var(--pico-del-color, #c62828);
+  --ip-hero-mono: var(--pico-code-background-color);
+}
+
+:root[data-theme="dark"] {
+  --ip-surface-elevated: color-mix(in srgb, var(--pico-background-color) 88%, var(--pico-primary));
+  --ip-hero-mono: color-mix(in srgb, var(--pico-code-background-color) 80%, var(--pico-background-color));
+}

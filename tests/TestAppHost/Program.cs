@@ -1,6 +1,6 @@
-using CleanArchitecture.Shared;
+using Ntk.Note.IP.Shared;
 
-namespace CleanArchitecture.TestAppHost;
+namespace Ntk.Note.IP.TestAppHost;
 
 public class Program
 {

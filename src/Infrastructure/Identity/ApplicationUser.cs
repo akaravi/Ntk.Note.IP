@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
-namespace CleanArchitecture.Infrastructure.Identity;
+namespace Ntk.Note.IP.Infrastructure.Identity;
 
 public class ApplicationUser : IdentityUser
 {

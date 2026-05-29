@@ -1,0 +1,139 @@
+<section class="dashboard" data-testid="dashboard-page" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="dashboard__hero">
+    <h1>{{ i18n.t('DASHBOARD.TITLE') }}</h1>
+    <p class="dashboard__muted">{{ i18n.t('DASHBOARD.SUBTITLE') }}</p>
+  </header>
+
+  @if (error()) {
+    <article class="dashboard__alert" role="alert">{{ error() }}</article>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else {
+    <div class="dashboard__stats" data-testid="dashboard-stats">
+      <article class="dashboard__stat">
+        <span class="dashboard__stat-value">{{ stats().total }}</span>
+        <span class="dashboard__stat-label">{{ i18n.t('DASHBOARD.STAT_TOTAL') }}</span>
+      </article>
+      <article class="dashboard__stat">
+        <span class="dashboard__stat-value">{{ stats().uniqueAddresses }}</span>
+        <span class="dashboard__stat-label">{{ i18n.t('DASHBOARD.STAT_UNIQUE_IP') }}</span>
+      </article>
+      <article class="dashboard__stat">
+        <span class="dashboard__stat-value">{{ stats().uniqueCountries }}</span>
+        <span class="dashboard__stat-label">{{ i18n.t('DASHBOARD.STAT_COUNTRIES') }}</span>
+      </article>
+      <article class="dashboard__stat">
+        <span class="dashboard__stat-value">{{ stats().noteCount }}</span>
+        <span class="dashboard__stat-label">{{ i18n.t('DASHBOARD.STAT_NOTES') }}</span>
+      </article>
+    </div>
+
+    @if (countryBreakdown().length) {
+      <article class="dashboard__card">
+        <h2>{{ i18n.t('DASHBOARD.COUNTRY_MAP') }}</h2>
+        <div class="dashboard__countries">
+          @for (row of countryBreakdown(); track row.code) {
+            <button
+              type="button"
+              class="dashboard__country"
+              [class.dashboard__country--active]="countryFilter() === row.code"
+              (click)="filterByCountry(row.code)"
+            >
+              {{ row.code }} <span class="dashboard__country-count">{{ row.count }}</span>
+            </button>
+          }
+        </div>
+        @if (mapLoading()) {
+          <p class="dashboard__muted">{{ i18n.t('DASHBOARD.MAP_LOADING') }}</p>
+        } @else if (mapUrl(); as map) {
+          <img class="dashboard__map" [src]="map" [alt]="i18n.t('DASHBOARD.MAP_ALT')" width="640" height="300" loading="lazy" />
+        } @else {
+          <p class="dashboard__muted">{{ i18n.t('DASHBOARD.MAP_UNAVAILABLE') }}</p>
+        }
+      </article>
+    }
+
+    <article class="dashboard__card">
+      <div class="dashboard__toolbar">
+        <label for="dash-search">{{ i18n.t('DASHBOARD.SEARCH') }}</label>
+        <input
+          id="dash-search"
+          type="search"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          [placeholder]="i18n.t('DASHBOARD.SEARCH_PLACEHOLDER')"
+        />
+        <label for="dash-country">{{ i18n.t('DASHBOARD.FILTER_COUNTRY') }}</label>
+        <select
+          id="dash-country"
+          [ngModel]="countryFilter()"
+          (ngModelChange)="countryFilter.set($event)"
+        >
+          <option value="">{{ i18n.t('DASHBOARD.FILTER_ALL') }}</option>
+          @for (code of countryOptions(); track code) {
+            <option [value]="code">{{ code }}</option>
+          }
+        </select>
+        <div class="dashboard__export">
+          <button type="button" class="outline" data-testid="dashboard-export-csv" (click)="exportCsv()">{{ i18n.t('DASHBOARD.EXPORT_CSV') }}</button>
+          <button type="button" class="outline" data-testid="dashboard-export-json" (click)="exportJson()">{{ i18n.t('DASHBOARD.EXPORT_JSON') }}</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="dashboard__card">
+      <h2>{{ i18n.t('DASHBOARD.TIMELINE') }}</h2>
+      @if (filteredItems().length === 0) {
+        <p>{{ i18n.t('DASHBOARD.EMPTY') }}</p>
+        <a routerLink="/ip-lookup" role="button">{{ i18n.t('HOME.START_LOOKUP') }}</a>
+      } @else {
+        <ol class="dashboard__timeline">
+          @for (item of filteredItems(); track item.id) {
+            <li class="dashboard__timeline-item" [class.dashboard__timeline-item--note]="item.kind === 'note'">
+              <div class="dashboard__timeline-dot" aria-hidden="true"></div>
+              <div class="dashboard__timeline-body">
+                <div class="dashboard__timeline-head">
+                  <span class="dashboard__badge">{{ item.kind === 'note' ? i18n.t('DASHBOARD.KIND_NOTE') : i18n.t('DASHBOARD.KIND_LOOKUP') }}</span>
+                  <time>{{ formatWhen(item.recordedAt) }}</time>
+                </div>
+                <button type="button" class="dashboard__address" (click)="openLookup(item)">
+                  {{ item.address }}
+                </button>
+                @if (item.city || item.countryCode) {
+                  <p class="dashboard__muted">
+                    {{ item.city }}{{ item.city && item.countryCode ? ', ' : '' }}{{ item.countryCode }}
+                  </p>
+                }
+                @if (item.deviceLabel) {
+                  <p class="dashboard__muted">{{ item.deviceLabel }}</p>
+                }
+                @if (item.title) {
+                  <strong>{{ item.title }}</strong>
+                }
+                @if (item.body) {
+                  <p>{{ item.body }}</p>
+                }
+                @if (item.tags) {
+                  <div class="dashboard__tags">
+                    @for (tag of item.tags.split(','); track tag) {
+                      @if (tag.trim()) {
+                        <span class="dashboard__tag">{{ tag.trim() }}</span>
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ol>
+      }
+    </article>
+
+    <p>
+      <button type="button" class="secondary" (click)="openNotes()">{{ i18n.t('HOME.MY_NOTES') }}</button>
+      <button type="button" class="outline" (click)="load()">{{ i18n.t('DASHBOARD.REFRESH') }}</button>
+    </p>
+  }
+</section>

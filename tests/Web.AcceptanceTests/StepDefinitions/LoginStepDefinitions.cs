@@ -1,4 +1,4 @@
-namespace CleanArchitecture.Web.AcceptanceTests.StepDefinitions;
+namespace Ntk.Note.IP.Web.AcceptanceTests.StepDefinitions;
 
 [Binding]
 public sealed class LoginStepDefinitions(LoginPage loginPage)
@@ -12,7 +12,7 @@ public sealed class LoginStepDefinitions(LoginPage loginPage)
         container.RegisterInstanceAs(new LoginPage(page));
     }
 
-    [AfterFeature]
+    [AfterFeature("Login")]
     public static async Task AfterLoginFeature(IObjectContainer container)
     {
         var context = container.Resolve<IBrowserContext>();
@@ -31,13 +31,7 @@ public sealed class LoginStepDefinitions(LoginPage loginPage)
     }
 
     [Then("they log in successfully")]
-    public async Task TheyLogInSuccessfully()
-    {
-        var logoutButtonText = await loginPage.LogoutButtonText();
-
-        logoutButtonText.ShouldNotBeNull();
-        logoutButtonText.ShouldBe("Log out");
-    }
+    public Task TheyLogInSuccessfully() => loginPage.AssertLogoutVisibleAsync();
 
     [When("the user logs in with invalid credentials")]
     public async Task TheUserLogsInWithInvalidCredentials()

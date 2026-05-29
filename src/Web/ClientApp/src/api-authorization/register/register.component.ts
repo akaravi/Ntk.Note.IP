@@ -1,7 +1,8 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { firstValueFrom } from 'rxjs';
+import { I18nService } from 'src/app/core/i18n.service';
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -11,6 +12,7 @@ const MIN_PASSWORD_LENGTH = 6;
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {
+  readonly i18n = inject(I18nService);
   email = '';
   password = '';
   emailTouched = false;
@@ -33,7 +35,7 @@ export class RegisterComponent {
       await firstValueFrom(this.authService.register(this.email, this.password));
       await this.router.navigate(['/login']);
     } catch {
-      this.error = 'Registration failed. Please try again.';
+      this.error = this.i18n.t('AUTH.REGISTER_FAILED');
       this.cdr.detectChanges();
     }
   }

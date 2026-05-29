@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.Common.Security;
+namespace Ntk.Note.IP.Application.Common.Security;
 
 /// <summary>
 /// Specifies the class this attribute is applied to requires authorization.

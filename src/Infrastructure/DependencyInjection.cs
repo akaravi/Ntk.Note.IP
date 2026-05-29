@@ -1,7 +1,27 @@
-﻿using CleanArchitecture.Application.Common.Interfaces;
-using CleanArchitecture.Infrastructure.Data;
-using CleanArchitecture.Infrastructure.Data.Interceptors;
-using CleanArchitecture.Infrastructure.Identity;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Application.Common.Options;
+using Ntk.Note.IP.Infrastructure.Data;
+using Ntk.Note.IP.Infrastructure.Dns;
+using Ntk.Note.IP.Infrastructure.DnsResolution;
+using Ntk.Note.IP.Infrastructure.Blacklist;
+using Ntk.Note.IP.Infrastructure.BackgroundJobs;
+using Ntk.Note.IP.Infrastructure.Caching;
+using Ntk.Note.IP.Infrastructure.GeoIp;
+using Ntk.Note.IP.Infrastructure.IpLookup;
+using Ntk.Note.IP.Shared;
+using Hangfire;
+using Hangfire.MemoryStorage;
+using Hangfire.PostgreSql;
+using Microsoft.Extensions.Caching.Distributed;
+using HealthChecks.Redis;
+using Ntk.Note.IP.Infrastructure.NetworkTools;
+using Ntk.Note.IP.Infrastructure.Push;
+using Ntk.Note.IP.Infrastructure.Whois;
+using Ntk.Note.IP.Infrastructure.Data.Interceptors;
+using Ntk.Note.IP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -20,23 +40,36 @@ public static class DependencyInjection
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
+        builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection(DatabaseOptions.SectionName));
+        var databaseProvider = builder.Configuration.GetValue<string>($"{DatabaseOptions.SectionName}:Provider") ?? "Sqlite";
+
+        var usePostgreSql = DatabaseProviderConfiguration.IsPostgreSql(databaseProvider);
+
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+            DatabaseProviderConfiguration.ConfigureDbContext(options, databaseProvider, connectionString, sp));
+
+        var healthChecks = builder.Services.AddHealthChecks()
+            .AddDbContextCheck<ApplicationDbContext>(tags: ["ready"]);
+
+        var redisConnection = builder.Configuration.GetConnectionString(Services.Redis);
+        if (!string.IsNullOrWhiteSpace(redisConnection))
         {
-            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlite(connectionString);
-            options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
-        });
+            var instanceName = builder.Configuration.GetValue<string>($"{CacheOptions.SectionName}:RedisInstanceName") ?? "ipnote:";
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnection;
+                options.InstanceName = instanceName;
+            });
+
+            healthChecks.AddRedis(redisConnection, name: "redis", tags: ["ready"]);
+        }
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            })
-            .AddIdentityCookies();
+        builder.Services.AddIpNoteAuthentication(builder.Configuration);
 
         builder.Services.AddAuthorizationBuilder();
 
@@ -50,5 +83,164 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+
+        builder.Services.AddSingleton<IDnsLookupService, SystemDnsLookupService>();
+
+        builder.Services.Configure<DnsOptions>(builder.Configuration.GetSection(DnsOptions.SectionName));
+        builder.Services.AddSingleton<FakeDnsResolutionService>();
+        builder.Services.AddSingleton<DnsClientResolutionService>();
+        builder.Services.AddScoped<IDnsResolutionService>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<DnsOptions>>().Value;
+            if (string.Equals(options.Provider, "DnsClient", StringComparison.OrdinalIgnoreCase))
+            {
+                return sp.GetRequiredService<DnsClientResolutionService>();
+            }
+
+            return sp.GetRequiredService<FakeDnsResolutionService>();
+        });
+
+        builder.Services.Configure<DnsPropagationOptions>(builder.Configuration.GetSection(DnsPropagationOptions.SectionName));
+        builder.Services.AddSingleton<FakeDnsPropagationChecker>();
+        builder.Services.AddSingleton<DnsPropagationChecker>();
+        builder.Services.AddScoped<IDnsPropagationChecker>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<DnsPropagationOptions>>().Value;
+            return string.Equals(options.Provider, "Live", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<DnsPropagationChecker>()
+                : sp.GetRequiredService<FakeDnsPropagationChecker>();
+        });
+        builder.Services.AddMemoryCache();
+        builder.Services.Configure<CacheOptions>(builder.Configuration.GetSection(CacheOptions.SectionName));
+        builder.Services.AddSingleton<ICacheService>(sp => new TwoTierCacheService(
+            sp.GetRequiredService<IMemoryCache>(),
+            sp.GetRequiredService<IOptions<CacheOptions>>(),
+            sp.GetService<IDistributedCache>()));
+
+        builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection(OutboxOptions.SectionName));
+        builder.Services.AddScoped<IOutboxProcessor, Ntk.Note.IP.Infrastructure.Outbox.OutboxProcessor>();
+
+        builder.Services.Configure<GeoIpOptions>(builder.Configuration.GetSection(GeoIpOptions.SectionName));
+        builder.Services.AddSingleton<FakeGeoIpDatabase>();
+        builder.Services.AddSingleton<MmdbGeoIpDatabase>();
+        builder.Services.AddSingleton<IGeoIpDatabase>(sp =>
+        {
+            var geoOptions = sp.GetRequiredService<IOptions<GeoIpOptions>>().Value;
+            if (string.Equals(geoOptions.Provider, "Mmdb", StringComparison.OrdinalIgnoreCase))
+            {
+                var mmdb = sp.GetRequiredService<MmdbGeoIpDatabase>();
+                if (mmdb.IsAvailable)
+                {
+                    return mmdb;
+                }
+            }
+
+            return sp.GetRequiredService<FakeGeoIpDatabase>();
+        });
+
+        builder.Services.AddHangfire(configuration =>
+        {
+            if (usePostgreSql)
+            {
+                configuration.UsePostgreSqlStorage(
+                    options => options.UseNpgsqlConnection(connectionString),
+                    new PostgreSqlStorageOptions
+                    {
+                        SchemaName = "hangfire"
+                    });
+            }
+            else
+            {
+                configuration.UseMemoryStorage();
+            }
+        });
+        builder.Services.AddHangfireServer();
+        builder.Services.AddTransient<GeoIpDatabaseRefreshJob>();
+        builder.Services.AddTransient<ProcessOutboxJob>();
+        builder.Services.AddScoped<IPushIpMonitorPollService, PushIpMonitorPollService>();
+        builder.Services.AddTransient<PushIpMonitorPollJob>();
+        builder.Services.AddHostedService<HangfireJobRegistration>();
+
+        builder.Services.Configure<IpLookupOptions>(builder.Configuration.GetSection(IpLookupOptions.SectionName));
+        builder.Services.AddHttpClient<IpApiLookupProvider>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        builder.Services.AddSingleton<FakeIpLookupProvider>();
+        builder.Services.AddScoped<IIpLookupProvider>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<IpLookupOptions>>().Value;
+            IIpLookupProvider inner = string.Equals(options.Provider, "IpApi", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<IpApiLookupProvider>()
+                : sp.GetRequiredService<FakeIpLookupProvider>();
+
+            inner = new GeoEnrichedIpLookupProvider(inner, sp.GetRequiredService<IGeoIpDatabase>());
+
+            return new CachedIpLookupProvider(
+                inner,
+                sp.GetRequiredService<ICacheService>(),
+                sp.GetRequiredService<IOptions<CacheOptions>>());
+        });
+
+        builder.Services.Configure<WhoisOptions>(builder.Configuration.GetSection(WhoisOptions.SectionName));
+        builder.Services.AddHttpClient<RdapWhoisProvider>(client => client.Timeout = TimeSpan.FromSeconds(20));
+        builder.Services.AddSingleton<FakeWhoisProvider>();
+        builder.Services.AddScoped<IWhoisProvider>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<WhoisOptions>>().Value;
+            if (string.Equals(options.Provider, "Rdap", StringComparison.OrdinalIgnoreCase))
+            {
+                return sp.GetRequiredService<RdapWhoisProvider>();
+            }
+
+            return sp.GetRequiredService<FakeWhoisProvider>();
+        });
+
+        builder.Services.Configure<BlacklistOptions>(builder.Configuration.GetSection(BlacklistOptions.SectionName));
+        builder.Services.AddSingleton<FakeBlacklistChecker>();
+        builder.Services.AddSingleton<DnsblBlacklistChecker>();
+        builder.Services.AddScoped<IBlacklistChecker>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<BlacklistOptions>>().Value;
+            if (string.Equals(options.Provider, "Dnsbl", StringComparison.OrdinalIgnoreCase))
+            {
+                return sp.GetRequiredService<DnsblBlacklistChecker>();
+            }
+
+            return sp.GetRequiredService<FakeBlacklistChecker>();
+        });
+
+        builder.Services.Configure<NetworkToolsOptions>(builder.Configuration.GetSection(NetworkToolsOptions.SectionName));
+        builder.Services.AddSingleton<TcpPortCheckService>();
+        builder.Services.AddSingleton<FakePortCheckService>();
+        builder.Services.AddScoped<IPortCheckService>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<NetworkToolsOptions>>().Value;
+            return string.Equals(options.PortCheckProvider, "Tcp", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<TcpPortCheckService>()
+                : sp.GetRequiredService<FakePortCheckService>();
+        });
+
+        builder.Services.AddSingleton<SslCertificateProbeService>();
+        builder.Services.AddSingleton<FakeSslCertificateService>();
+        builder.Services.AddScoped<ISslCertificateService>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<NetworkToolsOptions>>().Value;
+            return string.Equals(options.SslProvider, "Probe", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<SslCertificateProbeService>()
+                : sp.GetRequiredService<FakeSslCertificateService>();
+        });
+
+        builder.Services.Configure<PushOptions>(builder.Configuration.GetSection(PushOptions.SectionName));
+        builder.Services.AddSingleton<NoOpPushSender>();
+        builder.Services.AddSingleton<FirebasePushSender>();
+        builder.Services.AddSingleton<IPushSender>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<PushOptions>>().Value;
+            return string.Equals(options.Provider, "Firebase", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<FirebasePushSender>()
+                : sp.GetRequiredService<NoOpPushSender>();
+        });
+        builder.Services.AddScoped<IUserPushNotificationService, UserPushNotificationService>();
     }
 }

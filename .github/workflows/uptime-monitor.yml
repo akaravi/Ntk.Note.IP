@@ -1,0 +1,53 @@
+name: Uptime monitor
+
+on:
+  schedule:
+    # Every 15 minutes (GitHub Actions cron uses UTC)
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      include_staging:
+        description: Check STAGING_WEB_BASE_URL secret
+        required: false
+        type: boolean
+        default: true
+      include_production:
+        description: Check PRODUCTION_WEB_BASE_URL secret
+        required: false
+        type: boolean
+        default: true
+      require_tls:
+        description: Require https URLs
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  uptime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Uptime check
+        shell: pwsh
+        env:
+          STAGING_WEB_BASE_URL: ${{ secrets.STAGING_WEB_BASE_URL }}
+          PRODUCTION_WEB_BASE_URL: ${{ secrets.PRODUCTION_WEB_BASE_URL }}
+        run: |
+          $params = @{ WaitSeconds = 60 }
+          if ('${{ github.event_name }}' -eq 'schedule') {
+            $params.IncludeStaging = $true
+            $params.IncludeProduction = $true
+            $params.RequireTls = $true
+          }
+          else {
+            if ('${{ inputs.include_staging }}' -eq 'true') { $params.IncludeStaging = $true }
+            if ('${{ inputs.include_production }}' -eq 'true') { $params.IncludeProduction = $true }
+            if ('${{ inputs.require_tls }}' -eq 'true') { $params.RequireTls = $true }
+          }
+          & ./scripts/uptime-check.ps1 @params

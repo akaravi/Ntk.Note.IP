@@ -1,0 +1,58 @@
+name: Deploy staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'GHCR image tag (e.g. v1.2.3 or 1.2.3)'
+        required: true
+        type: string
+      run_smoke:
+        description: Run post-deploy smoke on STAGING_WEB_BASE_URL
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Approve and deploy to staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Image coordinates
+        id: img
+        run: |
+          repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          ref="ghcr.io/${repo}/ipnote-web:${{ inputs.image_tag }}"
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Staging deploy"
+            echo ""
+            echo "Image: \`${ref}\`"
+            echo ""
+            echo "On the staging host:"
+            echo '```bash'
+            echo "export IPNOTE_WEB_IMAGE=${ref}"
+            echo "docker pull \"\$IPNOTE_WEB_IMAGE\""
+            echo "docker compose -f docker-compose.prod.yml -f docker-compose.prod.registry.yml up -d"
+            echo '```'
+            echo ""
+            echo "See [container-registry.md](../docs/runbooks/container-registry.md)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    needs: deploy
+    if: inputs.run_smoke == true
+    uses: ./.github/workflows/staging-smoke.yml
+    with:
+      wait_seconds: '90'
+      skip_k6: true
+      skip_spa: false
+      require_tls: true
+    secrets:
+      STAGING_WEB_BASE_URL: ${{ secrets.STAGING_WEB_BASE_URL }}

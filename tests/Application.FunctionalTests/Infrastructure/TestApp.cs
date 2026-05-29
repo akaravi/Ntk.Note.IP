@@ -1,12 +1,12 @@
-using CleanArchitecture.Domain.Constants;
-using CleanArchitecture.Infrastructure.Data;
-using CleanArchitecture.Infrastructure.Identity;
+using Ntk.Note.IP.Domain.Constants;
+using Ntk.Note.IP.Infrastructure.Data;
+using Ntk.Note.IP.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CleanArchitecture.Application.FunctionalTests.Infrastructure;
+namespace Ntk.Note.IP.Application.FunctionalTests.Infrastructure;
 
 public static class TestApp
 {
@@ -111,6 +111,9 @@ public static class TestApp
 
         await context.SaveChangesAsync();
     }
+
+    public static Task<string> GetHttpStringAsync(string path) =>
+        FunctionalTestSetup.HttpClient.GetStringAsync(path);
 
     public static async Task<int> CountAsync<TEntity>() where TEntity : class
     {

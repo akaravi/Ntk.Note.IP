@@ -1,4 +1,4 @@
-namespace CleanArchitecture.Web.AcceptanceTests.Pages;
+namespace Ntk.Note.IP.Web.AcceptanceTests.Pages;
 
 public abstract class BasePage(IPage page)
 {

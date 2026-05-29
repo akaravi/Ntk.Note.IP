@@ -1,4 +1,4 @@
-namespace CleanArchitecture.Web.AcceptanceTests.Pages;
+namespace Ntk.Note.IP.Web.AcceptanceTests.Pages;
 
 public class LoginPage(IPage page) : BasePage(page)
 {
@@ -13,8 +13,9 @@ public class LoginPage(IPage page) : BasePage(page)
     public Task ClickLogin()
         => Page.Locator("button[type='submit']").ClickAsync();
 
-    public Task<string?> LogoutButtonText()
-        => Page.Locator("a:has-text('Log out')").TextContentAsync();
+    public Task AssertLogoutVisibleAsync()
+        => Assertions.Expect(Page.Locator("[data-testid='nav-logout']")).ToBeVisibleAsync(
+            new LocatorAssertionsToBeVisibleOptions { Timeout = 15_000 });
 
     public Task AssertErrorVisible()
         => Assertions.Expect(Page.Locator("#login-error")).ToBeVisibleAsync();

@@ -1,3 +1,4 @@
+@use "design-tokens";
 @use "sass:map";
 @use "@picocss/pico/scss/index" as * with (
   $theme-color: "violet",
@@ -9,6 +10,10 @@
 // ── Base font size & typography ───────────────────────────────────────────────
 html {
   font-size: 95%;
+}
+
+body.ip-locale-fa {
+  --pico-font-family-sans-serif: "Vazirmatn", "Inter", system-ui, sans-serif;
 }
 
 :root {
@@ -69,6 +74,16 @@ app-nav-menu > header nav > ul:first-child a {
   color: var(--pico-contrast);
 }
 
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.auth-switch {
+  margin-top: 1rem;
+}
+
 // ── Login / Register centered layout ──────────────────────────────────────────
 app-root > main:has(> app-login, > app-register) {
   display: flex;
@@ -107,6 +122,19 @@ app-root > main:has(> app-login, > app-register) {
   background: var(--pico-muted-border-color);
   padding: 0;
   margin-inline: 0.25rem;
+}
+
+.nav-lang {
+  min-width: 2.5rem;
+  padding-inline: 0.65rem;
+  font-weight: 600;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1.5rem var(--pico-block-spacing-horizontal);
+  color: var(--ip-text-muted, var(--pico-muted-color));
+  border-top: 1px solid var(--ip-border, var(--pico-muted-border-color));
 }
 
 // ── Theme toggle ───────────────────────────────────────────────────────────────

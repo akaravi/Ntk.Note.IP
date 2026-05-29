@@ -1,0 +1,38 @@
+# Single-server production sample (SQLite file volume).
+# For PostgreSQL use overlay: docker-compose.prod.postgresql.yml
+services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    volumes:
+      - ipnote-data:/data
+    mem_limit: 512m
+    cpus: "1.0"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__IPNoteDb: Data Source=/data/ipnote.db
+    volumes:
+      - ipnote-data:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    mem_limit: 768m
+    cpus: "1.5"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+
+volumes:
+  ipnote-data:

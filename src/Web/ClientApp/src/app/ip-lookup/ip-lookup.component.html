@@ -1,0 +1,440 @@
+<section class="ip-lookup" data-testid="ip-lookup-page" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="ip-lookup__hero">
+    <h1>{{ i18n.t('IP.LOOKUP') }}</h1>
+    <p class="ip-lookup__tagline">{{ i18n.t('APP.TAGLINE') }}</p>
+  </header>
+
+  @if (error()) {
+    <article class="ip-lookup__alert" role="alert">{{ error() }}</article>
+  }
+
+  <article class="ip-lookup__card ip-lookup__hero-card ip-lookup__hero-card--primary">
+    @if (myIp(); as ip) {
+      <p class="ip-lookup__hero-ip-display" data-testid="my-ip-address" [attr.aria-label]="i18n.t('IP.ADDRESS')">{{ ip.address }}</p>
+      <p class="ip-lookup__hero-label">{{ i18n.t('IP.MY_IP') }}</p>
+      <div class="ip-lookup__badges">
+        <span class="ip-lookup__badge">{{ ip.isIPv6 ? i18n.t('IP.IPV6') : i18n.t('IP.IPV4') }}</span>
+        <span class="ip-lookup__badge ip-lookup__badge--muted">{{ i18n.t('IP.SCOPE') }}: {{ ip.scope }}</span>
+      </div>
+      <button type="button" class="ip-lookup__note-btn outline" data-testid="note-this-ip" (click)="noteThisIp()">
+        {{ i18n.t('IP.NOTE_THIS') }}
+      </button>
+      @if (localIpAddress(); as local) {
+        <p class="ip-lookup__local">
+          {{ i18n.t('IP.LOCAL_IP') }}:
+          <span class="ip-lookup__mono">{{ local }}</span>
+        </p>
+      } @else {
+        <p class="ip-lookup__muted">{{ i18n.t('IP.LOCAL_IP_UNAVAILABLE') }}</p>
+      }
+      <div class="ip-lookup__row ip-lookup__plain-actions">
+        <button type="button" class="secondary" (click)="copyAddress()">
+          {{ addressCopied() ? i18n.t('IP.COPIED') : i18n.t('IP.COPY') }}
+        </button>
+        <button type="button" class="outline" (click)="toggleQr()">
+          {{ showQr() ? i18n.t('IP.QR_HIDE') : i18n.t('IP.QR_SHOW') }}
+        </button>
+        <button type="button" class="outline" (click)="copyPlainIp()">
+          {{ plainCopied() ? i18n.t('IP.PLAIN_COPIED') : i18n.t('IP.PLAIN_TEXT') }}
+        </button>
+      </div>
+      @if (showQr() && qrDataUrl(); as qr) {
+        <img class="ip-lookup__qr" [src]="qr" [alt]="i18n.t('IP.QR_ALT')" width="220" height="220" />
+      }
+    } @else if (loading()) {
+      <p>{{ i18n.t('COMMON.LOADING') }}</p>
+    }
+  </article>
+
+  <article class="ip-lookup__card ip-lookup__device-card">
+    <h2>{{ i18n.t('DEVICE.TITLE') }}</h2>
+    <dl class="ip-lookup__mini-dl">
+      <dt>{{ i18n.t('DEVICE.BROWSER') }}</dt>
+      <dd>{{ device.browser }}</dd>
+      <dt>{{ i18n.t('DEVICE.OS') }}</dt>
+      <dd>{{ device.os }}</dd>
+      <dt>{{ i18n.t('DEVICE.TYPE') }}</dt>
+      <dd>{{ device.device }}</dd>
+      <dt>{{ i18n.t('DEVICE.LANGUAGE') }}</dt>
+      <dd>{{ device.language }}</dd>
+    </dl>
+  </article>
+
+  <article class="ip-lookup__card ip-lookup__curl-card">
+    <h2>{{ i18n.t('CMD.TITLE') }}</h2>
+    <p class="ip-lookup__muted">{{ i18n.t('CMD.HINT') }}</p>
+    <div class="ip-lookup__tabs" role="tablist">
+      @for (tab of curlTabs; track tab.id) {
+        <button
+          type="button"
+          role="tab"
+          class="ip-lookup__tab"
+          [class.ip-lookup__tab--active]="activeCurlTab() === tab.id"
+          [attr.aria-selected]="activeCurlTab() === tab.id"
+          (click)="activeCurlTab.set(tab.id)"
+        >
+          {{ i18n.t(tab.labelKey) }}
+        </button>
+      }
+    </div>
+    <pre class="ip-lookup__code">{{ activeCurlCommand() }}</pre>
+    <button type="button" class="secondary" (click)="copyCurlCommand()">
+      {{ curlCopied() ? i18n.t('IP.COPIED') : i18n.t('CMD.COPY') }}
+    </button>
+  </article>
+
+  <article class="ip-lookup__card ip-lookup__code-card">
+    <h2>{{ i18n.t('CODE.TITLE') }}</h2>
+    <p class="ip-lookup__muted">{{ i18n.t('CODE.HINT') }}</p>
+    <div class="ip-lookup__tabs" role="tablist">
+      @for (tab of codeTabs; track tab.id) {
+        <button
+          type="button"
+          role="tab"
+          class="ip-lookup__tab"
+          [class.ip-lookup__tab--active]="activeCodeTab() === tab.id"
+          [attr.aria-selected]="activeCodeTab() === tab.id"
+          (click)="activeCodeTab.set(tab.id)"
+        >
+          {{ i18n.t(tab.labelKey) }}
+        </button>
+      }
+    </div>
+    <pre class="ip-lookup__code">{{ activeCodeSnippet() }}</pre>
+    <button type="button" class="secondary" (click)="copyCodeSnippet()">
+      {{ codeCopied() ? i18n.t('IP.COPIED') : i18n.t('CODE.COPY') }}
+    </button>
+  </article>
+
+  @if (historyEntries().length || historySyncing()) {
+    <article class="ip-lookup__card ip-lookup__history" data-testid="ip-history-section">
+      <div class="ip-lookup__history-head">
+        <h2>{{ i18n.t('IP.HISTORY') }}</h2>
+        @if (historySyncing()) {
+          <small class="ip-lookup__muted">{{ i18n.t('IP.HISTORY_SYNC') }}</small>
+        }
+        <button type="button" class="outline contrast" (click)="clearHistory()">
+          {{ i18n.t('IP.HISTORY_CLEAR') }}
+        </button>
+      </div>
+      <ul class="ip-lookup__history-list">
+        @for (item of historyEntries(); track item.id) {
+          <li>
+            <button type="button" class="ip-lookup__history-item" data-testid="ip-history-item" (click)="selectHistoryEntry(item)">
+              <span class="ip-lookup__mono">{{ item.address }}</span>
+              <small>
+                {{ formatHistoryWhen(item.recordedAt) }}
+                @if (item.city || item.countryCode) {
+                  · {{ item.city }}{{ item.city && item.countryCode ? ', ' : '' }}{{ item.countryCode }}
+                }
+                @if (item.deviceLabel) {
+                  · {{ item.deviceLabel }}
+                }
+              </small>
+            </button>
+            <button
+              type="button"
+              class="ip-lookup__history-remove"
+              [attr.aria-label]="i18n.t('IP.HISTORY_REMOVE')"
+              (click)="removeHistoryEntry(item.id, $event)"
+            >
+              ×
+            </button>
+          </li>
+        }
+      </ul>
+    </article>
+  }
+
+  <form class="ip-lookup__card" (ngSubmit)="lookup()">
+    <label for="ip-address">{{ i18n.t('IP.ENTER_ADDRESS') }}</label>
+    <div class="ip-lookup__row">
+      <input
+        id="ip-address"
+        data-testid="ip-address-input"
+        name="address"
+        type="text"
+        inputmode="decimal"
+        [ngModel]="address()"
+        (ngModelChange)="address.set($event)"
+        placeholder="203.0.113.1"
+        autocomplete="off"
+      />
+      <button type="submit" data-testid="ip-lookup-submit" [disabled]="loading()">
+        {{ i18n.t('IP.LOOKUP_BUTTON') }}
+      </button>
+    </div>
+  </form>
+
+  <article class="ip-lookup__card" id="ip-tool-tools">
+    <h2>{{ i18n.t('TOOLS.TITLE') }}</h2>
+    <button type="button" (click)="runTools()" [disabled]="toolsLoading() || !address()">
+      {{ i18n.t('TOOLS.WHOIS') }} / {{ i18n.t('TOOLS.BLACKLIST') }} / {{ i18n.t('TOOLS.PRIVACY') }}
+    </button>
+
+    @if (whois(); as w) {
+      <h3>{{ i18n.t('TOOLS.WHOIS') }}</h3>
+      <p class="ip-lookup__mono">{{ w.handle }} — {{ w.name }} ({{ w.country }})</p>
+      <small>{{ w.startAddress }} – {{ w.endAddress }}</small>
+    }
+
+    @if (blacklist(); as bl) {
+      <h3>{{ i18n.t('TOOLS.BLACKLIST') }}</h3>
+      <ul>
+        @for (hit of bl; track hit.listId) {
+          <li>
+            {{ hit.listName }}:
+            {{ hit.isListed ? i18n.t('TOOLS.LISTED') : i18n.t('TOOLS.CLEAN') }}
+            <span class="ip-lookup__muted">({{ hit.responseCode }})</span>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (privacy(); as p) {
+      <h3>{{ i18n.t('TOOLS.PRIVACY') }}</h3>
+      <p>
+        Proxy: {{ p.proxy }} · Hosting: {{ p.hosting }} · Mobile: {{ p.mobile }} · Tor: {{ p.tor }}
+      </p>
+    }
+
+    <form (ngSubmit)="calculateSubnet()" class="ip-lookup__subnet-form">
+      <label for="cidr-input">{{ i18n.t('TOOLS.CIDR') }}</label>
+      <div class="ip-lookup__row">
+        <input id="cidr-input" name="cidr" [ngModel]="cidr()" (ngModelChange)="cidr.set($event)" />
+        <button type="submit" [disabled]="toolsLoading()">{{ i18n.t('TOOLS.SUBNET') }}</button>
+      </div>
+    </form>
+
+    @if (subnet(); as s) {
+      <p class="ip-lookup__mono">
+        {{ s.networkAddress }} – {{ s.broadcastAddress }} ({{ s.usableHosts }} hosts)
+      </p>
+    }
+  </article>
+
+  <form class="ip-lookup__card" id="ip-tool-whois-domain" (ngSubmit)="loadDomainWhois()">
+    <h2>{{ i18n.t('TOOLS.WHOIS_DOMAIN') }}</h2>
+    <div class="ip-lookup__row">
+      <input
+        type="text"
+        [ngModel]="domain()"
+        (ngModelChange)="domain.set($event)"
+        name="whois-domain"
+        placeholder="example.com"
+      />
+      <button type="submit" [disabled]="dnsLoading()">{{ i18n.t('TOOLS.WHOIS_DOMAIN') }}</button>
+    </div>
+    @if (whoisDomain(); as wd) {
+      <p class="ip-lookup__mono">{{ wd.handle }} — {{ wd.name }}</p>
+      <small>{{ wd.status }} · {{ wd.expirationDate }}</small>
+      <ul>
+        @for (ns of wd.nameServers; track ns) {
+          <li class="ip-lookup__mono">{{ ns }}</li>
+        }
+      </ul>
+    }
+  </form>
+
+  <article class="ip-lookup__card" id="ip-tool-port">
+    <h2>{{ i18n.t('TOOLS.PORT') }} / {{ i18n.t('TOOLS.SSL') }}</h2>
+    <div class="ip-lookup__row">
+      <input type="number" min="1" max="65535" [ngModel]="checkPort()" (ngModelChange)="checkPort.set($event)" name="port" />
+      <button type="button" (click)="checkPortOpen()" [disabled]="toolsLoading()">{{ i18n.t('TOOLS.PORT') }}</button>
+      <button type="button" (click)="loadSslCert()" [disabled]="toolsLoading()" class="outline">{{ i18n.t('TOOLS.SSL') }}</button>
+    </div>
+    @if (portCheck(); as pc) {
+      <p>
+        {{ pc.host }}:{{ pc.port }} —
+        {{ pc.isOpen ? i18n.t('TOOLS.PORT_OPEN') : i18n.t('TOOLS.PORT_CLOSED') }}
+        @if (pc.latencyMs != null) {
+          <span class="ip-lookup__muted">({{ pc.latencyMs }} ms)</span>
+        }
+      </p>
+    }
+    @if (sslCert(); as cert) {
+      <p class="ip-lookup__mono">{{ cert.subject }}</p>
+      <small>{{ cert.issuer }} · {{ cert.notAfter }}</small>
+    }
+  </article>
+
+  <form class="ip-lookup__card" id="ip-tool-dns" (ngSubmit)="resolveDns()">
+    <h2>{{ i18n.t('DNS.RESOLVE') }}</h2>
+    <label for="dns-domain">{{ i18n.t('DNS.DOMAIN') }}</label>
+    <div class="ip-lookup__row">
+      <input
+        id="dns-domain"
+        name="domain"
+        type="text"
+        [ngModel]="domain()"
+        (ngModelChange)="domain.set($event)"
+        placeholder="example.com"
+        autocomplete="off"
+      />
+      <button type="submit" [disabled]="dnsLoading()">
+        {{ i18n.t('DNS.RESOLVE') }}
+      </button>
+    </div>
+  </form>
+
+  <form class="ip-lookup__card" id="ip-tool-propagation" (ngSubmit)="checkPropagation()">
+    <h2>{{ i18n.t('DNS.PROPAGATION') }}</h2>
+    <p class="ip-lookup__muted">{{ i18n.t('DNS.PROPAGATION_HINT') }}</p>
+    <div class="ip-lookup__row">
+      <label for="prop-type">{{ i18n.t('DNS.TYPE') }}</label>
+      <select
+        id="prop-type"
+        name="propType"
+        [ngModel]="propagationType()"
+        (ngModelChange)="propagationType.set($event)"
+      >
+        <option value="A">A</option>
+        <option value="AAAA">AAAA</option>
+        <option value="MX">MX</option>
+        <option value="TXT">TXT</option>
+        <option value="NS">NS</option>
+        <option value="CNAME">CNAME</option>
+      </select>
+      <button type="submit" [disabled]="propagationLoading()">
+        {{ i18n.t('DNS.PROPAGATION_CHECK') }}
+      </button>
+    </div>
+  </form>
+
+  @if (propagation(); as prop) {
+    <article class="ip-lookup__card">
+      <h2>{{ i18n.t('DNS.PROPAGATION') }} — {{ prop.domain }} ({{ prop.recordType }})</h2>
+      <div class="ip-lookup__table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ i18n.t('DNS.RESOLVER') }}</th>
+              <th>{{ i18n.t('DNS.VALUE') }}</th>
+              <th>{{ i18n.t('DNS.STATUS') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of prop.resolvers; track row.resolverName) {
+              <tr>
+                <td>{{ row.resolverName }}</td>
+                <td class="ip-lookup__mono">
+                  @if (row.values.length) {
+                    @for (v of row.values; track v) {
+                      <div>{{ v }}</div>
+                    }
+                  } @else {
+                    —
+                  }
+                </td>
+                <td
+                  [class.ip-lookup__status--ok]="row.matchesReference"
+                  [class.ip-lookup__status--warn]="!row.matchesReference"
+                >
+                  {{
+                    row.matchesReference
+                      ? i18n.t('DNS.MATCHES')
+                      : i18n.t('DNS.DIFFERS')
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+
+  @if (dnsResult(); as dns) {
+    <article class="ip-lookup__card">
+      <h2>{{ i18n.t('DNS.RECORDS') }} — {{ dns.domain }}</h2>
+      <div class="ip-lookup__table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ i18n.t('DNS.TYPE') }}</th>
+              <th>{{ i18n.t('DNS.VALUE') }}</th>
+              <th>{{ i18n.t('DNS.TTL') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of dns.records; track row.type + row.value) {
+              <tr>
+                <td>{{ row.type }}</td>
+                <td class="ip-lookup__mono">{{ row.value }}</td>
+                <td>{{ row.ttl ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+
+  @if (detailsLoading()) {
+    <p class="ip-lookup__muted">{{ i18n.t('COMMON.LOADING') }}</p>
+  }
+
+  @if (details(); as d) {
+    @if (d.geo.latitude != null && d.geo.longitude != null) {
+      <article class="ip-lookup__card ip-lookup__map-card">
+        <h2>{{ i18n.t('IP.MAP') }}</h2>
+        <a
+          class="ip-lookup__map-link"
+          [href]="mapOpenUrl(d.geo.latitude!, d.geo.longitude!)"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            class="ip-lookup__map-img"
+            [src]="mapStaticUrl(d.geo.latitude!, d.geo.longitude!)"
+            [alt]="i18n.t('IP.MAP_ALT')"
+            width="640"
+            height="280"
+            loading="lazy"
+          />
+        </a>
+      </article>
+    }
+
+    <article class="ip-lookup__card ip-lookup__network-card">
+      <h2>{{ i18n.t('IP.NETWORK_CARD') }}</h2>
+      <dl class="ip-lookup__mini-dl">
+        <dt>{{ i18n.t('IP.ISP') }}</dt>
+        <dd>{{ d.isp || '—' }}</dd>
+        <dt>{{ i18n.t('IP.ASN') }}</dt>
+        <dd>
+          @if (d.asn.number) {
+            AS{{ d.asn.number }}
+          }
+          {{ d.asn.organization || '—' }}
+        </dd>
+        <dt>{{ i18n.t('IP.REVERSE_DNS') }}</dt>
+        <dd class="ip-lookup__mono">{{ d.reverseDns || '—' }}</dd>
+        <dt>{{ i18n.t('IP.SCOPE') }}</dt>
+        <dd>{{ d.scope }}</dd>
+      </dl>
+    </article>
+
+    <article class="ip-lookup__card ip-lookup__details">
+      <h2>{{ i18n.t('IP.DETAILS_TITLE') }}</h2>
+      <dl>
+        <dt>{{ i18n.t('IP.ADDRESS') }}</dt>
+        <dd class="ip-lookup__mono">{{ d.address }}</dd>
+
+        <dt>{{ i18n.t('IP.GEO') }}</dt>
+        <dd>
+          {{ d.geo.city }}, {{ d.geo.region }} ({{ d.geo.countryCode }})
+          @if (d.geo.latitude != null && d.geo.longitude != null) {
+            <span class="ip-lookup__muted">
+              — {{ d.geo.latitude }}, {{ d.geo.longitude }}
+            </span>
+          }
+        </dd>
+
+        <dt>{{ i18n.t('IP.TIMEZONE') }}</dt>
+        <dd>{{ d.geo.timezone || '—' }}</dd>
+
+      </dl>
+    </article>
+  }
+</section>

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CleanArchitecture.TestAppHost</RootNamespace>
-    <AssemblyName>CleanArchitecture.TestAppHost</AssemblyName>
+    <RootNamespace>Ntk.Note.IP.TestAppHost</RootNamespace>
+    <AssemblyName>Ntk.Note.IP.TestAppHost</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

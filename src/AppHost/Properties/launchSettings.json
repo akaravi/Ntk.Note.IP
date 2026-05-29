@@ -5,25 +5,25 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://cleanarchitecture.dev.localhost:17000;http://cleanarchitecture.dev.localhost:15000",
+      "applicationUrl": "https://Ntk.Note.IP.dev.localhost:5344;http://Ntk.Note.IP.dev.localhost:5343",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DOTNET_ENVIRONMENT": "Development",
-        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:21000",
-        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22000"
+        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:5347",
+        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:5348"
       }
     },
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://cleanarchitecture.dev.localhost:15000",
+      "applicationUrl": "http://Ntk.Note.IP.dev.localhost:5343",
       "environmentVariables": {
         "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DOTNET_ENVIRONMENT": "Development",
-        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "http://localhost:19000",
-        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:20000"
+        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "http://localhost:5345",
+        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:5346"
       }
     },
     "manifest": {

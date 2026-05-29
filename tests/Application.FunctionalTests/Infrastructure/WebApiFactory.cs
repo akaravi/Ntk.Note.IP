@@ -1,18 +1,37 @@
-using CleanArchitecture.Application.Common.Interfaces;
+using Microsoft.Extensions.Hosting;
+using Ntk.Note.IP.Application.Common.Interfaces;
+using Ntk.Note.IP.Infrastructure.Blacklist;
+using Ntk.Note.IP.Infrastructure.DnsResolution;
+using Ntk.Note.IP.Infrastructure.IpLookup;
+using Ntk.Note.IP.Infrastructure.Whois;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace CleanArchitecture.Application.FunctionalTests.Infrastructure;
+namespace Ntk.Note.IP.Application.FunctionalTests.Infrastructure;
 
 public class WebApiFactory(string connectionString) : WebApplicationFactory<Program>
 {
+    internal static TestClientIpResolver ClientIpResolver { get; } = new("203.0.113.25");
+
+    internal static TrackingPushSender PushSender { get; } = new();
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        TestDatabaseMigrator.EnsureLatestSchema(connectionString);
+        return base.CreateHost(builder);
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment(Environments.Development);
+
         builder
-            .UseSetting("ConnectionStrings:CleanArchitectureDb", connectionString);
+            .UseSetting("ConnectionStrings:IPNoteDb", connectionString);
+
+        builder.UseSetting("Push:Enabled", "true");
 
         builder.ConfigureTestServices(services =>
         {
@@ -25,6 +44,32 @@ public class WebApiFactory(string connectionString) : WebApplicationFactory<Prog
                     mock.SetupGet(x => x.Id).Returns(TestApp.GetUserId());
                     return mock.Object;
                 });
+
+            services
+                .RemoveAll<IClientIpResolver>()
+                .AddSingleton<IClientIpResolver>(ClientIpResolver);
+
+            services
+                .RemoveAll<IPushSender>()
+                .AddSingleton<IPushSender>(PushSender);
+
+            services.RemoveAll<IIpLookupProvider>();
+            services.AddSingleton<IIpLookupProvider, FakeIpLookupProvider>();
+
+            services.RemoveAll<IDnsLookupService>();
+            services.AddSingleton<IDnsLookupService, TestDnsLookupService>();
+
+            services.RemoveAll<IDnsResolutionService>();
+            services.AddSingleton<IDnsResolutionService, FakeDnsResolutionService>();
+
+            services.RemoveAll<IDnsPropagationChecker>();
+            services.AddSingleton<IDnsPropagationChecker, FakeDnsPropagationChecker>();
+
+            services.RemoveAll<IWhoisProvider>();
+            services.AddSingleton<IWhoisProvider, FakeWhoisProvider>();
+
+            services.RemoveAll<IBlacklistChecker>();
+            services.AddSingleton<IBlacklistChecker, FakeBlacklistChecker>();
         });
     }
 }
