@@ -8,8 +8,11 @@
   Quick dev (build + tests + i18n, no ZIP, start Aspire):
     .\_build-all-projects.ps1 -SkipPackage
 
-  Release artifact ZIP (Web publish + Flutter Android + SPA in wwwroot):
+  Release artifact ZIP (Web publish + Flutter Android APK/AAB + SPA in wwwroot):
     .\_build-all-projects.ps1 -Configuration Release
+
+  APK only (no Play Store bundle):
+    .\_build-all-projects.ps1 -Configuration Release -PackageOnly -AndroidArtifact apk
 
   Build only (no dev servers):
     .\_build-all-projects.ps1 -SkipPackage -SkipDevServers
@@ -35,7 +38,7 @@ param(
     [switch]$SkipFlutterAnalyze,
     [switch]$SkipFlutterAndroid,
     [ValidateSet("apk", "appbundle", "all")]
-    [string]$AndroidArtifact = "appbundle",
+    [string]$AndroidArtifact = "all",
     [string]$ApiBaseUrl = "https://api.ipnote.ir",
 
     [switch]$SkipSpa,
@@ -261,11 +264,24 @@ function Invoke-FlutterAndroidRelease {
 
     $outputs = Join-Path $flutterAppPath "build\app\outputs"
     if (Test-Path -LiteralPath $outputs) {
-        Get-ChildItem -Path $outputs -Recurse -Include *.apk, *.aab -ErrorAction SilentlyContinue |
-            ForEach-Object {
-                Copy-Item -Force $_.FullName (Join-Path $androidPublishDir $_.Name)
+        $copied = @(
+            Get-ChildItem -Path $outputs -Recurse -Include *.apk, *.aab -ErrorAction SilentlyContinue |
+                ForEach-Object {
+                    $dest = Join-Path $androidPublishDir $_.Name
+                    Copy-Item -Force $_.FullName $dest
+                    Get-Item -LiteralPath $dest
+                }
+        )
+        if ($copied.Count -gt 0) {
+            Write-Host "Android artifacts copied -> $androidPublishDir" -ForegroundColor Green
+            foreach ($artifact in $copied) {
+                $kind = if ($artifact.Extension -eq ".apk") { "APK" } else { "AAB" }
+                Write-Host "  [$kind] $($artifact.FullName)" -ForegroundColor DarkGreen
             }
-        Write-Host "Android artifacts copied -> $androidPublishDir" -ForegroundColor Green
+        }
+        else {
+            Write-Warning "No .apk or .aab found under $outputs"
+        }
     }
 }
 
@@ -310,6 +326,9 @@ function Invoke-DeployZip {
             foreach ($f in $androidFiles) {
                 Copy-Item -Force $f.FullName (Join-Path $androidStage $f.Name)
             }
+            $apkCount = @($androidFiles | Where-Object { $_.Extension -eq ".apk" }).Count
+            $aabCount = @($androidFiles | Where-Object { $_.Extension -eq ".aab" }).Count
+            Write-Host "ZIP mobile_android: $apkCount APK, $aabCount AAB" -ForegroundColor DarkGray
         }
     }
 
@@ -410,4 +429,5 @@ Write-Host "Tips:" -ForegroundColor DarkYellow
 Write-Host "  -SkipPackage     daily dev build (default companion to run-all)" -ForegroundColor DarkGray
 Write-Host "  -Configuration Release -PackageOnly   release ZIP without AppHost" -ForegroundColor DarkGray
 Write-Host "  -SkipStopRunningProjects   skip killing AppHost/Web before build" -ForegroundColor DarkGray
+Write-Host "  -AndroidArtifact apk|appbundle|all   default all (APK + AAB in ZIP)" -ForegroundColor DarkGray
 Write-Host "  -SkipFlutterAndroid   release ZIP without mobile artifacts" -ForegroundColor DarkGray

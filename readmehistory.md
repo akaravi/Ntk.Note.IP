@@ -1,5 +1,17 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-29 22:30 (Asia/Tehran)
+
+- **DevOps:** `_build-all-projects.ps1` — پیش‌فرض `-AndroidArtifact all` (APK + AAB)؛ لاگ مسیر APK/AAB در `publish\flutter\android` و داخل ZIP `mobile_android/`.
+
+## 2026-05-29 22:15 (Asia/Tehran)
+
+- **DevOps:** `FolderProfile.pubxml` — `SatelliteResourceLanguages=en` (publish بدون پوشه‌های de/es/fr/pt/…).
+
+## 2026-05-29 22:00 (Asia/Tehran)
+
+- **DevOps:** `src/Web/Properties/PublishProfiles/FolderProfile.pubxml` + `FolderProfile-Debug.pubxml` (file-system publish to `artifacts/publish/web`). `.gitignore` allows `Properties/PublishProfiles/*.pubxml`. `publish-api.ps1` uses `/p:PublishProfile=`.
+
 ## 2026-05-29 19:45 (Asia/Tehran)
 
 - **Tests:** `TestDatabaseMigrator` repairs stale Aspire SQLite (IpNotes snapshot columns); single-run lock. Production/RateLimit factories set environment after `base.ConfigureWebHost`. Functional tests 42/42 Release.
