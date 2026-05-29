@@ -58,7 +58,7 @@ if (Test-Path $keyProps) {
     Write-Host "Android: release signing via android/key.properties" -ForegroundColor Green
 }
 else {
-    Write-Host "WARN: android/key.properties missing — Android release uses debug signing." -ForegroundColor Yellow
+    Write-Host "WARN: android/key.properties missing - Android release uses debug signing." -ForegroundColor Yellow
     Write-Host "      Copy android/key.properties.example and add upload keystore." -ForegroundColor DarkGray
 }
 

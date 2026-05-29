@@ -71,8 +71,8 @@ public class RateLimitingApiTests
     {
         protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
         {
-            builder.UseEnvironment(Environments.Production);
             base.ConfigureWebHost(builder);
+            builder.UseEnvironment(Environments.Production);
 
             if (guestPermitLimit.HasValue)
             {

@@ -1,5 +1,10 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-29 19:45 (Asia/Tehran)
+
+- **Tests:** `TestDatabaseMigrator` repairs stale Aspire SQLite (IpNotes snapshot columns); single-run lock. Production/RateLimit factories set environment after `base.ConfigureWebHost`. Functional tests 42/42 Release.
+- **DevOps:** `flutter-release-build.ps1` PowerShell parse fix (ASCII warn). Package ZIP: `D:\PublishKaravi\IPNote.ir\IPNote_ir_Build_20260529_191739.zip` (~83 MB).
+
 ## 2026-05-29 21:30 (Asia/Tehran)
 
 - **Feature:** Home page — IP address shown large; small «یاداشت کن» button routes to `/ip-notes?capture=1` (authenticated) or login with return URL.

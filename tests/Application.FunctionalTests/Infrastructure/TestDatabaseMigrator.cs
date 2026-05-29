@@ -9,6 +9,9 @@ namespace Ntk.Note.IP.Application.FunctionalTests.Infrastructure;
 /// </summary>
 internal static class TestDatabaseMigrator
 {
+    private static readonly SemaphoreSlim Gate = new(1, 1);
+    private static bool _schemaReady;
+
     private const string SnapshotMigrationId = "20260529152256_AddIpNoteSnapshotMetadata";
 
     private static readonly Dictionary<string, string> IpNoteSnapshotAlterSql = new(StringComparer.Ordinal)
@@ -27,6 +30,33 @@ internal static class TestDatabaseMigrator
     };
 
     public static async Task EnsureLatestSchemaAsync(string connectionString, CancellationToken cancellationToken = default)
+    {
+        if (_schemaReady)
+        {
+            return;
+        }
+
+        await Gate.WaitAsync(cancellationToken);
+        try
+        {
+            if (_schemaReady)
+            {
+                return;
+            }
+
+            await ApplySchemaAsync(connectionString, cancellationToken);
+            _schemaReady = true;
+        }
+        finally
+        {
+            Gate.Release();
+        }
+    }
+
+    public static void EnsureLatestSchema(string connectionString) =>
+        EnsureLatestSchemaAsync(connectionString).GetAwaiter().GetResult();
+
+    private static async Task ApplySchemaAsync(string connectionString, CancellationToken cancellationToken)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseSqlite(connectionString)
@@ -54,9 +84,6 @@ internal static class TestDatabaseMigrator
                 "Verify migrations are included in the Infrastructure assembly.");
         }
     }
-
-    public static void EnsureLatestSchema(string connectionString) =>
-        EnsureLatestSchemaAsync(connectionString).GetAwaiter().GetResult();
 
     private static async Task RepairIpNoteSnapshotColumnsAsync(
         ApplicationDbContext context,

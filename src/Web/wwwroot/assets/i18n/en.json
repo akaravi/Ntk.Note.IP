@@ -105,7 +105,9 @@
     "ADD_NOTE": "Add note",
     "USE_MY_IP": "My IP",
     "NOTE_TAGS_HINT": "tag1, tag2",
-    "NOTE_DELETE_CONFIRM": "Delete this note?"
+    "NOTE_DELETE_CONFIRM": "Delete this note?",
+    "NOTE_THIS": "Note this",
+    "NOTE_SNAPSHOT_READY": "Time, device, and IP details will be attached to this note."
   },
   "TOOLS": {
     "TITLE": "Network tools",

@@ -105,7 +105,9 @@
     "ADD_NOTE": "افزودن یادداشت",
     "USE_MY_IP": "IP من",
     "NOTE_TAGS_HINT": "برچسب۱, برچسب۲",
-    "NOTE_DELETE_CONFIRM": "این یادداشت حذف شود؟"
+    "NOTE_DELETE_CONFIRM": "این یادداشت حذف شود؟",
+    "NOTE_THIS": "یاداشت کن",
+    "NOTE_SNAPSHOT_READY": "زمان، دستگاه و جزئیات IP برای این یادداشت ضمیمه می‌شود."
   },
   "TOOLS": {
     "TITLE": "ابزارهای شبکه",
