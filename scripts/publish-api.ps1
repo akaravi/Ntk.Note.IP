@@ -6,9 +6,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
-$defaultOutput = Join-Path $root "artifacts\publish\web"
+$defaultOutput = Join-Path $root "publish\web"
 if ($Configuration -eq "Debug") {
-    $defaultOutput = Join-Path $root "artifacts\publish\web-debug"
+    $defaultOutput = Join-Path $root "publish\web-debug"
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {

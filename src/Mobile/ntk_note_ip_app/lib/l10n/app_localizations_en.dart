@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'IPNote.ir';
+  String get appTitle => 'IP Note';
 
   @override
   String get homeTagline => 'IP notes and network intelligence';
@@ -349,7 +349,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get biometricUnlockAction => 'Unlock';
 
   @override
-  String get biometricUnlockReason => 'Verify your identity to open IPNote.ir';
+  String get biometricUnlockReason => 'Verify your identity to open IP Note';
 
   @override
   String get biometricUnlockFailed => 'Authentication failed';
@@ -558,7 +558,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get introBody =>
-      'IPNote.ir — IP lookup, notes, and network tools for web and mobile.';
+      'IP Note — IP lookup, notes, and network tools for web and mobile.';
 
   @override
   String get footerChangelog => 'Changelog';
@@ -570,10 +570,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About';
 
   @override
-  String get aboutSubtitle => 'IPNote.ir — an NTK product';
+  String get aboutSubtitle => 'IP Note — an NTK product';
 
   @override
-  String get aboutProductTitle => 'What is IPNote.ir?';
+  String get aboutProductTitle => 'What is IP Note?';
 
   @override
   String get aboutProductBody =>
@@ -627,14 +627,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyrightTitle => 'Copyright';
 
   @override
-  String get copyrightSubtitle => 'Legal information for IPNote.ir';
+  String get copyrightSubtitle => 'Legal information for IP Note';
 
   @override
   String get copyrightOwnershipTitle => 'Ownership';
 
   @override
   String get copyrightOwnershipBody =>
-      'IPNote.ir is owned by NTK / Alireza Karavi.';
+      'IP Note is owned by NTK / Alireza Karavi.';
 
   @override
   String get copyrightLicenseTitle => 'License';
@@ -648,7 +648,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyrightTrademarksBody =>
-      'IPNote.ir and NTK are related trademarks.';
+      'IP Note and NTK are related trademarks.';
 
   @override
   String get copyrightThirdPartyTitle => 'Third-party services';

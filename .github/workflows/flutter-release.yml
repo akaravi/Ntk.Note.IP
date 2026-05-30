@@ -65,17 +65,40 @@ jobs:
           API_BASE_URL: ${{ github.event.inputs.api_base_url || 'https://ipnote.ir' }}
           TARGET: ${{ github.event.inputs.target || 'appbundle' }}
         run: |
+          SYMBOLS_DIR=build/app/outputs/symbols
+          SIZE_ARGS="--obfuscate --split-debug-info=$SYMBOLS_DIR --tree-shake-icons --target-platform=android-arm,android-arm64"
           if [ "$TARGET" = "apk" ]; then
-            flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
+            flutter build apk --release --split-per-abi $SIZE_ARGS --dart-define=API_BASE_URL="$API_BASE_URL"
           else
-            flutter build appbundle --release --dart-define=API_BASE_URL="$API_BASE_URL"
+            flutter build appbundle --release $SIZE_ARGS --dart-define=API_BASE_URL="$API_BASE_URL"
           fi
+
+      - name: Publish versioned Android artifacts
+        run: |
+          VERSION=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/^version:[[:space:]]*//' | tr '+' '-build')
+          OUT=../../../publish/flutter/android
+          mkdir -p "$OUT"
+          publish() {
+            for f in "$@"; do
+              [ -f "$f" ] || continue
+              case "$f" in
+                *app-release.apk) continue ;;
+              esac
+              base=$(basename "$f")
+              ext="${base##*.}"
+              name="${base%.*}"
+              cp "$f" "$OUT/${name}_${VERSION}.${ext}"
+            done
+          }
+          publish build/app/outputs/bundle/release/*.aab
+          publish build/app/outputs/flutter-apk/*-release.apk
+          ls -lh "$OUT" || true
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-release-${{ github.sha }}
           path: |
-            src/Mobile/ntk_note_ip_app/build/app/outputs/bundle/release/*.aab
-            src/Mobile/ntk_note_ip_app/build/app/outputs/flutter-apk/*-release.apk
+            publish/flutter/android/*
+            src/Mobile/ntk_note_ip_app/build/app/outputs/symbols/**
           if-no-files-found: warn

@@ -16,7 +16,7 @@ class IpChangeBackgroundRunner {
   static const _notificationId = 41001;
 
   static Future<void> run({
-    String notificationTitle = 'IPNote.ir',
+    String notificationTitle = 'IP Note',
     String notificationBodyPrefix = 'Public IP changed to',
   }) async {
     WidgetsFlutterBinding.ensureInitialized();

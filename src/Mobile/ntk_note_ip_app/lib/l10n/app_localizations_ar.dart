@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'IPNote.ir';
+  String get appTitle => 'IP Note';
 
   @override
   String get homeTagline => 'ملاحظات IP وذكاء الشبكة';
@@ -346,7 +346,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get biometricUnlockAction => 'فتح القفل';
 
   @override
-  String get biometricUnlockReason => 'تحقق من هويتك لفتح IPNote.ir';
+  String get biometricUnlockReason => 'تحقق من هويتك لفتح IP Note';
 
   @override
   String get biometricUnlockFailed => 'فشل التحقق';
@@ -554,7 +554,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get introBody =>
-      'IPNote.ir — جستجو، یادداشت و ابزار IP برای وب و موبایل.';
+      'IP Note — جستجو، یادداشت و ابزار IP برای وب و موبایل.';
 
   @override
   String get footerChangelog => 'تغییرات';
@@ -566,10 +566,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aboutTitle => 'درباره ما';
 
   @override
-  String get aboutSubtitle => 'IPNote.ir — محصول NTK';
+  String get aboutSubtitle => 'IP Note — محصول NTK';
 
   @override
-  String get aboutProductTitle => 'IPNote.ir چیست؟';
+  String get aboutProductTitle => 'IP Note چیست؟';
 
   @override
   String get aboutProductBody =>
@@ -623,14 +623,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyrightTitle => 'حقوق نشر';
 
   @override
-  String get copyrightSubtitle => 'اطلاعات حقوقی IPNote.ir';
+  String get copyrightSubtitle => 'اطلاعات حقوقی IP Note';
 
   @override
   String get copyrightOwnershipTitle => 'مالکیت';
 
   @override
   String get copyrightOwnershipBody =>
-      'حقوق IPNote.ir متعلق به NTK / علیرضا کاروی است.';
+      'حقوق IP Note متعلق به NTK / علیرضا کاروی است.';
 
   @override
   String get copyrightLicenseTitle => 'مجوز استفاده';
@@ -644,7 +644,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get copyrightTrademarksBody =>
-      'IPNote.ir و NTK علامت‌های تجاری مرتبط هستند.';
+      'IP Note و NTK علامت‌های تجاری مرتبط هستند.';
 
   @override
   String get copyrightThirdPartyTitle => 'سرویس‌های شخص ثالث';

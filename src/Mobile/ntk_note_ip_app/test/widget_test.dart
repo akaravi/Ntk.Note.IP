@@ -33,7 +33,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('IPNote.ir'), findsWidgets);
+    expect(find.text('IP Note'), findsWidgets);
   });
 }
 

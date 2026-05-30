@@ -1,7 +1,7 @@
 name: ntk_note_ip_app
-description: IPNote.ir mobile client (Android/iOS)
+description: IP Note mobile client (Android/iOS)
 publish_to: "none"
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ^3.11.5

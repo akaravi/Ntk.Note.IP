@@ -8,8 +8,16 @@
   Quick dev (build + tests + i18n, no ZIP, start Aspire):
     .\_build-all-projects.ps1 -SkipPackage
 
-  Release artifact ZIP (Web publish + Flutter Android APK/AAB + Flutter web + SPA in wwwroot):
+  Release artifact ZIP (outputs under publish/; ZIP file written outside publish/):
     .\_build-all-projects.ps1 -Configuration Release
+
+  Publish layout (repo root):
+    publish/web              Web API Release
+    publish/web-debug        Web API Debug
+    publish/flutter/android  Android APK/AAB
+    publish/flutter/web      Flutter web
+
+  Default ZIP output: artifacts\release-zips (override with -ZipOutputDirectory)
 
   APK only (no Play Store bundle):
     .\_build-all-projects.ps1 -Configuration Release -PackageOnly -AndroidArtifact apk
@@ -59,9 +67,13 @@ $solutionPath = Join-Path $root "Ntk.Note.IP.sln"
 $webProj = Join-Path $root "src\Web\Web.csproj"
 $appHostProj = Join-Path $root "src\AppHost\AppHost.csproj"
 $flutterAppPath = Join-Path $root "src\Mobile\ntk_note_ip_app"
-$publishWebDir = Join-Path $root "artifacts\publish\web"
-$androidPublishDir = Join-Path $root "publish\flutter\android"
-$flutterWebPublishDir = Join-Path $root "publish\flutter\web"
+$publishRoot = Join-Path $root "publish"
+$publishWebDir = Join-Path $publishRoot "web"
+$publishWebDebugDir = Join-Path $publishRoot "web-debug"
+$androidPublishDir = Join-Path $publishRoot "flutter\android"
+$flutterWebPublishDir = Join-Path $publishRoot "flutter\web"
+$zipStagingDir = Join-Path $root "artifacts\zip-staging"
+$defaultZipOutputDir = Join-Path $root "artifacts\release-zips"
 
 Set-Location $root
 
@@ -265,29 +277,24 @@ function Invoke-FlutterAndroidRelease {
     & (Join-Path $root "scripts\flutter-release-build.ps1") `
         -Target $target `
         -ApiBaseUrl $ApiBaseUrl `
+        -PublishDir $androidPublishDir `
         -SkipCi
     if ($LASTEXITCODE -ne 0) { throw "flutter-release-build.ps1 failed" }
 
-    $outputs = Join-Path $flutterAppPath "build\app\outputs"
-    if (Test-Path -LiteralPath $outputs) {
-        $copied = @(
-            Get-ChildItem -Path $outputs -Recurse -Include *.apk, *.aab -ErrorAction SilentlyContinue |
-                ForEach-Object {
-                    $dest = Join-Path $androidPublishDir $_.Name
-                    Copy-Item -Force $_.FullName $dest
-                    Get-Item -LiteralPath $dest
-                }
-        )
-        if ($copied.Count -gt 0) {
-            Write-Host "Android artifacts copied -> $androidPublishDir" -ForegroundColor Green
-            foreach ($artifact in $copied) {
-                $kind = if ($artifact.Extension -eq ".apk") { "APK" } else { "AAB" }
-                Write-Host "  [$kind] $($artifact.FullName)" -ForegroundColor DarkGreen
-            }
+    $published = @(
+        Get-ChildItem -Path $androidPublishDir -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.Extension -in @(".apk", ".aab") -and $_.Name -match '_\d+\.\d+\.\d+-build\d+' }
+    )
+    if ($published.Count -gt 0) {
+        Write-Host "Android versioned artifacts -> $androidPublishDir" -ForegroundColor Green
+        foreach ($artifact in $published) {
+            $kind = if ($artifact.Extension -eq ".apk") { "APK" } else { "AAB" }
+            $sizeMb = [math]::Round($artifact.Length / 1MB, 2)
+            Write-Host "  [$kind] $($artifact.Name) ($sizeMb MB)" -ForegroundColor DarkGreen
         }
-        else {
-            Write-Warning "No .apk or .aab found under $outputs"
-        }
+    }
+    else {
+        Write-Warning "No versioned .apk or .aab found under $androidPublishDir"
     }
 }
 
@@ -330,13 +337,13 @@ function Invoke-DeployZip {
     $zipName = "IPNote_ir_Build_$stamp.zip"
     $zipFullPath = Join-Path $resolvedZipDir $zipName
 
-    $stageRoot = Join-Path $root "publish\deploy-staging"
+    $stageRoot = $zipStagingDir
     if (Test-Path -LiteralPath $stageRoot) {
         Remove-Item -Recurse -Force $stageRoot
     }
     New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
 
-    Write-Host "Staging deploy ZIP under $stageRoot ..." -ForegroundColor Cyan
+    Write-Host "Staging deploy ZIP under $stageRoot (publish/ is not used for ZIP staging) ..." -ForegroundColor Cyan
 
     if (Test-Path -LiteralPath $publishWebDir) {
         Copy-Item -Recurse -Force $publishWebDir (Join-Path $stageRoot "web_publish")
@@ -416,14 +423,14 @@ if (-not $SkipStopRunningProjects) {
 if (-not $SkipPackage) {
     if ([string]::IsNullOrWhiteSpace($ZipOutputDirectory)) {
         if ($NonInteractive) {
-            $ZipOutputDirectory = Join-Path $root "publish\github-release"
+            $ZipOutputDirectory = $defaultZipOutputDir
             Write-Host "Non-interactive ZIP -> $ZipOutputDirectory" -ForegroundColor DarkGray
         }
         else {
-            Write-Host "مسیر پوشه برای ZIP خروجی استقرار را وارد کنید (Enter = publish\github-release):" -ForegroundColor Cyan
+            Write-Host "مسیر پوشه برای ZIP خروجی استقرار را وارد کنید (Enter = artifacts\release-zips):" -ForegroundColor Cyan
             $inputPath = Read-Host "ZIP output folder"
             if ([string]::IsNullOrWhiteSpace($inputPath)) {
-                $ZipOutputDirectory = Join-Path $root "publish\github-release"
+                $ZipOutputDirectory = $defaultZipOutputDir
             }
             else {
                 $ZipOutputDirectory = $inputPath
@@ -473,6 +480,7 @@ Write-Host "Tips:" -ForegroundColor DarkYellow
 Write-Host "  -SkipPackage     daily dev build (default companion to run-all)" -ForegroundColor DarkGray
 Write-Host "  -Configuration Release -PackageOnly   release ZIP without AppHost" -ForegroundColor DarkGray
 Write-Host "  -SkipStopRunningProjects   skip killing AppHost/Web before build" -ForegroundColor DarkGray
-Write-Host "  -AndroidArtifact apk|appbundle|all   default all (APK + AAB in ZIP)" -ForegroundColor DarkGray
+Write-Host "  publish/web, publish/flutter/*   all project publish outputs" -ForegroundColor DarkGray
+Write-Host "  -ZipOutputDirectory <path>   ZIP destination (default artifacts\release-zips)" -ForegroundColor DarkGray
 Write-Host "  -SkipFlutterAndroid   release ZIP without mobile Android artifacts" -ForegroundColor DarkGray
 Write-Host "  -SkipFlutterWeb       release ZIP without Flutter web artifacts" -ForegroundColor DarkGray

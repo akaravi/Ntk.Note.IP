@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title">IPNote.ir</string>
+    <string name="widget_title">IP Note</string>
     <string name="widget_subtitle">My public IP</string>
-    <string name="widget_no_ip">Open the app to refresh</string>
-    <string name="widget_tap_hint">Tap to open IPNote.ir</string>
-    <string name="widget_description">Shows your latest public IP address from IPNote.ir</string>
+    <string name="widget_api_base_url">https://ipnote.ir</string>
+    <string name="widget_loading_ip">Loading…</string>
+    <string name="widget_fetching_status">Fetching your public IP…</string>
+    <string name="widget_no_ip">IP unavailable — check network</string>
+    <string name="widget_tap_hint">Tap to open IP Note</string>
+    <string name="widget_updated_prefix">Updated</string>
+    <string name="widget_updated_unknown">Updated recently</string>
+    <string name="widget_description">Shows your latest public IP address from IP Note</string>
 </resources>

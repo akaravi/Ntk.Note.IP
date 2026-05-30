@@ -4,6 +4,20 @@ All notable changes to IPNote.ir are documented here (public summary).
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-05-30
+
+### Added
+- Android home-screen widget: auto-fetches and displays public IP without opening the app; periodic refresh.
+- Android release APK size optimizations (`split-per-abi`, R8 shrink, obfuscation) and version suffix on artifact filenames.
+
+### Changed
+- Mobile app display name **IP Note** (launcher, iOS, widget, notifications).
+- Flutter mobile semver aligned with `version.json` (`0.1.2+3`).
+
+### Fixed
+- Android home widget layout and provider (RemoteViews compatibility).
+- Web MSBuild OpenAPI generation when Hangfire/SQL is unavailable at build time.
+
 ## [0.1.1] — 2026-05-30
 
 ### Added

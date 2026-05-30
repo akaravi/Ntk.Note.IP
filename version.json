@@ -1,12 +1,12 @@
 {
-  "product": "IPNote.ir",
+  "product": "IP Note",
   "solution": "Ntk.Note.IP",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "stage": "S0",
   "semver": {
     "major": 0,
     "minor": 1,
-    "patch": 1,
+    "patch": 2,
     "preRelease": "alpha"
   }
 }

@@ -105,7 +105,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In fa, this message translates to:
-  /// **'IPNote.ir'**
+  /// **'IP Note'**
   String get appTitle;
 
   /// No description provided for @homeTagline.
@@ -771,7 +771,7 @@ abstract class AppLocalizations {
   /// No description provided for @biometricUnlockReason.
   ///
   /// In fa, this message translates to:
-  /// **'تأیید هویت برای باز کردن IPNote.ir'**
+  /// **'تأیید هویت برای باز کردن IP Note'**
   String get biometricUnlockReason;
 
   /// No description provided for @biometricUnlockFailed.
@@ -1167,7 +1167,7 @@ abstract class AppLocalizations {
   /// No description provided for @introBody.
   ///
   /// In fa, this message translates to:
-  /// **'IPNote.ir — جستجو، یادداشت و ابزار IP برای وب و موبایل.'**
+  /// **'IP Note — جستجو، یادداشت و ابزار IP برای وب و موبایل.'**
   String get introBody;
 
   /// No description provided for @footerChangelog.
@@ -1191,13 +1191,13 @@ abstract class AppLocalizations {
   /// No description provided for @aboutSubtitle.
   ///
   /// In fa, this message translates to:
-  /// **'IPNote.ir — محصول NTK'**
+  /// **'IP Note — محصول NTK'**
   String get aboutSubtitle;
 
   /// No description provided for @aboutProductTitle.
   ///
   /// In fa, this message translates to:
-  /// **'IPNote.ir چیست؟'**
+  /// **'IP Note چیست؟'**
   String get aboutProductTitle;
 
   /// No description provided for @aboutProductBody.
@@ -1299,7 +1299,7 @@ abstract class AppLocalizations {
   /// No description provided for @copyrightSubtitle.
   ///
   /// In fa, this message translates to:
-  /// **'اطلاعات حقوقی IPNote.ir'**
+  /// **'اطلاعات حقوقی IP Note'**
   String get copyrightSubtitle;
 
   /// No description provided for @copyrightOwnershipTitle.
@@ -1311,7 +1311,7 @@ abstract class AppLocalizations {
   /// No description provided for @copyrightOwnershipBody.
   ///
   /// In fa, this message translates to:
-  /// **'حقوق IPNote.ir متعلق به NTK / علیرضا کاروی است.'**
+  /// **'حقوق IP Note متعلق به NTK / علیرضا کاروی است.'**
   String get copyrightOwnershipBody;
 
   /// No description provided for @copyrightLicenseTitle.
@@ -1335,7 +1335,7 @@ abstract class AppLocalizations {
   /// No description provided for @copyrightTrademarksBody.
   ///
   /// In fa, this message translates to:
-  /// **'IPNote.ir و NTK علامت‌های تجاری مرتبط هستند.'**
+  /// **'IP Note و NTK علامت‌های تجاری مرتبط هستند.'**
   String get copyrightTrademarksBody;
 
   /// No description provided for @copyrightThirdPartyTitle.

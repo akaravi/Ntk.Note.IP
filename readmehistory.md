@@ -1,5 +1,33 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-30 21:50 (Asia/Tehran)
+
+- **Publish vs ZIP paths:** All project outputs under `publish/` only (`publish/web`, `publish/web-debug`, `publish/flutter/android`, `publish/flutter/web`). ZIP staging `artifacts/zip-staging`; default ZIP output `artifacts/release-zips` (or `-ZipOutputDirectory`). Updated `publish-api.ps1`, FolderProfile pubxml, CI `publish-api.yml`, `_build-all-projects.ps1`.
+
+## 2026-05-30 21:35 (Asia/Tehran)
+
+- **Version bump 0.1.2:** `version.json` 0.1.2; Flutter `pubspec.yaml` `0.1.2+3`; Angular `ClientApp` / `ClientApp-React` `0.1.2`; public `CHANGELOG.md` section `[0.1.2]`.
+
+## 2026-05-30 21:20 (Asia/Tehran)
+
+- **Mobile app display name:** Renamed from `IPNote.ir` to **IP Note** — Android label, iOS CFBundleDisplayName, Flutter l10n (fa/en/ar/fr ARB), widget strings, web manifest/index, notifications, `version.json` product, Windows Runner.rc.
+
+## 2026-05-30 21:00 (Asia/Tehran)
+
+- **Android home widget auto IP:** `WidgetIpFetcher.kt` calls `GetMyIp` on widget add/update (no app open required); loading → IP display; 30 min refresh via `updatePeriodMillis`; Flutter saves `widget_api_base_url` for dev/prod API.
+
+## 2026-05-30 20:10 (Asia/Tehran)
+
+- **Android release size + versioned filenames:** R8 `minifyEnabled` + `shrinkResources` + `proguard-rules.pro`; NDK `abiFilters` arm only; Flutter `--split-per-abi`, `--obfuscate`, `--split-debug-info`, `--tree-shake-icons`. Artifacts copied to `publish/flutter/android` with version suffix at end (e.g. `app-arm64-v8a-release_0.1.1-build2.apk`). Scripts: `flutter-android-publish.ps1`, updated `flutter-release-build.ps1`, CI `flutter-release.yml`.
+
+## 2026-05-30 19:30 (Asia/Tehran)
+
+- **Android home widget "Can't load widget":** Simplified `widget_ip_note.xml` (removed nested layout, `layout_weight`, API-26 `paddingHorizontal`); solid widget background; `HomeWidgetLaunchIntent`; `qualifiedAndroidName` in Flutter update; try/catch in provider.
+
+## 2026-05-30 19:15 (Asia/Tehran)
+
+- **Flutter pub get (Windows symlinks):** `flutter pub get` fails without Developer Mode (`Building with plugins requires symlink support`). `flutter-pub-get.ps1` now falls back to `dart pub get` when flutter exits non-zero; CI/analyze/test still pass.
+
 ## 2026-05-30 19:05 (Asia/Tehran)
 
 - **Web build / OpenAPI generation:** `dotnet-getdocument` failed when Hangfire tried SQL Server (error 10054) during MSBuild. Added `OpenApiDocumentGeneration.IsActive` in Shared; Hangfire uses MemoryStorage and skips server/job registration during OpenAPI doc generation (same pattern as DB init skip in Program.cs).

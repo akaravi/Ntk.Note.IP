@@ -41,7 +41,7 @@ Or against staging:
 
 ## Published folder (non-Docker)
 
-1. Redeploy the previous artifact from GitHub Actions **ipnote-web-publish** (tag run) or local `artifacts\publish\web` backup.
+1. Redeploy the previous artifact from GitHub Actions **ipnote-web-publish** (tag run) or local `publish\web` backup.
 2. Restart the host process or IIS/Kestrel service.
 3. Run `.\scripts\staging-smoke.ps1` against the public URL.
 

@@ -24,10 +24,16 @@ keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -vali
 ```powershell
 .\scripts\flutter-ci.ps1
 .\scripts\flutter-release-build.ps1 -Target appbundle
-# optional: -Target apk | ipa (ipa needs macOS)
+# optional: -Target apk | all
 ```
 
-Outputs: `build/app/outputs/bundle/release/*.aab`
+Outputs (version suffix at end of filename, from `pubspec.yaml`):
+
+- `publish/flutter/android/app-release_0.1.2-build3.aab` (Play Console)
+- `publish/flutter/android/app-arm64-v8a-release_0.1.2-build3.apk` (smallest sideload; per-ABI split)
+- `publish/flutter/android/app-armeabi-v7a-release_0.1.2-build3.apk`
+
+Size optimizations in release builds: R8 minify + resource shrink, `--split-per-abi`, Dart obfuscation, tree-shake icons, `--target-platform=android-arm,android-arm64` (no x86).
 
 ## 4. Deep links (Go-Live)
 

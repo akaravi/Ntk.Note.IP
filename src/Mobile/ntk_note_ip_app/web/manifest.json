@@ -1,11 +1,11 @@
 {
-    "name": "IPNote.ir",
-    "short_name": "IPNote.ir",
+    "name": "IP Note",
+    "short_name": "IP Note",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#1A1625",
     "theme_color": "#7C3AED",
-    "description": "IPNote.ir — IP notes and network intelligence",
+    "description": "IP Note — IP notes and network intelligence",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

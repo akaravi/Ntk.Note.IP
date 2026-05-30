@@ -21,6 +21,7 @@ Future<void> main() async {
   if (!kIsWeb) {
     await Workmanager().initialize(ipnoteWorkmanagerCallback);
     await BackgroundMonitorPrefs.persistApiBaseUrl(AppConfig.current.apiBaseUrl);
+    await IpHomeWidgetService.bootstrapNativeConfig();
     if (await BackgroundMonitorPrefs.isEnabled()) {
       await BackgroundIpMonitorService().syncRegistration(enabled: true);
     }

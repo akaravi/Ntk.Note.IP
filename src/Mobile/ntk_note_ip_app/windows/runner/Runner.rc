@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "ir.ipnote" "\0"
-            VALUE "FileDescription", "ntk_note_ip_app" "\0"
+            VALUE "FileDescription", "IP Note" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "ntk_note_ip_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 ir.ipnote. All rights reserved." "\0"
             VALUE "OriginalFilename", "ntk_note_ip_app.exe" "\0"
-            VALUE "ProductName", "ntk_note_ip_app" "\0"
+            VALUE "ProductName", "IP Note" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
