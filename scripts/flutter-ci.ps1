@@ -14,7 +14,7 @@ Set-Location $appDir
 Write-Host "=== IPNote.ir Flutter CI ===" -ForegroundColor Cyan
 
 if (-not $SkipPubGet) {
-    flutter pub get
+    & "$PSScriptRoot\flutter-pub-get.ps1"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 

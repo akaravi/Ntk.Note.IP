@@ -160,6 +160,12 @@ public static class DependencyInjection
 
         builder.Services.AddHangfire(configuration =>
         {
+            if (OpenApiDocumentGeneration.IsActive)
+            {
+                configuration.UseMemoryStorage();
+                return;
+            }
+
             if (usePostgreSql)
             {
                 configuration.UsePostgreSqlStorage(
@@ -182,12 +188,16 @@ public static class DependencyInjection
                 configuration.UseMemoryStorage();
             }
         });
-        builder.Services.AddHangfireServer();
+        if (!OpenApiDocumentGeneration.IsActive)
+        {
+            builder.Services.AddHangfireServer();
+            builder.Services.AddHostedService<HangfireJobRegistration>();
+        }
+
         builder.Services.AddTransient<GeoIpDatabaseRefreshJob>();
         builder.Services.AddTransient<ProcessOutboxJob>();
         builder.Services.AddScoped<IPushIpMonitorPollService, PushIpMonitorPollService>();
         builder.Services.AddTransient<PushIpMonitorPollJob>();
-        builder.Services.AddHostedService<HangfireJobRegistration>();
 
         builder.Services.Configure<IpLookupOptions>(builder.Configuration.GetSection(IpLookupOptions.SectionName));
         builder.Services.AddHttpClient<IpApiLookupProvider>(client =>

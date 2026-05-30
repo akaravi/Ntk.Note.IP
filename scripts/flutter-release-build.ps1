@@ -45,7 +45,7 @@ function Clear-AndroidReleaseCaches {
 }
 
 Set-Location $appDir
-flutter pub get
+& "$root\scripts\flutter-pub-get.ps1"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Clear-AndroidReleaseCaches -FlutterAppDir $appDir

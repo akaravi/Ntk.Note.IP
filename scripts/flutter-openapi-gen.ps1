@@ -19,7 +19,7 @@ if (-not $SkipSync) {
 Set-Location $appDir
 Write-Host '=== IPNote.ir Flutter OpenAPI codegen ===' -ForegroundColor Cyan
 
-flutter pub get
+& "$root\scripts\flutter-pub-get.ps1"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 dart run swagger_parser -f swagger_parser.yaml

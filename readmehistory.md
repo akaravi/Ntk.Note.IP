@@ -1,5 +1,13 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-30 19:05 (Asia/Tehran)
+
+- **Web build / OpenAPI generation:** `dotnet-getdocument` failed when Hangfire tried SQL Server (error 10054) during MSBuild. Added `OpenApiDocumentGeneration.IsActive` in Shared; Hangfire uses MemoryStorage and skips server/job registration during OpenAPI doc generation (same pattern as DB init skip in Program.cs).
+
+## 2026-05-30 18:40 (Asia/Tehran)
+
+- **Flutter pub get (pub.dev 403):** `home_widget` failed with `authorization failed` — pub.dev returns HTTP 403 from this network. Added `scripts/flutter-pub-get.ps1` (pub.dev then auto-retry `pub.flutter-io.cn`); used by flutter-ci, release/web/openapi scripts, and `_build-all-projects.ps1`.
+
 ## 2026-05-30 18:25 (Asia/Tehran)
 
 - **Flutter Android package ID:** Renamed from `ir.ntk.ipnote.app` to `ca.karavi.ipnote.app` — `applicationId` + `namespace`, Kotlin path `kotlin/ca/karavi/ipnote/app/`, `google-services.json`, `assetlinks.json`, `update-deep-links.ps1`, and mobile docs.

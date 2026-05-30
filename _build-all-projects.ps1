@@ -212,9 +212,13 @@ function Invoke-FlutterCi {
 
         Push-Location $flutterAppPath
         try {
-            $pubArgs = @("pub", "get")
-            if ($OfflinePubGet) { $pubArgs += "--offline" }
-            & $flutter @pubArgs
+            $pubScript = Join-Path $root "scripts\flutter-pub-get.ps1"
+            if ($OfflinePubGet) {
+                & $pubScript -Offline
+            }
+            else {
+                & $pubScript
+            }
             if ($LASTEXITCODE -ne 0) { throw "flutter pub get failed" }
 
             if (-not $SkipTests) {

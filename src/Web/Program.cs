@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
 using Ntk.Note.IP.Application.Common.Options;
 using Ntk.Note.IP.Infrastructure.Data;
+using Ntk.Note.IP.Shared;
 using Ntk.Note.IP.Web.Endpoints;
 using Ntk.Note.IP.Web.Infrastructure;
 using Scalar.AspNetCore;
@@ -20,9 +21,7 @@ builder.AddWebServices();
 var app = builder.Build();
 
 // Skip DB init during OpenAPI document generation at build/publish time.
-var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
-var isOpenApiDocumentGeneration = entryAssembly.Contains("GetDocument", StringComparison.OrdinalIgnoreCase)
-    || entryAssembly.Contains("dotnet-getdocument", StringComparison.OrdinalIgnoreCase);
+var isOpenApiDocumentGeneration = OpenApiDocumentGeneration.IsActive;
 
 var databaseOptions = app.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
 if (!isOpenApiDocumentGeneration && (app.Environment.IsDevelopment() || databaseOptions.ApplyMigrationsOnStartup))
