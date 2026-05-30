@@ -8,6 +8,8 @@ public class DomainNameValidatorTests
 {
     [TestCase("example.com", true)]
     [TestCase("sub.example.co.uk", true)]
+    [TestCase("https://example.com/path", true)]
+    [TestCase("http://www.google.com", true)]
     [TestCase("not valid", false)]
     [TestCase("", false)]
     public void ShouldValidateDomainNames(string input, bool expected)

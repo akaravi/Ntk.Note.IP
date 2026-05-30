@@ -39,7 +39,7 @@ Source: `src/Web/wwwroot/.well-known/`
 | iOS | `ios/Runner/Runner.entitlements` — `applinks:ipnote.ir`, `applinks:www.ipnote.ir` |
 | Flutter | `go_router` route `/ip-lookup` redirects to `/?address=`; `lib/core/navigation/deep_link_uri.dart` + unit tests |
 
-Package: `ir.ipnote.ntk_note_ip_app` (Android) · bundle `ir.ipnote.ntkNoteIpApp` (iOS).
+Package: `ca.karavi.ipnote.app` (Android) · bundle `ir.ipnote.ntkNoteIpApp` (iOS).
 
 ## Related
 

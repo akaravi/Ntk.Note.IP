@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/auth_tokens.dart';
@@ -40,31 +42,37 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> _loadStored() async {
     try {
-      final tokens = await _repo.getStoredTokens();
-      if (tokens == null || !tokens.isValid) {
-        state = const AuthState(loading: false);
-        return;
-      }
-
-      if (tokens.refreshToken.isNotEmpty &&
-          (tokens.shouldRefreshAccessToken || tokens.expiresAt == null)) {
-        final refresh = await _repo.refreshTokens();
-        if (refresh.isSuccess && refresh.data != null) {
-          state = AuthState(loading: false, tokens: refresh.data);
-          _schedulePostAuthWork();
-          return;
-        }
-
-        await _repo.logout();
-        state = const AuthState(loading: false);
-        return;
-      }
-
-      state = AuthState(loading: false, tokens: tokens);
-      _schedulePostAuthWork();
+      await _loadStoredImpl().timeout(const Duration(seconds: 8));
+    } on TimeoutException {
+      state = const AuthState(loading: false);
     } catch (_) {
       state = const AuthState(loading: false);
     }
+  }
+
+  Future<void> _loadStoredImpl() async {
+    final tokens = await _repo.getStoredTokens();
+    if (tokens == null || !tokens.isValid) {
+      state = const AuthState(loading: false);
+      return;
+    }
+
+    if (tokens.refreshToken.isNotEmpty &&
+        (tokens.shouldRefreshAccessToken || tokens.expiresAt == null)) {
+      final refresh = await _repo.refreshTokens();
+      if (refresh.isSuccess && refresh.data != null) {
+        state = AuthState(loading: false, tokens: refresh.data);
+        _schedulePostAuthWork();
+        return;
+      }
+
+      await _repo.logout();
+      state = const AuthState(loading: false);
+      return;
+    }
+
+    state = AuthState(loading: false, tokens: tokens);
+    _schedulePostAuthWork();
   }
 
   void _schedulePostAuthWork() {

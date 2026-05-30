@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,8 @@ class AuthTokenStore implements AuthTokenStorePort {
   final FlutterSecureStorage _secure;
   AuthTokens? _sessionTokens;
 
+  bool get _useWebPrefs => kIsWeb;
+
   @override
   Future<bool> isPersistentSession() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,6 +51,10 @@ class AuthTokenStore implements AuthTokenStorePort {
       return null;
     }
 
+    if (_useWebPrefs) {
+      return _readPersistedFromPrefs(prefs);
+    }
+
     final access = await _secure.read(key: _accessKey);
     final refresh = await _secure.read(key: _refreshKey);
     if (access != null && access.isNotEmpty) {
@@ -59,6 +66,19 @@ class AuthTokenStore implements AuthTokenStorePort {
     }
 
     return _migrateFromSharedPreferences();
+  }
+
+  AuthTokens? _readPersistedFromPrefs(SharedPreferences prefs) {
+    final access = prefs.getString(_accessKey);
+    if (access == null || access.isEmpty) {
+      return null;
+    }
+
+    return AuthTokens(
+      accessToken: access,
+      refreshToken: prefs.getString(_refreshKey) ?? '',
+      expiresAt: _readExpiresAt(prefs),
+    );
   }
 
   DateTime? _readExpiresAt(SharedPreferences prefs) {
@@ -94,10 +114,19 @@ class AuthTokenStore implements AuthTokenStorePort {
 
     if (persist) {
       _sessionTokens = null;
-      await _secure.write(key: _accessKey, value: tokens.accessToken);
-      await _secure.write(key: _refreshKey, value: tokens.refreshToken);
+      if (_useWebPrefs) {
+        await prefs.setString(_accessKey, tokens.accessToken);
+        await prefs.setString(_refreshKey, tokens.refreshToken);
+      } else {
+        await _secure.write(key: _accessKey, value: tokens.accessToken);
+        await _secure.write(key: _refreshKey, value: tokens.refreshToken);
+      }
+
       if (tokens.expiresAt != null) {
-        await prefs.setString(_expiresAtKey, tokens.expiresAt!.toUtc().toIso8601String());
+        await prefs.setString(
+          _expiresAtKey,
+          tokens.expiresAt!.toUtc().toIso8601String(),
+        );
       } else {
         await prefs.remove(_expiresAtKey);
       }
@@ -105,19 +134,29 @@ class AuthTokenStore implements AuthTokenStorePort {
     }
 
     _sessionTokens = tokens;
-    await _secure.delete(key: _accessKey);
-    await _secure.delete(key: _refreshKey);
+    if (_useWebPrefs) {
+      await prefs.remove(_accessKey);
+      await prefs.remove(_refreshKey);
+    } else {
+      await _secure.delete(key: _accessKey);
+      await _secure.delete(key: _refreshKey);
+    }
     await prefs.remove(_expiresAtKey);
   }
 
   @override
   Future<void> clear() async {
     _sessionTokens = null;
-    await _secure.delete(key: _accessKey);
-    await _secure.delete(key: _refreshKey);
+    if (!_useWebPrefs) {
+      await _secure.delete(key: _accessKey);
+      await _secure.delete(key: _refreshKey);
+    }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_persistKey);
     await prefs.remove(_expiresAtKey);
+    await prefs.remove(_accessKey);
+    await prefs.remove(_refreshKey);
     await prefs.remove(_legacyAccessKey);
     await prefs.remove(_legacyRefreshKey);
   }

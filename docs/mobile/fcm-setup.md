@@ -25,7 +25,7 @@ Homogeneous lists and `ErrorExceptionResult` envelope apply to any future list e
 Packages: `firebase_core`, `firebase_messaging`.
 
 1. Create Firebase project.
-2. Replace placeholder `android/app/google-services.json` with the file from Firebase Console (package `ir.ipnote.ntk_note_ip_app`).
+2. Replace placeholder `android/app/google-services.json` with the file from Firebase Console (package `ca.karavi.ipnote.app`).
 3. Add `ios/Runner/GoogleService-Info.plist` from Firebase (iOS).
 4. On login / app resume with session, app calls `ActionRegister` via `PushRegistrationService`.
 5. On logout, `ActionUnregister` with last stored token.

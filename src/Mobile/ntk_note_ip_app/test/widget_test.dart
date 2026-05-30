@@ -24,6 +24,9 @@ void main() {
           splashMinimumDurationProvider.overrideWith(
             (ref) => Duration.zero,
           ),
+          authBootstrapTimeoutProvider.overrideWith(
+            (ref) => Duration.zero,
+          ),
         ],
         child: const IpNoteApp(),
       ),

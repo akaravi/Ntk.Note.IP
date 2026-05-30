@@ -213,57 +213,13 @@
     }
   </article>
 
-  <form class="ip-lookup__card" id="ip-tool-whois-domain" (ngSubmit)="loadDomainWhois()">
-    <h2>{{ i18n.t('TOOLS.WHOIS_DOMAIN') }}</h2>
+  <article class="ip-lookup__card" id="ip-tool-domain">
+    <h2>{{ i18n.t('DOMAIN.TITLE') }}</h2>
+    <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.HINT') }}</p>
+    <label for="domain-input">{{ i18n.t('DNS.DOMAIN') }}</label>
     <div class="ip-lookup__row">
       <input
-        type="text"
-        [ngModel]="domain()"
-        (ngModelChange)="domain.set($event)"
-        name="whois-domain"
-        placeholder="example.com"
-      />
-      <button type="submit" [disabled]="dnsLoading()">{{ i18n.t('TOOLS.WHOIS_DOMAIN') }}</button>
-    </div>
-    @if (whoisDomain(); as wd) {
-      <p class="ip-lookup__mono">{{ wd.handle }} — {{ wd.name }}</p>
-      <small>{{ wd.status }} · {{ wd.expirationDate }}</small>
-      <ul>
-        @for (ns of wd.nameServers; track ns) {
-          <li class="ip-lookup__mono">{{ ns }}</li>
-        }
-      </ul>
-    }
-  </form>
-
-  <article class="ip-lookup__card" id="ip-tool-port">
-    <h2>{{ i18n.t('TOOLS.PORT') }} / {{ i18n.t('TOOLS.SSL') }}</h2>
-    <div class="ip-lookup__row">
-      <input type="number" min="1" max="65535" [ngModel]="checkPort()" (ngModelChange)="checkPort.set($event)" name="port" />
-      <button type="button" (click)="checkPortOpen()" [disabled]="toolsLoading()">{{ i18n.t('TOOLS.PORT') }}</button>
-      <button type="button" (click)="loadSslCert()" [disabled]="toolsLoading()" class="outline">{{ i18n.t('TOOLS.SSL') }}</button>
-    </div>
-    @if (portCheck(); as pc) {
-      <p>
-        {{ pc.host }}:{{ pc.port }} —
-        {{ pc.isOpen ? i18n.t('TOOLS.PORT_OPEN') : i18n.t('TOOLS.PORT_CLOSED') }}
-        @if (pc.latencyMs != null) {
-          <span class="ip-lookup__muted">({{ pc.latencyMs }} ms)</span>
-        }
-      </p>
-    }
-    @if (sslCert(); as cert) {
-      <p class="ip-lookup__mono">{{ cert.subject }}</p>
-      <small>{{ cert.issuer }} · {{ cert.notAfter }}</small>
-    }
-  </article>
-
-  <form class="ip-lookup__card" id="ip-tool-dns" (ngSubmit)="resolveDns()">
-    <h2>{{ i18n.t('DNS.RESOLVE') }}</h2>
-    <label for="dns-domain">{{ i18n.t('DNS.DOMAIN') }}</label>
-    <div class="ip-lookup__row">
-      <input
-        id="dns-domain"
+        id="domain-input"
         name="domain"
         type="text"
         [ngModel]="domain()"
@@ -271,16 +227,19 @@
         placeholder="example.com"
         autocomplete="off"
       />
-      <button type="submit" [disabled]="dnsLoading()">
-        {{ i18n.t('DNS.RESOLVE') }}
-      </button>
+      <input
+        id="domain-port"
+        name="domainPort"
+        type="number"
+        min="1"
+        max="65535"
+        class="ip-lookup__port-input"
+        [ngModel]="checkPort()"
+        (ngModelChange)="checkPort.set($event)"
+        [attr.aria-label]="i18n.t('TOOLS.PORT')"
+      />
     </div>
-  </form>
-
-  <form class="ip-lookup__card" id="ip-tool-propagation" (ngSubmit)="checkPropagation()">
-    <h2>{{ i18n.t('DNS.PROPAGATION') }}</h2>
-    <p class="ip-lookup__muted">{{ i18n.t('DNS.PROPAGATION_HINT') }}</p>
-    <div class="ip-lookup__row">
+    <div class="ip-lookup__row ip-lookup__row--domain-meta">
       <label for="prop-type">{{ i18n.t('DNS.TYPE') }}</label>
       <select
         id="prop-type"
@@ -295,80 +254,139 @@
         <option value="NS">NS</option>
         <option value="CNAME">CNAME</option>
       </select>
-      <button type="submit" [disabled]="propagationLoading()">
-        {{ i18n.t('DNS.PROPAGATION_CHECK') }}
+      <button
+        type="button"
+        (click)="runAllDomainChecks()"
+        [disabled]="domainLoading() || !domain().trim()"
+      >
+        {{ domainLoading() ? i18n.t('COMMON.LOADING') : i18n.t('DOMAIN.RUN_ALL') }}
       </button>
     </div>
-  </form>
 
-  @if (propagation(); as prop) {
-    <article class="ip-lookup__card">
-      <h2>{{ i18n.t('DNS.PROPAGATION') }} — {{ prop.domain }} ({{ prop.recordType }})</h2>
-      <div class="ip-lookup__table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>{{ i18n.t('DNS.RESOLVER') }}</th>
-              <th>{{ i18n.t('DNS.VALUE') }}</th>
-              <th>{{ i18n.t('DNS.STATUS') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of prop.resolvers; track row.resolverName) {
-              <tr>
-                <td>{{ row.resolverName }}</td>
-                <td class="ip-lookup__mono">
-                  @if (row.values.length) {
-                    @for (v of row.values; track v) {
-                      <div>{{ v }}</div>
+    <div class="ip-lookup__tabs" role="tablist">
+      @for (tab of domainTabs; track tab.id) {
+        <button
+          type="button"
+          role="tab"
+          class="ip-lookup__tab"
+          [class.ip-lookup__tab--active]="activeDomainTab() === tab.id"
+          [attr.aria-selected]="activeDomainTab() === tab.id"
+          (click)="activeDomainTab.set(tab.id)"
+        >
+          {{ i18n.t(tab.labelKey) }}
+        </button>
+      }
+    </div>
+
+    <div class="ip-lookup__tab-panel" role="tabpanel">
+      @switch (activeDomainTab()) {
+        @case ('whois') {
+          @if (whoisDomain(); as wd) {
+            <p class="ip-lookup__mono">{{ wd.handle }} — {{ wd.name }}</p>
+            <small>{{ wd.status }} · {{ wd.expirationDate }}</small>
+            <ul>
+              @for (ns of wd.nameServers; track ns) {
+                <li class="ip-lookup__mono">{{ ns }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.EMPTY') }}</p>
+          }
+        }
+        @case ('dns') {
+          @if (dnsResult(); as dns) {
+            @if (dns.records.length) {
+              <div class="ip-lookup__table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{{ i18n.t('DNS.TYPE') }}</th>
+                      <th>{{ i18n.t('DNS.VALUE') }}</th>
+                      <th>{{ i18n.t('DNS.TTL') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of dns.records; track row.type + row.value) {
+                      <tr>
+                        <td>{{ row.type }}</td>
+                        <td class="ip-lookup__mono">{{ row.value }}</td>
+                        <td>{{ row.ttl ?? '—' }}</td>
+                      </tr>
                     }
-                  } @else {
-                    —
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.EMPTY') }}</p>
+            }
+          } @else {
+            <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.EMPTY') }}</p>
+          }
+        }
+        @case ('propagation') {
+          @if (propagation(); as prop) {
+            <div class="ip-lookup__table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ i18n.t('DNS.RESOLVER') }}</th>
+                    <th>{{ i18n.t('DNS.VALUE') }}</th>
+                    <th>{{ i18n.t('DNS.STATUS') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of prop.resolvers; track row.resolverName) {
+                    <tr>
+                      <td>{{ row.resolverName }}</td>
+                      <td class="ip-lookup__mono">
+                        @if (row.values.length) {
+                          @for (v of row.values; track v) {
+                            <div>{{ v }}</div>
+                          }
+                        } @else {
+                          —
+                        }
+                      </td>
+                      <td
+                        [class.ip-lookup__status--ok]="row.matchesReference"
+                        [class.ip-lookup__status--warn]="!row.matchesReference"
+                      >
+                        {{
+                          row.matchesReference
+                            ? i18n.t('DNS.MATCHES')
+                            : i18n.t('DNS.DIFFERS')
+                        }}
+                      </td>
+                    </tr>
                   }
-                </td>
-                <td
-                  [class.ip-lookup__status--ok]="row.matchesReference"
-                  [class.ip-lookup__status--warn]="!row.matchesReference"
-                >
-                  {{
-                    row.matchesReference
-                      ? i18n.t('DNS.MATCHES')
-                      : i18n.t('DNS.DIFFERS')
-                  }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </article>
-  }
-
-  @if (dnsResult(); as dns) {
-    <article class="ip-lookup__card">
-      <h2>{{ i18n.t('DNS.RECORDS') }} — {{ dns.domain }}</h2>
-      <div class="ip-lookup__table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>{{ i18n.t('DNS.TYPE') }}</th>
-              <th>{{ i18n.t('DNS.VALUE') }}</th>
-              <th>{{ i18n.t('DNS.TTL') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of dns.records; track row.type + row.value) {
-              <tr>
-                <td>{{ row.type }}</td>
-                <td class="ip-lookup__mono">{{ row.value }}</td>
-                <td>{{ row.ttl ?? '—' }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </article>
-  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.EMPTY') }}</p>
+          }
+        }
+        @case ('port') {
+          @if (portCheck(); as pc) {
+            <p>
+              {{ pc.host }}:{{ pc.port }} —
+              {{ pc.isOpen ? i18n.t('TOOLS.PORT_OPEN') : i18n.t('TOOLS.PORT_CLOSED') }}
+              @if (pc.latencyMs != null) {
+                <span class="ip-lookup__muted">({{ pc.latencyMs }} ms)</span>
+              }
+            </p>
+          }
+          @if (sslCert(); as cert) {
+            <p class="ip-lookup__mono">{{ cert.subject }}</p>
+            <small>{{ cert.issuer }} · {{ cert.notAfter }}</small>
+          }
+          @if (!portCheck() && !sslCert()) {
+            <p class="ip-lookup__muted">{{ i18n.t('DOMAIN.EMPTY') }}</p>
+          }
+        }
+      }
+    </div>
+  </article>
 
   @if (detailsLoading()) {
     <p class="ip-lookup__muted">{{ i18n.t('COMMON.LOADING') }}</p>

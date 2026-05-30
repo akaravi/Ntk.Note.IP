@@ -8,3 +8,8 @@ final appVersionProvider = FutureProvider<PackageInfo>((ref) async {
 final splashMinimumDurationProvider = Provider<Duration>(
   (ref) => const Duration(milliseconds: 1400),
 );
+
+/// Max wait for settings + auth before leaving splash (web secure-storage hangs).
+final authBootstrapTimeoutProvider = Provider<Duration>(
+  (ref) => const Duration(seconds: 8),
+);

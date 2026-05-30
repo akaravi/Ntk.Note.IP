@@ -6,7 +6,7 @@ on:
       api_base_url:
         description: Production API base URL
         required: false
-        default: https://api.ipnote.ir
+        default: https://ipnote.ir
       target:
         description: Build target (appbundle | apk)
         required: false
@@ -62,7 +62,7 @@ jobs:
 
       - name: Build release
         env:
-          API_BASE_URL: ${{ github.event.inputs.api_base_url || 'https://api.ipnote.ir' }}
+          API_BASE_URL: ${{ github.event.inputs.api_base_url || 'https://ipnote.ir' }}
           TARGET: ${{ github.event.inputs.target || 'appbundle' }}
         run: |
           if [ "$TARGET" = "apk" ]; then

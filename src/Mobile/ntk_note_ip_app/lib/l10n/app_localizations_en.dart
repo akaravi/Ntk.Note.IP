@@ -523,6 +523,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dnsPropagationCheck => 'Check propagation';
 
   @override
+  String get dnsMatches => 'Matches';
+
+  @override
+  String get dnsDiffers => 'Differs';
+
+  @override
+  String get domainToolsTitle => 'Domain checks';
+
+  @override
+  String get domainToolsDesc =>
+      'WHOIS, DNS, propagation, port and SSL in one place';
+
+  @override
+  String get domainToolsRunAll => 'Run all domain checks';
+
+  @override
+  String get domainTabWhois => 'WHOIS';
+
+  @override
+  String get domainTabDns => 'DNS';
+
+  @override
+  String get domainTabPropagation => 'Propagation';
+
+  @override
+  String get domainTabPortSsl => 'Port / SSL';
+
+  @override
+  String get domainTabEmpty => 'Press run or enter a domain first.';
+
+  @override
   String get introTitle => 'Welcome';
 
   @override

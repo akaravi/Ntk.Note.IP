@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/device/device_info_summary.dart';
 import '../../../core/feedback/app_haptics.dart';
 import '../../../core/network/local_ip_service.dart';
+import '../../../core/widget/ip_home_widget_service.dart';
 import '../../../domain/entities/ip_details.dart';
 import '../../../domain/entities/my_ip.dart';
 import '../../providers/app_providers.dart';
@@ -195,6 +196,14 @@ class HomeController extends Notifier<HomeState> {
     } catch (_) {
       // Local history is best-effort; do not break home when storage fails on web.
     }
+
+    await IpHomeWidgetService.sync(
+      address: details.address,
+      scope: details.scope,
+      isIPv6: details.isIPv6,
+      city: details.geo.city,
+      countryCode: details.geo.countryCode,
+    );
 
     if (syncServer && ref.read(authControllerProvider).isAuthenticated) {
       await ref.read(actionLookupIpUseCaseProvider).call(address);

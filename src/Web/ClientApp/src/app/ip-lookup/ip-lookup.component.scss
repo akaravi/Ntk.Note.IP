@@ -105,8 +105,10 @@
 .ip-lookup__qr {
   display: block;
   margin: 1rem auto 0;
+  padding: 0.5rem;
   border-radius: var(--pico-border-radius);
   border: 1px solid var(--ip-border);
+  background: var(--ip-qr-bg);
 }
 
 .ip-lookup__mini-dl {
@@ -147,6 +149,19 @@
     border-color: var(--ip-accent);
     color: var(--ip-accent);
   }
+}
+
+.ip-lookup__tab-panel {
+  margin-top: 0.75rem;
+}
+
+.ip-lookup__port-input {
+  max-width: 6.5rem;
+}
+
+.ip-lookup__row--domain-meta {
+  align-items: center;
+  margin-top: 0.5rem;
 }
 
 .ip-lookup__code {

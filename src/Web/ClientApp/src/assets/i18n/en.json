@@ -163,6 +163,16 @@
     "MATCHES": "Matches",
     "DIFFERS": "Differs"
   },
+  "DOMAIN": {
+    "TITLE": "Domain checks",
+    "HINT": "WHOIS, DNS, propagation, port and SSL — one button, results in tabs",
+    "RUN_ALL": "Run all domain checks",
+    "TAB_WHOIS": "WHOIS",
+    "TAB_DNS": "DNS",
+    "TAB_PROPAGATION": "Propagation",
+    "TAB_PORT_SSL": "Port / SSL",
+    "EMPTY": "Run checks to see results in each tab."
+  },
   "DEVICE": {
     "TITLE": "Device and browser",
     "BROWSER": "Browser",

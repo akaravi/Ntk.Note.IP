@@ -104,10 +104,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (state.showQr && state.myIp?.address.isNotEmpty == true) ...[
               const SizedBox(height: 16),
               Center(
-                child: QrImageView(
-                  data: state.myIp!.address,
-                  size: 180,
-                  backgroundColor: scheme.surface,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: QrImageView(
+                    data: state.myIp!.address,
+                    size: 180,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                    eyeStyle: QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: scheme.onSurface,
+                    ),
+                    dataModuleStyle: QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: scheme.onSurface,
+                    ),
+                  ),
                 ),
               ),
             ],

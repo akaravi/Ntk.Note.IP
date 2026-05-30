@@ -6,6 +6,7 @@ import '../config/app_config.dart';
 import '../history/database/app_database.dart';
 import '../history/ip_history_store.dart';
 import '../network/api_client.dart';
+import '../widget/ip_home_widget_service.dart';
 import 'background_monitor_prefs.dart';
 import 'ip_change_detector.dart';
 
@@ -73,6 +74,12 @@ class IpChangeBackgroundRunner {
     }
 
     await BackgroundMonitorPrefs.writeLastPublicIp(address);
+
+    await IpHomeWidgetService.sync(
+      address: address,
+      scope: scope,
+      isIPv6: isIPv6,
+    );
 
     if (changed != null) {
       await _showNotification(

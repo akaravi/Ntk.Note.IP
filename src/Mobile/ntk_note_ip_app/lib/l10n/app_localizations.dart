@@ -1098,6 +1098,66 @@ abstract class AppLocalizations {
   /// **'بررسی انتشار'**
   String get dnsPropagationCheck;
 
+  /// No description provided for @dnsMatches.
+  ///
+  /// In fa, this message translates to:
+  /// **'هم‌خوان'**
+  String get dnsMatches;
+
+  /// No description provided for @dnsDiffers.
+  ///
+  /// In fa, this message translates to:
+  /// **'متفاوت'**
+  String get dnsDiffers;
+
+  /// No description provided for @domainToolsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'بررسی دامنه'**
+  String get domainToolsTitle;
+
+  /// No description provided for @domainToolsDesc.
+  ///
+  /// In fa, this message translates to:
+  /// **'WHOIS، DNS، انتشار، پورت و SSL در یک صفحه'**
+  String get domainToolsDesc;
+
+  /// No description provided for @domainToolsRunAll.
+  ///
+  /// In fa, this message translates to:
+  /// **'اجرای همه بررسی‌های دامنه'**
+  String get domainToolsRunAll;
+
+  /// No description provided for @domainTabWhois.
+  ///
+  /// In fa, this message translates to:
+  /// **'WHOIS'**
+  String get domainTabWhois;
+
+  /// No description provided for @domainTabDns.
+  ///
+  /// In fa, this message translates to:
+  /// **'DNS'**
+  String get domainTabDns;
+
+  /// No description provided for @domainTabPropagation.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتشار'**
+  String get domainTabPropagation;
+
+  /// No description provided for @domainTabPortSsl.
+  ///
+  /// In fa, this message translates to:
+  /// **'پورت / SSL'**
+  String get domainTabPortSsl;
+
+  /// No description provided for @domainTabEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'ابتدا دکمهٔ اجرا را بزنید یا دامنه را وارد کنید.'**
+  String get domainTabEmpty;
+
   /// No description provided for @introTitle.
   ///
   /// In fa, this message translates to:

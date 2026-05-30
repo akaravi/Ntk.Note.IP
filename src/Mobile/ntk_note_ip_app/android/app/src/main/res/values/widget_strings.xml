@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title">IPNote.ir</string>
+    <string name="widget_subtitle">My public IP</string>
+    <string name="widget_no_ip">Open the app to refresh</string>
+    <string name="widget_tap_hint">Tap to open IPNote.ir</string>
+    <string name="widget_description">Shows your latest public IP address from IPNote.ir</string>
+</resources>

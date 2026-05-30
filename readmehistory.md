@@ -1,5 +1,41 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-30 18:25 (Asia/Tehran)
+
+- **Flutter Android package ID:** Renamed from `ir.ntk.ipnote.app` to `ca.karavi.ipnote.app` — `applicationId` + `namespace`, Kotlin path `kotlin/ca/karavi/ipnote/app/`, `google-services.json`, `assetlinks.json`, `update-deep-links.ps1`, and mobile docs.
+
+## 2026-05-30 18:10 (Asia/Tehran)
+
+- **Flutter Android package ID:** Renamed from `ir.ipnote.ntk_note_ip_app` to `ir.ntk.ipnote.app` — `applicationId` + `namespace` in `android/app/build.gradle.kts`; Kotlin sources moved to `kotlin/ir/ntk/ipnote/app/` (`MainActivity`, `IpNoteHomeWidgetProvider`); updated `google-services.json`, `assetlinks.json`, `scripts/update-deep-links.ps1`, and mobile docs (FCM, store checklist, deep-links runbook).
+
+## 2026-05-30 17:55 (Asia/Tehran)
+
+- **Fix Android DNS failure (`Failed host lookup: 'api.ipnote.ir'`):** Root cause — the `api.ipnote.ir` subdomain has no DNS record (`nslookup` timeout; `curl` → 000), while the API is served from the main domain `https://ipnote.ir` (`/myip` → 200). The release APK was built with `API_BASE_URL=https://api.ipnote.ir`, so the device could not resolve the host. Changed the default production API base URL from `https://api.ipnote.ir` to `https://ipnote.ir` in `scripts/flutter-release-build.ps1`, `scripts/flutter-web-build.ps1`, `_build-all-projects.ps1`, and `.github/workflows/flutter-release.yml` (input default + build env). Updated `docs/mobile/store-release-checklist.md`. Requires a fresh APK/AAB rebuild to take effect. Alternative long-term fix: create a DNS A record `api.ipnote.ir → 78.157.42.219` with matching TLS.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter Android home widget:** Added `home_widget` integration with `IpNoteHomeWidgetProvider` — branded widget shows latest public IP, scope (IPv4/IPv6), location, and tap-to-open app. Syncs from home screen load, background IP monitor, and cached IP on startup. Persian + English widget strings.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **QR theme-aware colors (Web + Flutter):** QR modules/background adapt to light and dark theme. Web: `--ip-qr-module` / `--ip-qr-bg` tokens, resolved computed colors in `QrCodeService`, auto-regenerate on theme or system scheme change. Flutter: `QrImageView` uses `colorScheme.onSurface` with bordered container.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Version bump 0.1.1:** `version.json` 0.1.1; Flutter `pubspec.yaml` `0.1.1+2` (aligned with product semver); Angular `ClientApp` / `ClientApp-React` `0.1.1`; public `CHANGELOG.md` section `[0.1.1]`.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Domain checks unified (Web + Flutter):** One button runs WHOIS, DNS, propagation, port and SSL; results in tabs (WHOIS / DNS / Propagation / Port+SSL). Flutter `DomainToolScreen`; Web `#ip-tool-domain` card; tools hub consolidated to IP WHOIS + Domain checks.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **WHOIS domain fix:** `Whois:Provider` was `Fake` (dummy ns1.example.com data). Switched to `Rdap`; added port-43 fallback via `whois.nic.ir` for `.ir` and other TLDs without RDAP bootstrap; `DomainNameValidator` accepts URLs (`https://example.com`); Angular WHOIS domain button uses `toolsLoading`.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter splash stuck (bootstrap):** Splash exit waits on settings **and** auth; if settings never `hasValue` the app hung forever. Added `authBootstrapTimeoutProvider` (8s) to force proceed; settings load 5s timeout with defaults; lazy `GoRouter` only after splash; web tokens via SharedPreferences; timers cancelled on dispose.
+
 ## 2026-05-30 (Asia/Tehran)
 
 - **Flutter splash stuck fix:** Defer splash `onFinished` to post-frame (no setState during build); auth `_loadStored` try/catch so `loading` always clears; widget test auth override.

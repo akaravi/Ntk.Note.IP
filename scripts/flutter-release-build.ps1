@@ -2,7 +2,7 @@ param(
     [ValidateSet('appbundle', 'apk', 'ipa', 'all')]
     [string]$Target = 'appbundle',
 
-    [string]$ApiBaseUrl = 'https://api.ipnote.ir',
+    [string]$ApiBaseUrl = 'https://ipnote.ir',
 
     [switch]$SkipCi
 )

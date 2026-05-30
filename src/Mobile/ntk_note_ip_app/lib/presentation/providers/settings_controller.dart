@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,7 +13,15 @@ import 'app_lock_controller.dart';
 class SettingsController extends AsyncNotifier<AppSettings> {
   @override
   Future<AppSettings> build() async {
-    return SettingsRepository().load();
+    try {
+      return await SettingsRepository()
+          .load()
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      return AppSettings.defaults;
+    } catch (_) {
+      return AppSettings.defaults;
+    }
   }
 
   Future<void> setLocale(Locale locale) async {

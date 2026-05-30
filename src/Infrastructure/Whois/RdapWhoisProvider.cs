@@ -51,9 +51,28 @@ public sealed class RdapWhoisProvider(HttpClient httpClient) : IWhoisProvider
     public async Task<WhoisDomainDto> LookupDomainAsync(string normalizedDomain, CancellationToken cancellationToken = default)
     {
         var url = $"https://rdap.org/domain/{Uri.EscapeDataString(normalizedDomain.ToUpperInvariant())}";
-        using var response = await httpClient.GetAsync(url, cancellationToken);
-        response.EnsureSuccessStatusCode();
 
+        try
+        {
+            using var response = await httpClient.GetAsync(url, cancellationToken);
+            if (response.IsSuccessStatusCode)
+            {
+                return await ParseRdapDomainAsync(response, normalizedDomain, cancellationToken);
+            }
+        }
+        catch (HttpRequestException)
+        {
+            // RDAP unreachable — fall back to classic WHOIS.
+        }
+
+        return await Port43WhoisDomainLookup.LookupAsync(normalizedDomain, cancellationToken);
+    }
+
+    private static async Task<WhoisDomainDto> ParseRdapDomainAsync(
+        HttpResponseMessage response,
+        string normalizedDomain,
+        CancellationToken cancellationToken)
+    {
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
         var root = document.RootElement;

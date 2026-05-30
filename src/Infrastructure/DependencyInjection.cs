@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Ntk.Note.IP.Application.Common.Interfaces;
@@ -216,7 +216,11 @@ public static class DependencyInjection
         });
 
         builder.Services.Configure<WhoisOptions>(builder.Configuration.GetSection(WhoisOptions.SectionName));
-        builder.Services.AddHttpClient<RdapWhoisProvider>(client => client.Timeout = TimeSpan.FromSeconds(20));
+        builder.Services.AddHttpClient<RdapWhoisProvider>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(20);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("IPNote.ir/1.0 (+https://ipnote.ir; RDAP)");
+        });
         builder.Services.AddSingleton<FakeWhoisProvider>();
         builder.Services.AddScoped<IWhoisProvider>(sp =>
         {

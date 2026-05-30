@@ -10,6 +10,7 @@ import 'core/background/workmanager_callback.dart';
 import 'core/config/app_config.dart';
 import 'core/push/push_bootstrap.dart';
 import 'core/splash/native_splash_binding.dart';
+import 'core/widget/ip_home_widget_service.dart';
 
 Future<void> main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,10 @@ Future<void> main() async {
     await BackgroundMonitorPrefs.persistApiBaseUrl(AppConfig.current.apiBaseUrl);
     if (await BackgroundMonitorPrefs.isEnabled()) {
       await BackgroundIpMonitorService().syncRegistration(enabled: true);
+    }
+    final cachedIp = await BackgroundMonitorPrefs.readLastPublicIp();
+    if (cachedIp != null && cachedIp.trim().isNotEmpty) {
+      await IpHomeWidgetService.sync(address: cachedIp.trim());
     }
   }
 

@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CODE_SNIPPET_TABS, CodeSnippetTabId } from './code-snippet-samples';
 import { CURL_COMMAND_TABS, CurlCommandTabId } from './curl-command-snippets';
 import { IpHistorySyncService } from '../core/ip-history-sync.service';
 import { AuthService } from 'src/api-authorization/auth.service';
-import { distinctUntilChanged, filter, switchMap, take } from 'rxjs';
+import { distinctUntilChanged, filter, switchMap, take, forkJoin, of, catchError, finalize } from 'rxjs';
 import { DeviceInfoService } from '../core/device-info.service';
 import { IpHistoryEntry, IpHistoryService } from '../core/ip-history.service';
 import { API_BASE_URL } from '../web-api-client';
@@ -28,7 +28,18 @@ import {
 import { I18nService } from '../core/i18n.service';
 import { LocalIpService } from '../core/local-ip.service';
 import { QrCodeService } from '../core/qr-code.service';
+import { ThemeService } from '../theme.service';
 import { IpDetailsDto, IpLookupService, MyIpDto } from './ip-lookup.service';
+
+export type DomainTabId = 'whois' | 'dns' | 'propagation' | 'port';
+
+const FOCUS_TO_DOMAIN_TAB: Record<string, DomainTabId> = {
+  domain: 'whois',
+  'whois-domain': 'whois',
+  dns: 'dns',
+  propagation: 'propagation',
+  port: 'port',
+};
 
 @Component({
   standalone: false,
@@ -42,6 +53,8 @@ export class IpLookupComponent implements OnInit, OnDestroy {
   private readonly ipTools = inject(IpToolsService);
   private readonly localIp = inject(LocalIpService);
   private readonly qrCode = inject(QrCodeService);
+  private readonly themeService = inject(ThemeService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly ipHistory = inject(IpHistoryService);
   private readonly historySync = inject(IpHistorySyncService);
   private readonly authService = inject(AuthService);
@@ -54,6 +67,12 @@ export class IpLookupComponent implements OnInit, OnDestroy {
   readonly curlTabs = CURL_COMMAND_TABS;
   readonly codeTabs = CODE_SNIPPET_TABS;
   readonly device = this.deviceInfo.getSummary();
+  readonly domainTabs: ReadonlyArray<{ id: DomainTabId; labelKey: string }> = [
+    { id: 'whois', labelKey: 'DOMAIN.TAB_WHOIS' },
+    { id: 'dns', labelKey: 'DOMAIN.TAB_DNS' },
+    { id: 'propagation', labelKey: 'DOMAIN.TAB_PROPAGATION' },
+    { id: 'port', labelKey: 'DOMAIN.TAB_PORT_SSL' },
+  ];
   private liveIpTimer: ReturnType<typeof setInterval> | null = null;
 
   address = signal('');
@@ -73,9 +92,9 @@ export class IpLookupComponent implements OnInit, OnDestroy {
   privacy = signal<PrivacyFlagsDto | null>(null);
   subnet = signal<SubnetInfoDto | null>(null);
   loading = signal(false);
-  dnsLoading = signal(false);
-  propagationLoading = signal(false);
+  domainLoading = signal(false);
   toolsLoading = signal(false);
+  activeDomainTab = signal<DomainTabId>('whois');
   error = signal<string | null>(null);
   plainCopied = signal(false);
   addressCopied = signal(false);
@@ -90,6 +109,13 @@ export class IpLookupComponent implements OnInit, OnDestroy {
   historySyncing = signal(false);
   detailsLoading = signal(false);
 
+  constructor() {
+    effect(() => {
+      this.themeService.theme();
+      void this.regenerateQrIfOpen();
+    });
+  }
+
   ngOnInit(): void {
     this.refreshHistory();
     this.loadMyIp();
@@ -102,6 +128,12 @@ export class IpLookupComponent implements OnInit, OnDestroy {
 
     this.scrollToToolFocus();
     this.startLiveIpWatch();
+
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const onSchemeChange = () => void this.regenerateQrIfOpen();
+    prefersDark.addEventListener('change', onSchemeChange);
+    this.destroyRef.onDestroy(() => prefersDark.removeEventListener('change', onSchemeChange));
+
     this.authService.isAuthenticated$
       .pipe(
         distinctUntilChanged(),
@@ -225,6 +257,18 @@ export class IpLookupComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const domainTab = FOCUS_TO_DOMAIN_TAB[focus];
+    if (domainTab) {
+      this.activeDomainTab.set(domainTab);
+      setTimeout(() => {
+        document.getElementById('ip-tool-domain')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 150);
+      return;
+    }
+
     setTimeout(() => {
       document.getElementById(`ip-tool-${focus}`)?.scrollIntoView({
         behavior: 'smooth',
@@ -287,12 +331,33 @@ export class IpLookupComponent implements OnInit, OnDestroy {
       return;
     }
 
+    await this.renderQr(ip);
+  }
+
+  private async renderQr(ip: string): Promise<void> {
     try {
       const url = await this.qrCode.toDataUrl(ip);
       this.qrDataUrl.set(url);
       this.showQr.set(true);
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  private async regenerateQrIfOpen(): Promise<void> {
+    if (!this.showQr()) {
+      return;
+    }
+
+    const ip = this.myIp()?.address;
+    if (!ip) {
+      return;
+    }
+
+    try {
+      this.qrDataUrl.set(await this.qrCode.toDataUrl(ip));
+    } catch {
+      // Keep the previous image if regeneration fails.
     }
   }
 
@@ -388,61 +453,75 @@ export class IpLookupComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadDomainWhois(): void {
+  runAllDomainChecks(): void {
     const value = this.domain().trim();
     if (!value) {
       return;
     }
 
-    this.toolsLoading.set(true);
-    this.ipTools.getWhoisDomain(value).subscribe({
-      next: (data) => {
-        this.whoisDomain.set(data);
-        this.toolsLoading.set(false);
-      },
-      error: (err: Error) => {
-        this.error.set(err.message);
-        this.toolsLoading.set(false);
-      },
-    });
-  }
+    const port = this.checkPort();
+    this.domainLoading.set(true);
+    this.error.set(null);
+    this.whoisDomain.set(null);
+    this.dnsResult.set(null);
+    this.propagation.set(null);
+    this.portCheck.set(null);
+    this.sslCert.set(null);
 
-  checkPortOpen(): void {
-    const host = this.address().trim() || this.domain().trim();
-    if (!host) {
-      return;
-    }
-
-    this.toolsLoading.set(true);
-    this.ipTools.checkPort(host, this.checkPort()).subscribe({
-      next: (data) => {
-        this.portCheck.set(data);
-        this.toolsLoading.set(false);
-      },
-      error: (err: Error) => {
-        this.error.set(err.message);
-        this.toolsLoading.set(false);
-      },
-    });
-  }
-
-  loadSslCert(): void {
-    const value = this.domain().trim();
-    if (!value) {
-      return;
-    }
-
-    this.toolsLoading.set(true);
-    this.ipTools.getSslCertificate(value).subscribe({
-      next: (data) => {
-        this.sslCert.set(data);
-        this.toolsLoading.set(false);
-      },
-      error: (err: Error) => {
-        this.error.set(err.message);
-        this.toolsLoading.set(false);
-      },
-    });
+    forkJoin({
+      whois: this.ipTools.getWhoisDomain(value).pipe(
+        catchError((err: Error) => {
+          this.error.set(err.message);
+          return of(null);
+        })
+      ),
+      dns: this.dnsService.resolveDns(value).pipe(
+        catchError((err: Error) => {
+          this.error.set(err.message);
+          return of(null);
+        })
+      ),
+      propagation: this.dnsService
+        .getListDnsPropagation(value, this.propagationType())
+        .pipe(
+          catchError((err: Error) => {
+            this.error.set(err.message);
+            return of(null);
+          })
+        ),
+      port: this.ipTools.checkPort(value, port).pipe(
+        catchError((err: Error) => {
+          this.error.set(err.message);
+          return of(null);
+        })
+      ),
+      ssl: this.ipTools.getSslCertificate(value, port).pipe(
+        catchError((err: Error) => {
+          this.error.set(err.message);
+          return of(null);
+        })
+      ),
+    })
+      .pipe(finalize(() => this.domainLoading.set(false)))
+      .subscribe({
+        next: (results) => {
+          if (results.whois) {
+            this.whoisDomain.set(results.whois);
+          }
+          if (results.dns) {
+            this.dnsResult.set(results.dns);
+          }
+          if (results.propagation) {
+            this.propagation.set(results.propagation);
+          }
+          if (results.port) {
+            this.portCheck.set(results.port);
+          }
+          if (results.ssl) {
+            this.sslCert.set(results.ssl);
+          }
+        },
+      });
   }
 
   calculateSubnet(): void {
@@ -460,50 +539,6 @@ export class IpLookupComponent implements OnInit, OnDestroy {
       error: (err: Error) => {
         this.error.set(err.message);
         this.toolsLoading.set(false);
-      },
-    });
-  }
-
-  resolveDns(): void {
-    const value = this.domain().trim();
-    if (!value) {
-      return;
-    }
-
-    this.dnsLoading.set(true);
-    this.error.set(null);
-    this.dnsResult.set(null);
-
-    this.dnsService.resolveDns(value).subscribe({
-      next: (data) => {
-        this.dnsResult.set(data);
-        this.dnsLoading.set(false);
-      },
-      error: (err: Error) => {
-        this.error.set(err.message);
-        this.dnsLoading.set(false);
-      },
-    });
-  }
-
-  checkPropagation(): void {
-    const value = this.domain().trim();
-    if (!value) {
-      return;
-    }
-
-    this.propagationLoading.set(true);
-    this.error.set(null);
-    this.propagation.set(null);
-
-    this.dnsService.getListDnsPropagation(value, this.propagationType()).subscribe({
-      next: (data) => {
-        this.propagation.set(data);
-        this.propagationLoading.set(false);
-      },
-      error: (err: Error) => {
-        this.error.set(err.message);
-        this.propagationLoading.set(false);
       },
     });
   }

@@ -11,6 +11,20 @@ public static class DomainNameValidator
         }
 
         var host = input.Trim().TrimEnd('.');
+        if (Uri.TryCreate(host, UriKind.Absolute, out var absoluteUri)
+            && !string.IsNullOrWhiteSpace(absoluteUri.Host))
+        {
+            host = absoluteUri.Host;
+        }
+        else
+        {
+            var slashIndex = host.IndexOf('/');
+            if (slashIndex > 0)
+            {
+                host = host[..slashIndex];
+            }
+        }
+
         if (host.Length is 0 or > 253)
         {
             return false;

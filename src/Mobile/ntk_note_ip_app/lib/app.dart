@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'core/settings/app_settings.dart';
 import 'core/settings/supported_app_locales.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
+import 'presentation/providers/app_version_provider.dart';
 import 'presentation/providers/auth_controller.dart';
 import 'presentation/providers/settings_controller.dart';
 import 'presentation/router/app_router.dart';
@@ -25,23 +28,92 @@ class IpNoteApp extends ConsumerStatefulWidget {
 
 class _IpNoteAppState extends ConsumerState<IpNoteApp> {
   _BootstrapStep _step = _BootstrapStep.splash;
+  var _minSplashElapsed = false;
+  var _bootstrapWaitExpired = false;
+  var _splashFinishScheduled = false;
+
+  Timer? _minSplashTimer;
+  Timer? _bootstrapTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scheduleBootstrapTimers());
+  }
+
+  void _scheduleBootstrapTimers() {
+    if (!mounted) {
+      return;
+    }
+
+    final minimum = ref.read(splashMinimumDurationProvider);
+    final bootstrapTimeout = ref.read(authBootstrapTimeoutProvider);
+
+    _minSplashTimer?.cancel();
+    _bootstrapTimer?.cancel();
+
+    _minSplashTimer = Timer(minimum, () {
+      if (mounted) {
+        setState(() => _minSplashElapsed = true);
+      }
+    });
+
+    _bootstrapTimer = Timer(bootstrapTimeout, () {
+      if (mounted) {
+        setState(() => _bootstrapWaitExpired = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _minSplashTimer?.cancel();
+    _bootstrapTimer?.cancel();
+    super.dispose();
+  }
+
+  bool _isBootstrapReady(AsyncValue<AppSettings> settings, AuthState auth) {
+    if (_bootstrapWaitExpired) {
+      return true;
+    }
+
+    if (settings.hasError) {
+      return !auth.loading;
+    }
+
+    return settings.hasValue && !auth.loading;
+  }
+
+  void _maybeFinishSplash(bool bootstrapReady) {
+    if (_step != _BootstrapStep.splash ||
+        _splashFinishScheduled ||
+        !_minSplashElapsed ||
+        !bootstrapReady) {
+      return;
+    }
+
+    _splashFinishScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _step != _BootstrapStep.splash) {
+        return;
+      }
+
+      _onSplashFinished();
+    });
+  }
 
   void _onSplashFinished() {
     if (!mounted) {
       return;
     }
 
-    final settings = ref.read(settingsControllerProvider).value ?? AppSettings.defaults;
+    final settings =
+        ref.read(settingsControllerProvider).value ?? AppSettings.defaults;
     final nextStep = settings.localeChosen
         ? _BootstrapStep.main
         : _BootstrapStep.language;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _step != _BootstrapStep.splash) {
-        return;
-      }
-      setState(() => _step = nextStep);
-    });
+    setState(() => _step = nextStep);
   }
 
   void _onLanguageFinished() {
@@ -54,9 +126,9 @@ class _IpNoteAppState extends ConsumerState<IpNoteApp> {
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsControllerProvider);
     final auth = ref.watch(authControllerProvider);
-    final router = ref.watch(appRouterProvider);
     final settings = settingsAsync.value ?? AppSettings.defaults;
-    final bootstrapReady = settingsAsync.hasValue && !auth.loading;
+    final bootstrapReady = _isBootstrapReady(settingsAsync, auth);
+    _maybeFinishSplash(bootstrapReady);
 
     switch (_step) {
       case _BootstrapStep.splash:
@@ -64,6 +136,7 @@ class _IpNoteAppState extends ConsumerState<IpNoteApp> {
       case _BootstrapStep.language:
         return _buildLanguageShell(settings);
       case _BootstrapStep.main:
+        final router = ref.watch(appRouterProvider);
         return _buildApp(context, ref, settings, router);
     }
   }
@@ -71,10 +144,7 @@ class _IpNoteAppState extends ConsumerState<IpNoteApp> {
   Widget _buildSplashShell(AppSettings settings, bool bootstrapReady) {
     return _buildBootstrapMaterialApp(
       settings: settings,
-      home: AppSplashScreen(
-        ready: bootstrapReady,
-        onFinished: _onSplashFinished,
-      ),
+      home: AppSplashScreen(ready: bootstrapReady),
       themeMode: ThemeMode.dark,
     );
   }

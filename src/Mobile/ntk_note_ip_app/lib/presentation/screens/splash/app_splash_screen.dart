@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,12 +13,10 @@ abstract final class AppSplashColors {
 class AppSplashScreen extends ConsumerStatefulWidget {
   const AppSplashScreen({
     required this.ready,
-    required this.onFinished,
     super.key,
   });
 
   final bool ready;
-  final VoidCallback onFinished;
 
   @override
   ConsumerState<AppSplashScreen> createState() => _AppSplashScreenState();
@@ -32,10 +28,7 @@ class _AppSplashScreenState extends ConsumerState<AppSplashScreen>
   late final Animation<double> _logoScale;
   late final Animation<double> _contentOpacity;
 
-  Timer? _minimumTimer;
-  var _minimumElapsed = false;
   var _nativeSplashRemoved = false;
-  var _finished = false;
 
   @override
   void initState() {
@@ -58,43 +51,12 @@ class _AppSplashScreenState extends ConsumerState<AppSplashScreen>
         removeNativeSplash();
         _nativeSplashRemoved = true;
       }
-      unawaited(_controller.forward());
-    });
-
-    final minimum = ref.read(splashMinimumDurationProvider);
-    _minimumTimer = Timer(minimum, () {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _minimumElapsed = true);
-      _tryFinish();
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant AppSplashScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.ready && !oldWidget.ready) {
-      _tryFinish();
-    }
-  }
-
-  void _tryFinish() {
-    if (_finished || !widget.ready || !_minimumElapsed) {
-      return;
-    }
-
-    _finished = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        widget.onFinished();
-      }
+      _controller.forward();
     });
   }
 
   @override
   void dispose() {
-    _minimumTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

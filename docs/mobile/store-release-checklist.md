@@ -5,7 +5,7 @@ Use after [S7 stage close](s7-stage-close-checklist.md) (Parts 47–58).
 ## 1. Version and API
 
 - [ ] Bump `version` in `src/Mobile/ntk_note_ip_app/pubspec.yaml` (`major.minor.patch+build`)
-- [ ] Set production API: `--dart-define=API_BASE_URL=https://api.ipnote.ir` (default in `scripts/flutter-release-build.ps1`)
+- [ ] Set production API: `--dart-define=API_BASE_URL=https://ipnote.ir` (default in `scripts/flutter-release-build.ps1`). Note: the `api.ipnote.ir` subdomain has no DNS record yet; the API is served from `https://ipnote.ir`.
 
 ## 2. Android signing
 
@@ -45,7 +45,7 @@ Deploy Web so `/.well-known/*` is live, then verify on a physical device (signed
 
 | Platform | Track | Notes |
 |----------|-------|--------|
-| Google Play | Internal testing | Upload AAB; package `ir.ipnote.ntk_note_ip_app` |
+| Google Play | Internal testing | Upload AAB; package `ca.karavi.ipnote.app` |
 | App Store | TestFlight | Archive on macOS; bundle `ir.ipnote.ntkNoteIpApp` |
 
 - [ ] Store listing fa/en (screenshots, privacy policy URL)

@@ -163,6 +163,16 @@
     "MATCHES": "هم‌خوان",
     "DIFFERS": "متفاوت"
   },
+  "DOMAIN": {
+    "TITLE": "بررسی دامنه",
+    "HINT": "WHOIS، DNS، انتشار DNS، پورت و SSL — یک دکمه، نتایج در تب‌ها",
+    "RUN_ALL": "اجرای همه بررسی‌های دامنه",
+    "TAB_WHOIS": "WHOIS",
+    "TAB_DNS": "DNS",
+    "TAB_PROPAGATION": "انتشار",
+    "TAB_PORT_SSL": "پورت / SSL",
+    "EMPTY": "پس از اجرا، نتیجهٔ هر بخش در تب مربوط نمایش داده می‌شود."
+  },
   "DEVICE": {
     "TITLE": "دستگاه و مرورگر",
     "BROWSER": "مرورگر",

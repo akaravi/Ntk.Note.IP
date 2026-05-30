@@ -520,6 +520,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dnsPropagationCheck => 'بررسی انتشار';
 
   @override
+  String get dnsMatches => 'هم‌خوان';
+
+  @override
+  String get dnsDiffers => 'متفاوت';
+
+  @override
+  String get domainToolsTitle => 'بررسی دامنه';
+
+  @override
+  String get domainToolsDesc => 'WHOIS، DNS، انتشار، پورت و SSL';
+
+  @override
+  String get domainToolsRunAll => 'اجرای همه بررسی‌های دامنه';
+
+  @override
+  String get domainTabWhois => 'WHOIS';
+
+  @override
+  String get domainTabDns => 'DNS';
+
+  @override
+  String get domainTabPropagation => 'انتشار';
+
+  @override
+  String get domainTabPortSsl => 'پورت / SSL';
+
+  @override
+  String get domainTabEmpty => 'ابتدا دکمهٔ اجرا را بزنید.';
+
+  @override
   String get introTitle => 'معرفی';
 
   @override

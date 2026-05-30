@@ -1,4 +1,4 @@
-package ir.ipnote.ntk_note_ip_app
+package ca.karavi.ipnote.app
 
 import io.flutter.embedding.android.FlutterActivity
 

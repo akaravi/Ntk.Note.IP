@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title">IPNote.ir</string>
+    <string name="widget_subtitle">IP عمومی من</string>
+    <string name="widget_no_ip">برای بروزرسانی اپ را باز کنید</string>
+    <string name="widget_tap_hint">برای باز کردن IPNote.ir لمس کنید</string>
+    <string name="widget_description">آخرین IP عمومی شما از IPNote.ir را نمایش می‌دهد</string>
+</resources>

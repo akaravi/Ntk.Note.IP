@@ -40,7 +40,7 @@ param(
     [switch]$SkipFlutterWeb,
     [ValidateSet("apk", "appbundle", "all")]
     [string]$AndroidArtifact = "all",
-    [string]$ApiBaseUrl = "https://api.ipnote.ir",
+    [string]$ApiBaseUrl = "https://ipnote.ir",
 
     [switch]$SkipSpa,
     [switch]$SkipDevServers,
