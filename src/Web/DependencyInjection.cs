@@ -36,7 +36,32 @@ public static class DependencyInjection
         });
 
         builder.Services.Configure<CorsOptions>(builder.Configuration.GetSection(CorsOptions.SectionName));
-        builder.Services.AddCors();
+        builder.Services.Configure<Dictionary<string, ClientRegistrationOptions>>(
+            builder.Configuration.GetSection(ClientsConfigurationExtensions.ClientsSectionName));
+        builder.Services.AddSingleton<IRegisteredClientStore, RegisteredClientStore>();
+        builder.Services.AddSingleton<ClientHmacValidator>();
+
+        var normalizedOrigins = builder.Configuration.GetMergedCorsOrigins();
+
+        builder.Services.AddCors(options =>
+        {
+            if (normalizedOrigins.Length > 0)
+            {
+                options.AddDefaultPolicy(policy => policy
+                    .WithOrigins(normalizedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .SetPreflightMaxAge(TimeSpan.FromHours(24)));
+            }
+            else if (builder.Environment.IsDevelopment())
+            {
+                options.AddDefaultPolicy(policy => policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin());
+            }
+        });
 
         var guestPermitLimit = builder.Configuration.GetValue("RateLimiting:GuestPermitLimit", 60);
         var guestWindowMinutes = builder.Configuration.GetValue("RateLimiting:GuestWindowMinutes", 1);

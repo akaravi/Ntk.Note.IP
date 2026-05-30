@@ -13,6 +13,19 @@
     @if (snapshotReady()) {
       <p class="ip-notes__snapshot-hint">{{ i18n.t('IP.NOTE_SNAPSHOT_READY') }}</p>
     }
+    @if (formDeviceRows().length) {
+      <section class="ip-notes__device" role="group" [attr.aria-label]="i18n.t('DEVICE.TITLE')">
+        <span class="ip-notes__device-title">{{ i18n.t('DEVICE.TITLE') }}</span>
+        <dl class="ip-notes__device-grid">
+          @for (row of formDeviceRows(); track row.key) {
+            <div class="ip-notes__device-cell">
+              <dt>{{ i18n.t(row.key) }}</dt>
+              <dd>{{ row.value }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    }
     <label for="note-address">{{ i18n.t('IP.ADDRESS') }}</label>
     <div class="ip-notes__address-row">
       <input id="note-address" name="address" [(ngModel)]="form.address" required />
@@ -50,19 +63,36 @@
                 {{ i18n.t('COMMON.DELETE') }}
               </button>
             </div>
-            <small class="ip-notes__muted">{{ noteWhen(note) }}</small>
-            @if (locationLine(note) || note.deviceLabel) {
+            <div class="ip-notes__when">
+              <time class="ip-notes__when-primary">{{ noteWhenPrimary(note) }}</time>
+              @if (isRecent(note)) {
+                <small class="ip-notes__when-exact ip-notes__muted">{{ noteWhenExact(note) }}</small>
+              }
+            </div>
+            @if (locationLine(note) || note.localIpAddress) {
               <p class="ip-notes__meta">
                 @if (locationLine(note)) {
                   <span>{{ locationLine(note) }}</span>
                 }
-                @if (note.deviceLabel) {
-                  <span>{{ locationLine(note) ? ' · ' : '' }}{{ note.deviceLabel }}</span>
-                }
                 @if (note.localIpAddress) {
-                  <span> · {{ i18n.t('IP.LOCAL_IP') }}: {{ note.localIpAddress }}</span>
+                  <span>{{ locationLine(note) ? ' · ' : '' }}{{ i18n.t('IP.LOCAL_IP') }}: {{ note.localIpAddress }}</span>
                 }
               </p>
+            }
+            @if (deviceRows(note).length) {
+              <section class="ip-notes__device" role="group" [attr.aria-label]="i18n.t('DEVICE.TITLE')">
+                <span class="ip-notes__device-title">{{ i18n.t('DEVICE.TITLE') }}</span>
+                <dl class="ip-notes__device-grid">
+                  @for (row of deviceRows(note); track row.key) {
+                    <div class="ip-notes__device-cell">
+                      <dt>{{ i18n.t(row.key) }}</dt>
+                      <dd>{{ row.value }}</dd>
+                    </div>
+                  }
+                </dl>
+              </section>
+            } @else if (note.deviceLabel) {
+              <p class="ip-notes__meta">{{ note.deviceLabel }}</p>
             }
             @if (note.isp || note.asn) {
               <p class="ip-notes__meta ip-notes__meta--network">

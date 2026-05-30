@@ -5,8 +5,8 @@ public sealed class CorsOptions
     public const string SectionName = "Cors";
 
     /// <summary>
-    /// Explicit browser origins. Empty in base appsettings: Development uses appsettings.Development.json;
-    /// Production uses appsettings.Production.json (e.g. https://ipnote.ir).
+    /// Extra browser origins merged with all <c>Clients:*:AllowedOrigins</c>.
+    /// Prefer registering origins under <c>Clients</c> (panel-web, flutter-app).
     /// </summary>
     public string[] AllowedOrigins { get; set; } = [];
 }

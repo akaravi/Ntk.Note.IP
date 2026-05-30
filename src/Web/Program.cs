@@ -50,29 +50,18 @@ else
     app.UseForwardedHeaders(forwardedHeaders);
 }
 
+// CORS must run before redirects, static files, auth, and rate limiting so preflight
+// and error responses (401/429/5xx) still include Access-Control-* headers.
+app.UseCors();
+
+app.UseClientHmacValidation();
+
 app.UseHttpsRedirection();
 app.UseSecurityHeaders();
 
 var rewriteOptions = new RewriteOptions()
     .AddRewrite(@"^api/(?!v1/)(.*)", "api/v1/$1", skipRemainingRules: false);
 app.UseRewriter(rewriteOptions);
-
-var corsOptions = app.Configuration.GetSection(CorsOptions.SectionName).Get<CorsOptions>() ?? new CorsOptions();
-if (corsOptions.AllowedOrigins.Length > 0)
-{
-    app.UseCors(policy => policy
-        .WithOrigins(corsOptions.AllowedOrigins)
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials());
-}
-else if (app.Environment.IsDevelopment())
-{
-    app.UseCors(policy => policy
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowAnyOrigin());
-}
 
 app.UseFileServer();
 

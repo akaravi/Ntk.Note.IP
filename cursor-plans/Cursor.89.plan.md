@@ -22,7 +22,7 @@
     },
     "zip": {
       "staging": "artifacts/zip-staging",
-      "defaultOutput": "artifacts/release-zips"
+      "defaultOutput": "D:/PublishKaravi/IPNote.ir"
     }
   }
 }

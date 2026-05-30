@@ -1,0 +1,18 @@
+---
+description: No external CDN — all static assets (fonts, CanvasKit, JS/CSS libs) must be self-hosted or bundled at build time.
+alwaysApply: true
+---
+
+# No external CDN
+
+**Must:** Do not load runtime assets from third-party CDNs (Google Fonts, gstatic, jsDelivr, unpkg, cdnjs, Bootstrap CDN, etc.).
+
+**Required patterns:**
+
+- **Flutter web:** always `flutter build web --no-web-resources-cdn` and `flutter run --no-web-resources-cdn` for web targets.
+- **Web fonts:** use npm packages (e.g. `@fontsource/*`) imported in SCSS/CSS, or files under `wwwroot`/app `assets/`.
+- **Libraries:** install via npm/pub and bundle in the build output; no `<script src="https://cdn...">` or `<link href="https://cdn...">`.
+
+**Verify:** run `.\scripts\verify-no-external-cdn.ps1` before release builds.
+
+**Allowed exceptions:** API calls to your own backend, deep links, user-facing external URLs (About links), and map tile APIs configured as product features (not font/script CDNs).

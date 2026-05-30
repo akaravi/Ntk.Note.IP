@@ -34,10 +34,23 @@ import { CopyrightComponent } from './copyright/copyright.component';
 import { ContactComponent } from './contact/contact.component';
 import { AdminTicketsComponent } from './admin/admin-tickets.component';
 import { PwaService } from './core/pwa.service';
+import { AppSettingsService } from './core/app-settings.service';
+
+let appSettingsService: AppSettingsService;
 
 export function getApiBaseUrl(): string {
+  const override = appSettingsService?.apiBaseUrlOverride?.trim();
+  if (override) {
+    return override.endsWith('/') ? override.slice(0, -1) : override;
+  }
+
   const url = document.getElementsByTagName('base')[0].href;
   return url.endsWith('/') ? url.slice(0, -1) : url;
+}
+
+export function initAppSettings(settings: AppSettingsService): () => Promise<void> {
+  appSettingsService = settings;
+  return () => settings.load();
 }
 
 @NgModule({
@@ -104,6 +117,7 @@ export function getApiBaseUrl(): string {
         { provide: APP_ID, useValue: 'ng-cli-universal' },
         { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },
         { provide: API_BASE_URL, useFactory: getApiBaseUrl, deps: [] },
+        provideAppInitializer(() => initAppSettings(inject(AppSettingsService))()),
         provideAppInitializer(() => inject(AuthService).initialize()),
         provideAppInitializer(() => {
           const i18n = inject(I18nService);

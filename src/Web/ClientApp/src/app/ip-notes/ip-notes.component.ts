@@ -38,6 +38,13 @@ export class IpNotesComponent implements OnInit {
     this.reload();
   }
 
+  private static readonly DAY_MS = 24 * 60 * 60 * 1000;
+
+  private noteWhenIso(note: IpNoteDto): string | undefined {
+    return note.notedAtClient ?? note.created;
+  }
+
+  /** Full, explicit date + time (weekday + full date + clock) for clarity. */
   formatWhen(iso?: string): string {
     if (!iso) {
       return '—';
@@ -45,7 +52,7 @@ export class IpNotesComponent implements OnInit {
 
     try {
       return new Intl.DateTimeFormat(this.i18n.locale(), {
-        dateStyle: 'short',
+        dateStyle: 'full',
         timeStyle: 'short',
       }).format(new Date(iso));
     } catch {
@@ -53,8 +60,71 @@ export class IpNotesComponent implements OnInit {
     }
   }
 
-  noteWhen(note: IpNoteDto): string {
-    return this.formatWhen(note.notedAtClient ?? note.created);
+  /** True when the note was captured within the last 24h. */
+  isRecent(note: IpNoteDto): boolean {
+    const iso = this.noteWhenIso(note);
+    if (!iso) {
+      return false;
+    }
+
+    const diff = Date.now() - new Date(iso).getTime();
+    return diff >= 0 && diff < IpNotesComponent.DAY_MS;
+  }
+
+  /** Within a day -> relative ("3 hours ago"); otherwise the full date. */
+  noteWhenPrimary(note: IpNoteDto): string {
+    const iso = this.noteWhenIso(note);
+    if (!iso) {
+      return '—';
+    }
+
+    return this.isRecent(note) ? this.relativeWhen(iso) : this.formatWhen(iso);
+  }
+
+  /** Always the full, exact date + time (secondary line for recent notes). */
+  noteWhenExact(note: IpNoteDto): string {
+    return this.formatWhen(this.noteWhenIso(note));
+  }
+
+  private relativeWhen(iso: string): string {
+    const diffMs = Date.now() - new Date(iso).getTime();
+
+    if (diffMs < 60_000) {
+      return this.i18n.t('IP.NOTE_JUST_NOW');
+    }
+
+    try {
+      const rtf = new Intl.RelativeTimeFormat(this.i18n.locale(), { numeric: 'always' });
+      if (diffMs < 3_600_000) {
+        return rtf.format(-Math.floor(diffMs / 60_000), 'minute');
+      }
+      return rtf.format(-Math.floor(diffMs / 3_600_000), 'hour');
+    } catch {
+      return this.formatWhen(iso);
+    }
+  }
+
+  deviceRows(note: IpNoteDto): Array<{ key: string; value: string }> {
+    return this.buildDeviceRows(note.deviceInfo);
+  }
+
+  formDeviceRows(): Array<{ key: string; value: string }> {
+    return this.buildDeviceRows(this.form.deviceInfo);
+  }
+
+  private buildDeviceRows(
+    info?: { browser?: string; os?: string; deviceType?: string; language?: string }
+  ): Array<{ key: string; value: string }> {
+    if (!info) {
+      return [];
+    }
+
+    return [
+      { key: 'DEVICE.BROWSER', value: info.browser ?? '' },
+      { key: 'DEVICE.OS', value: info.os ?? '' },
+      { key: 'DEVICE.TYPE', value: info.deviceType ?? '' },
+      { key: 'DEVICE.LANGUAGE', value: info.language ?? '' },
+    ].filter((row) => row.value.trim().length > 0);
   }
 
   locationLine(note: IpNoteDto): string {

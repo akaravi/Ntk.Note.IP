@@ -201,7 +201,7 @@ abstract class AppLocalizations {
   /// No description provided for @rememberMe.
   ///
   /// In fa, this message translates to:
-  /// **'مرا به خاطر بسپار (۱ ماه)'**
+  /// **'مرا به خاطر بسپار '**
   String get rememberMe;
 
   /// No description provided for @contactTitle.
@@ -935,6 +935,30 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'زبان'**
   String get deviceLanguage;
+
+  /// No description provided for @noteRecordedAt.
+  ///
+  /// In fa, this message translates to:
+  /// **'زمان ثبت'**
+  String get noteRecordedAt;
+
+  /// No description provided for @noteJustNow.
+  ///
+  /// In fa, this message translates to:
+  /// **'همین الان'**
+  String get noteJustNow;
+
+  /// No description provided for @noteMinutesAgo.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} دقیقه پیش'**
+  String noteMinutesAgo(int count);
+
+  /// No description provided for @noteHoursAgo.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} ساعت پیش'**
+  String noteHoursAgo(int count);
 
   /// No description provided for @toolsHubWhois.
   ///

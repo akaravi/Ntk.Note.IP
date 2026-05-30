@@ -16,7 +16,7 @@
   "loginTitle": "ورود",
   "loginSubtitle": "برای داشبورد و یادداشت‌های IP وارد شوید",
   "loginAction": "ورود",
-  "rememberMe": "مرا به خاطر بسپار (۱ ماه)",
+  "rememberMe": "مرا به خاطر بسپار ",
   "contactTitle": "تماس با ما",
   "contactSubtitle": "پیام خود را بفرستید؛ تیم پشتیبانی در اسرع وقت پاسخ می‌دهد.",
   "contactName": "نام",
@@ -160,6 +160,24 @@
   "deviceOs": "سیستم‌عامل",
   "deviceType": "نوع دستگاه",
   "deviceLanguage": "زبان",
+  "noteRecordedAt": "زمان ثبت",
+  "noteJustNow": "همین الان",
+  "noteMinutesAgo": "{count} دقیقه پیش",
+  "@noteMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteHoursAgo": "{count} ساعت پیش",
+  "@noteHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "toolsHubWhois": "WHOIS و امنیت IP",
   "toolsHubWhoisDesc": "WHOIS، لیست سیاه و VPN/پروکسی",
   "toolsHubDns": "بررسی DNS",

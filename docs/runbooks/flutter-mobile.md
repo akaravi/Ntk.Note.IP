@@ -83,6 +83,24 @@ After the **5th** successful dashboard load, the app may show the platform store
 
 See [store-release-checklist.md](../mobile/store-release-checklist.md).
 
+## Flutter web
+
+Release build bundles CanvasKit locally (project rule: **no external CDN**):
+
+```powershell
+.\scripts\flutter-web-build.ps1
+# output: src/Mobile/ntk_note_ip_app/build/web → publish/flutter/web (via _build-all-projects.ps1)
+```
+
+Local dev:
+
+```powershell
+cd src\Mobile\ntk_note_ip_app
+flutter run -d chrome --no-web-resources-cdn --dart-define=API_BASE_URL=http://localhost:5340
+```
+
+Verify before release: `.\scripts\verify-no-external-cdn.ps1 -IncludePublishOutput`
+
 ## Stage S7 close
 
 See [s7-stage-close-checklist.md](../mobile/s7-stage-close-checklist.md).

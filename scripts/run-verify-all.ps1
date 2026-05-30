@@ -18,6 +18,9 @@ Set-Location $root
 
 Write-Host "=== IPNote.ir verify-all ===" -ForegroundColor Cyan
 
+& "$root\scripts\verify-no-external-cdn.ps1"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 if (-not $SkipFlutter) {
     & "$root\scripts\flutter-ci.ps1"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

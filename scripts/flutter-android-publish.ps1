@@ -18,16 +18,67 @@ function Get-FlutterPubspecVersionLabel {
     return "unknown"
 }
 
+function Get-FlutterAppNameSlug {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FlutterAppDir,
+        [string]$Fallback = "IP-Note"
+    )
+
+    $versionJsonPath = Join-Path $FlutterAppDir "..\..\..\version.json"
+    $versionJsonPath = [System.IO.Path]::GetFullPath($versionJsonPath)
+    if (-not (Test-Path -LiteralPath $versionJsonPath)) {
+        return $Fallback
+    }
+
+    try {
+        $product = (Get-Content -LiteralPath $versionJsonPath -Raw | ConvertFrom-Json).product
+        if ([string]::IsNullOrWhiteSpace($product)) {
+            return $Fallback
+        }
+
+        $slug = ($product.Trim() -replace '\s+', '-' -replace '[^A-Za-z0-9\-_.]', '')
+        if ([string]::IsNullOrWhiteSpace($slug)) {
+            return $Fallback
+        }
+
+        return $slug
+    }
+    catch {
+        return $Fallback
+    }
+}
+
+function Get-VersionedAndroidArtifactBaseName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$GradleBaseName,
+        [Parameter(Mandatory = $true)]
+        [string]$AppNameSlug
+    )
+
+    if ($GradleBaseName -match '^app-(.+)$') {
+        return "$AppNameSlug-$($matches[1])"
+    }
+
+    return "$AppNameSlug-$GradleBaseName"
+}
+
 function Publish-FlutterAndroidArtifacts {
     param(
         [Parameter(Mandatory = $true)]
         [string]$FlutterAppDir,
         [string]$DestinationDir = "",
-        [string]$VersionLabel = ""
+        [string]$VersionLabel = "",
+        [string]$AppNameSlug = ""
     )
 
     if ([string]::IsNullOrWhiteSpace($VersionLabel)) {
         $VersionLabel = Get-FlutterPubspecVersionLabel -FlutterAppDir $FlutterAppDir
+    }
+
+    if ([string]::IsNullOrWhiteSpace($AppNameSlug)) {
+        $AppNameSlug = Get-FlutterAppNameSlug -FlutterAppDir $FlutterAppDir
     }
 
     $outputsRoot = Join-Path $FlutterAppDir "build\app\outputs"
@@ -69,7 +120,10 @@ function Publish-FlutterAndroidArtifacts {
 
     $published = @()
     foreach ($artifact in $artifacts) {
-        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($artifact.Name)
+        $gradleBaseName = [System.IO.Path]::GetFileNameWithoutExtension($artifact.Name)
+        $baseName = Get-VersionedAndroidArtifactBaseName `
+            -GradleBaseName $gradleBaseName `
+            -AppNameSlug $AppNameSlug
         $versionedName = "${baseName}_${VersionLabel}$($artifact.Extension)"
         $destPath = Join-Path $DestinationDir $versionedName
         Copy-Item -LiteralPath $artifact.FullName -Destination $destPath -Force

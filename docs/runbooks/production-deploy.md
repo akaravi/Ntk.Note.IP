@@ -11,7 +11,7 @@
 
 ```powershell
 .\scripts\publish-api.ps1 -Configuration Release
-# output: publish\web
+# output: publish\dotnet\web
 ```
 
 Includes Angular production build via `Web.csproj` publish target.

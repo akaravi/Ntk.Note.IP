@@ -9,7 +9,7 @@
 | Authenticated bypass | Guest limit skipped when `User.Identity.IsAuthenticated` |
 | HTTPS / HSTS | `UseHttpsRedirection`; `UseHsts` in non-Development |
 | Security headers | `SecurityHeadersMiddleware`: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` |
-| CORS | Explicit origins via `Cors:AllowedOrigins`; Development allows any origin without credentials wildcard in prod config |
+| CORS | `Clients:*:AllowedOrigins` merged into global policy; optional extra `Cors:AllowedOrigins`; see ADR-015 |
 | JWT | `Jwt:BearerTokenExpirationHours` in appsettings |
 | Hangfire | Development only; `LocalRequestsOnlyAuthorizationFilter` |
 | Health endpoints | Development only (`MapDefaultEndpoints`) |
@@ -35,7 +35,8 @@
 
 ## Pre-release checklist (manual)
 
-- [ ] Production `Cors:AllowedOrigins` set (no open CORS)
+- [ ] Production `Clients:*:Secret` set via env (not `CHANGE_ME_*` if HMAC enforced)
+- [ ] Production client origins include `app.ipnote.ir` / dashboard hosts
 - [ ] Secrets in Key Vault / env, not in repo
 - [ ] Scalar/Swagger exposure reviewed for Production
 - [ ] TLS certificates valid

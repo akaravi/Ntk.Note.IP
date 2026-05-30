@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 abstract final class AppTheme {
   static const Color _seed = Color(0xFF6D28D9);
@@ -37,6 +36,6 @@ abstract final class AppTheme {
       return base;
     }
 
-    return GoogleFonts.vazirmatnTextTheme(base);
+    return base.apply(fontFamily: 'Vazirmatn');
   }
 }

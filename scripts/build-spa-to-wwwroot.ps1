@@ -38,3 +38,6 @@ Get-ChildItem -LiteralPath $distBrowser -Force | ForEach-Object {
 }
 
 Write-Host 'SPA published to wwwroot.' -ForegroundColor Green
+
+& (Join-Path $root 'scripts\verify-no-external-cdn.ps1') -IncludePublishOutput
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

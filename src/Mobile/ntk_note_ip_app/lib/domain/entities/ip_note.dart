@@ -1,3 +1,38 @@
+class IpNoteDeviceInfo {
+  const IpNoteDeviceInfo({
+    this.browser = '',
+    this.os = '',
+    this.deviceType = '',
+    this.language = '',
+  });
+
+  final String browser;
+  final String os;
+  final String deviceType;
+  final String language;
+
+  bool get hasAny =>
+      browser.isNotEmpty ||
+      os.isNotEmpty ||
+      deviceType.isNotEmpty ||
+      language.isNotEmpty;
+
+  static IpNoteDeviceInfo? fromJson(Object? value) {
+    if (value is! Map) {
+      return null;
+    }
+
+    final info = IpNoteDeviceInfo(
+      browser: value['browser']?.toString() ?? '',
+      os: value['os']?.toString() ?? '',
+      deviceType: value['deviceType']?.toString() ?? '',
+      language: value['language']?.toString() ?? '',
+    );
+
+    return info.hasAny ? info : null;
+  }
+}
+
 class IpNote {
   const IpNote({
     required this.id,
@@ -15,6 +50,7 @@ class IpNote {
     this.isp,
     this.asn,
     this.deviceLabel,
+    this.deviceInfo,
   });
 
   final int id;
@@ -32,6 +68,7 @@ class IpNote {
   final String? isp;
   final String? asn;
   final String? deviceLabel;
+  final IpNoteDeviceInfo? deviceInfo;
 
   factory IpNote.fromJson(Map<String, dynamic> json) {
     return IpNote(
@@ -50,6 +87,7 @@ class IpNote {
       isp: json['isp']?.toString(),
       asn: json['asn']?.toString(),
       deviceLabel: json['deviceLabel']?.toString(),
+      deviceInfo: IpNoteDeviceInfo.fromJson(json['deviceInfo']),
     );
   }
 

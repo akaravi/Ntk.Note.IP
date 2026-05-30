@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../domain/entities/ip_note.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../widgets/app_drawer.dart';
+import '../../widgets/info_row.dart';
 import '../../widgets/ltr_technical_text.dart';
 import '../../providers/app_providers.dart';
 import 'ip_notes_controller.dart';
@@ -329,10 +330,13 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final when = DateTime.tryParse(note.notedWhen);
-    final whenText = when != null
-        ? DateFormat.yMMMd().add_Hm().format(when.toLocal())
+    final theme = Theme.of(context);
+    final when = DateTime.tryParse(note.notedWhen)?.toLocal();
+    final exactText = when != null
+        ? DateFormat.yMMMMEEEEd().add_Hm().format(when)
         : note.notedWhen;
+    final primaryWhen = _relativeWhen(when, exactText);
+    final showExact = when != null && primaryWhen != exactText;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -345,20 +349,35 @@ class _NoteCard extends StatelessWidget {
               note.address,
               style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w600),
             ),
-            if (note.locationLine.isNotEmpty || (note.deviceLabel?.isNotEmpty ?? false))
+            const SizedBox(height: 4),
+            Text(
+              primaryWhen,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (showExact)
               Text(
-                [
-                  if (note.locationLine.isNotEmpty) note.locationLine,
-                  if (note.deviceLabel?.isNotEmpty ?? false) note.deviceLabel,
-                ].join(' · '),
-                style: Theme.of(context).textTheme.bodySmall,
+                exactText,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            if (note.locationLine.isNotEmpty)
+              Text(
+                note.locationLine,
+                style: theme.textTheme.bodySmall,
               ),
             if (note.isp != null && note.isp!.isNotEmpty)
               isLatinTechnicalText(note.isp!)
-                  ? LtrText(note.isp!, style: Theme.of(context).textTheme.bodySmall)
-                  : Text(note.isp!, style: Theme.of(context).textTheme.bodySmall),
+                  ? LtrText(note.isp!, style: theme.textTheme.bodySmall)
+                  : Text(note.isp!, style: theme.textTheme.bodySmall),
+            if (note.deviceInfo != null)
+              _DeviceInfoBox(info: note.deviceInfo!, l10n: l10n)
+            else if (note.deviceLabel?.isNotEmpty ?? false)
+              Text(note.deviceLabel!, style: theme.textTheme.bodySmall),
             if (note.title != null && note.title!.isNotEmpty)
-              Text(note.title!, style: Theme.of(context).textTheme.titleSmall),
+              Text(note.title!, style: theme.textTheme.titleSmall),
             if (note.body != null && note.body!.isNotEmpty) Text(note.body!),
             if (note.tagList.isNotEmpty)
               Wrap(
@@ -368,7 +387,6 @@ class _NoteCard extends StatelessWidget {
                     Chip(label: Text(tag), visualDensity: VisualDensity.compact),
                 ],
               ),
-            Text(whenText, style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -388,6 +406,74 @@ class _NoteCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  String _relativeWhen(DateTime? when, String fallback) {
+    if (when == null) {
+      return fallback;
+    }
+
+    final diff = DateTime.now().difference(when);
+    if (diff.isNegative || diff.inHours >= 24) {
+      return fallback;
+    }
+
+    if (diff.inMinutes < 1) {
+      return l10n.noteJustNow;
+    }
+
+    if (diff.inMinutes < 60) {
+      return l10n.noteMinutesAgo(diff.inMinutes);
+    }
+
+    return l10n.noteHoursAgo(diff.inHours);
+  }
+}
+
+class _DeviceInfoBox extends StatelessWidget {
+  const _DeviceInfoBox({required this.info, required this.l10n});
+
+  final IpNoteDeviceInfo info;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final rows = <MapEntry<String, String>>[
+      if (info.browser.isNotEmpty) MapEntry(l10n.deviceBrowser, info.browser),
+      if (info.os.isNotEmpty) MapEntry(l10n.deviceOs, info.os),
+      if (info.deviceType.isNotEmpty) MapEntry(l10n.deviceType, info.deviceType),
+      if (info.language.isNotEmpty) MapEntry(l10n.deviceLanguage, info.language),
+    ];
+
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.deviceTitle,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          for (final row in rows)
+            InfoRow(label: row.key, value: row.value),
+        ],
       ),
     );
   }

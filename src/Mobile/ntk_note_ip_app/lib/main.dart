@@ -8,12 +8,29 @@ import 'core/background/background_ip_monitor_service.dart';
 import 'core/background/background_monitor_prefs.dart';
 import 'core/background/workmanager_callback.dart';
 import 'core/config/app_config.dart';
+import 'core/config/app_settings.dart';
 import 'core/push/push_bootstrap.dart';
 import 'core/splash/native_splash_binding.dart';
 import 'core/widget/ip_home_widget_service.dart';
 
 Future<void> main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  await AppSettings.load();
+
+  const fromDefine = String.fromEnvironment('API_BASE_URL');
+  final settingsApiBaseUrl = AppSettings.instance.apiBaseUrl.trim();
+  final resolvedApiBaseUrl = fromDefine.isNotEmpty
+      ? fromDefine
+      : settingsApiBaseUrl.isNotEmpty
+          ? settingsApiBaseUrl
+          : AppConfig.current.apiBaseUrl;
+
+  AppConfig.apply(
+    apiBaseUrl: resolvedApiBaseUrl,
+    clientId: AppSettings.instance.clientId,
+    clientSecret: AppSettings.instance.clientSecret,
+  );
+
   if (!kIsWeb) {
     preserveNativeSplash(widgetsBinding);
   }

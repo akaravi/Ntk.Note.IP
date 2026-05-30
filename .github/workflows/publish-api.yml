@@ -40,13 +40,13 @@ jobs:
       - uses: actions/setup-dotnet@v5
 
       - name: Publish Web
-        run: pwsh ./scripts/publish-api.ps1 -Configuration Release -OutputPath ./publish/web
+        run: pwsh ./scripts/publish-api.ps1 -Configuration Release -OutputPath ./publish/dotnet/web
 
       - name: Upload publish artifact
         uses: actions/upload-artifact@v5
         with:
           name: ipnote-web-publish
-          path: publish/web
+          path: publish/dotnet/web
           retention-days: 30
 
       - name: Dependency audit (informational)

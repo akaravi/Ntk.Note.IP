@@ -1,5 +1,53 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-30 21:30 (Asia/Tehran)
+
+- **Client appsettings simplify:** Angular/Flutter appsettings now flat (`ClientId`, `ApiBaseUrl`, `Secret` only); full `Clients` + CORS stays on Web API only.
+
+## 2026-05-30 21:15 (Asia/Tehran)
+
+- **Client appsettings:** `appsettings.json` + `appsettings.Production.json` in `ClientApp` (panel-web) and `ntk_note_ip_app` (flutter-app); `AppSettingsService` / `AppSettings` load at startup; aligned `Clients` block with Web API.
+
+## 2026-05-30 21:00 (Asia/Tehran)
+
+- **Registered clients config:** `Clients:panel-web` and `Clients:flutter-app` with `Secret` + `AllowedOrigins`; CORS merges all client origins; optional HMAC middleware (`X-Client-Id`, `X-Client-Timestamp`, `X-Client-Signature`). ADR-015, runbook `registered-clients.md`.
+
+## 2026-05-30 20:20 (Asia/Tehran)
+
+- **CORS app.ipnote.ir:** `appsettings.Production.json` now includes `https://app.ipnote.ir` / `https://app.noteip.ir`; default CORS policy in `AddWebServices`; `UseCors()` moved before HTTPS redirect/auth/rate limit.
+
+## 2026-05-30 20:10 (Asia/Tehran)
+
+- **IP note device info + friendlier time:** Notes now show a readonly device/browser box (Browser, OS, Device type, Browser language) sourced from the already-persisted `DeviceInfoJson` (no backend/DB change), so it appears on later retrievals. Timestamp is larger/clearer with relative time within a day ("3 hr ago" / "۲ ساعت پیش") plus the full exact date. Web: `ip-notes.component.{ts,html,scss}` + `IP.NOTE_JUST_NOW` (fa/en). Flutter: `IpNoteDeviceInfo` parsing in `ip_note.dart`, `_DeviceInfoBox` + relative time in `ip_notes_screen.dart`, ARB `noteJustNow/noteMinutesAgo/noteHoursAgo` (fa/en/fr/ar) regenerated. Verified: `ng build` OK, `flutter analyze` clean. Plan: `cursor-plans/Cursor.93.plan.md`.
+
+## 2026-05-30 23:35 (Asia/Tehran)
+
+- **No external CDN (project law):** `.cursor/rules/no-external-cdn.mdc`; `scripts/verify-no-external-cdn.ps1` (wired into `run-verify-all`, `build-spa-to-wwwroot`, `flutter-web-build`). Angular/React: Google Fonts → `@fontsource/*` bundled in SCSS. Flutter: removed `google_fonts`; Vazirmatn TTF in `assets/fonts/`; CanvasKit `--no-web-resources-cdn`. wwwroot republished without gstatic.
+
+## 2026-05-30 23:25 (Asia/Tehran)
+
+- **Flutter web CanvasKit CDN fix:** `flutter build web --no-web-resources-cdn` in `flutter-web-build.ps1` — bundles `canvaskit/` locally instead of loading from `www.gstatic.com` (fixes `ERR_CONNECTION_CLOSED` / `Failed to fetch` on filtered networks). Runbook updated.
+
+## 2026-05-30 23:05 (Asia/Tehran)
+
+- **Android artifact names:** Include app product name from `version.json` (e.g. `IP-Note-arm64-v8a-release_0.1.2-build3.apk`); `flutter-android-publish.ps1` + CI `flutter-release.yml`.
+
+## 2026-05-30 22:55 (Asia/Tehran)
+
+- **Release ZIP default path:** `_build-all-projects.ps1` default `-ZipOutputDirectory` → `D:\PublishKaravi\IPNote.ir` (publish outputs still under repo `publish/`).
+
+## 2026-05-30 22:45 (Asia/Tehran)
+
+- **Publish layout:** .NET Web moved to `publish/dotnet/web` (Debug: `publish/dotnet/web-debug`); Flutter stays under `publish/flutter/*`.
+
+## 2026-05-30 22:30 (Asia/Tehran)
+
+- **Flutter release API URL + login errors:** `AppConfig` release default `https://ipnote.ir` (`kReleaseMode`) when `API_BASE_URL` dart-define omitted; mobile login uses `useCookies=false` (Bearer JSON); user-friendly Dio/500 messages instead of raw validateStatus text.
+
+## 2026-05-30 22:05 (Asia/Tehran)
+
+- **Publish culture folders:** Documented that `de/fr/pt/…` are NuGet satellite assemblies (Hangfire/EF), not SPA i18n. `SatelliteResourceLanguages=en` in `Directory.Build.props` + `publish-api.ps1`; post-publish `prune-publish-satellites.ps1`. Fixed publish output to `publish/web` (`UseArtifactsOutput=false`). Excluded `ClientApp`/`ClientApp-React` source from publish copy.
+
 ## 2026-05-30 21:50 (Asia/Tehran)
 
 - **Publish vs ZIP paths:** All project outputs under `publish/` only (`publish/web`, `publish/web-debug`, `publish/flutter/android`, `publish/flutter/web`). ZIP staging `artifacts/zip-staging`; default ZIP output `artifacts/release-zips` (or `-ZipOutputDirectory`). Updated `publish-api.ps1`, FolderProfile pubxml, CI `publish-api.yml`, `_build-all-projects.ps1`.

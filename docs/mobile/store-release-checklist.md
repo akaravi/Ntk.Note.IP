@@ -27,11 +27,11 @@ keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -vali
 # optional: -Target apk | all
 ```
 
-Outputs (version suffix at end of filename, from `pubspec.yaml`):
+Outputs (app name from `version.json` product + version suffix from `pubspec.yaml`):
 
-- `publish/flutter/android/app-release_0.1.2-build3.aab` (Play Console)
-- `publish/flutter/android/app-arm64-v8a-release_0.1.2-build3.apk` (smallest sideload; per-ABI split)
-- `publish/flutter/android/app-armeabi-v7a-release_0.1.2-build3.apk`
+- `publish/flutter/android/IP-Note-arm64-v8a-release_0.1.2-build3.apk` (smallest sideload; per-ABI split)
+- `publish/flutter/android/IP-Note-armeabi-v7a-release_0.1.2-build3.apk`
+- `publish/flutter/android/IP-Note-release_0.1.2-build3.aab` (Play Console)
 
 Size optimizations in release builds: R8 minify + resource shrink, `--split-per-abi`, Dart obfuscation, tree-shake icons, `--target-platform=android-arm,android-arm64` (no x86).
 

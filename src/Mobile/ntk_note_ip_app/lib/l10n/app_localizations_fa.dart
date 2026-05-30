@@ -57,7 +57,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get loginAction => 'ورود';
 
   @override
-  String get rememberMe => 'مرا به خاطر بسپار (۱ ماه)';
+  String get rememberMe => 'مرا به خاطر بسپار ';
 
   @override
   String get contactTitle => 'تماس با ما';
@@ -440,6 +440,22 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get deviceLanguage => 'زبان';
+
+  @override
+  String get noteRecordedAt => 'زمان ثبت';
+
+  @override
+  String get noteJustNow => 'همین الان';
+
+  @override
+  String noteMinutesAgo(int count) {
+    return '$count دقیقه پیش';
+  }
+
+  @override
+  String noteHoursAgo(int count) {
+    return '$count ساعت پیش';
+  }
 
   @override
   String get toolsHubWhois => 'WHOIS و امنیت IP';

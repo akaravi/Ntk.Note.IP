@@ -442,6 +442,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deviceLanguage => 'Language';
 
   @override
+  String get noteRecordedAt => 'Recorded at';
+
+  @override
+  String get noteJustNow => 'Just now';
+
+  @override
+  String noteMinutesAgo(int count) {
+    return '$count min ago';
+  }
+
+  @override
+  String noteHoursAgo(int count) {
+    return '$count hr ago';
+  }
+
+  @override
   String get toolsHubWhois => 'WHOIS & IP security';
 
   @override

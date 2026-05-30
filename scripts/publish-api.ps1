@@ -6,9 +6,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
-$defaultOutput = Join-Path $root "publish\web"
+$defaultOutput = Join-Path $root "publish\dotnet\web"
 if ($Configuration -eq "Debug") {
-    $defaultOutput = Join-Path $root "publish\web-debug"
+    $defaultOutput = Join-Path $root "publish\dotnet\web-debug"
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
@@ -21,23 +21,25 @@ Write-Host "=== IPNote.ir publish Web ($Configuration) ===" -ForegroundColor Cya
 Write-Host "Profile: $profile" -ForegroundColor DarkGray
 Write-Host "Output: $OutputPath" -ForegroundColor DarkGray
 
-$publishArgs = @(
-    (Join-Path $root "src\Web\Web.csproj"),
-    "/p:PublishProfile=$profile"
-)
-
-if ($OutputPath -ne $defaultOutput) {
-    $resolved = (Resolve-Path -LiteralPath (Split-Path $OutputPath -Parent) -ErrorAction SilentlyContinue)?.Path
-    if (-not $resolved) {
-        New-Item -ItemType Directory -Force -Path (Split-Path $OutputPath -Parent) | Out-Null
-        $resolved = (Resolve-Path -LiteralPath (Split-Path $OutputPath -Parent)).Path
-    }
-    $publishUrl = Join-Path $resolved (Split-Path $OutputPath -Leaf)
-    if (-not $publishUrl.EndsWith('\')) { $publishUrl += '\' }
-    $publishArgs += "/p:PublishUrl=$publishUrl"
+New-Item -ItemType Directory -Force -Path $OutputPath | Out-Null
+$publishDir = (Resolve-Path -LiteralPath $OutputPath).Path
+if (-not $publishDir.EndsWith('\')) {
+    $publishDir += '\'
 }
 
+$publishArgs = @(
+    (Join-Path $root "src\Web\Web.csproj"),
+    "/p:PublishProfile=$profile",
+    "/p:SatelliteResourceLanguages=en",
+    "/p:UseArtifactsOutput=false",
+    "/p:PublishDir=$publishDir",
+    "/p:PublishUrl=$publishDir"
+)
+
 dotnet publish @publishArgs
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+& (Join-Path $PSScriptRoot "prune-publish-satellites.ps1") -PublishDir $publishDir.TrimEnd('\')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Publish completed." -ForegroundColor Green

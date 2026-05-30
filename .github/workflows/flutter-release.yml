@@ -76,6 +76,7 @@ jobs:
       - name: Publish versioned Android artifacts
         run: |
           VERSION=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/^version:[[:space:]]*//' | tr '+' '-build')
+          APP_SLUG=$(grep -E '"product"' ../../../version.json | head -1 | sed -E 's/.*"product"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/' | tr ' ' '-')
           OUT=../../../publish/flutter/android
           mkdir -p "$OUT"
           publish() {
@@ -87,6 +88,10 @@ jobs:
               base=$(basename "$f")
               ext="${base##*.}"
               name="${base%.*}"
+              case "$name" in
+                app-*) name="${APP_SLUG}-${name#app-}" ;;
+                *) name="${APP_SLUG}-${name}" ;;
+              esac
               cp "$f" "$OUT/${name}_${VERSION}.${ext}"
             done
           }

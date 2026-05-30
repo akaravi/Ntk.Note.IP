@@ -439,6 +439,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deviceLanguage => 'زبان';
 
   @override
+  String get noteRecordedAt => 'وقت التسجيل';
+
+  @override
+  String get noteJustNow => 'الآن';
+
+  @override
+  String noteMinutesAgo(int count) {
+    return 'قبل $count دقيقة';
+  }
+
+  @override
+  String noteHoursAgo(int count) {
+    return 'قبل $count ساعة';
+  }
+
+  @override
   String get toolsHubWhois => 'WHOIS و امنیت IP';
 
   @override

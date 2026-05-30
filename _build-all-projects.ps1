@@ -12,12 +12,12 @@
     .\_build-all-projects.ps1 -Configuration Release
 
   Publish layout (repo root):
-    publish/web              Web API Release
-    publish/web-debug        Web API Debug
-    publish/flutter/android  Android APK/AAB
-    publish/flutter/web      Flutter web
+    publish/dotnet/web         Web API Release
+    publish/dotnet/web-debug   Web API Debug
+    publish/flutter/android    Android APK/AAB
+    publish/flutter/web        Flutter web
 
-  Default ZIP output: artifacts\release-zips (override with -ZipOutputDirectory)
+  Default ZIP output: D:\PublishKaravi\IPNote.ir (override with -ZipOutputDirectory)
 
   APK only (no Play Store bundle):
     .\_build-all-projects.ps1 -Configuration Release -PackageOnly -AndroidArtifact apk
@@ -68,12 +68,12 @@ $webProj = Join-Path $root "src\Web\Web.csproj"
 $appHostProj = Join-Path $root "src\AppHost\AppHost.csproj"
 $flutterAppPath = Join-Path $root "src\Mobile\ntk_note_ip_app"
 $publishRoot = Join-Path $root "publish"
-$publishWebDir = Join-Path $publishRoot "web"
-$publishWebDebugDir = Join-Path $publishRoot "web-debug"
+$publishWebDir = Join-Path $publishRoot "dotnet\web"
+$publishWebDebugDir = Join-Path $publishRoot "dotnet\web-debug"
 $androidPublishDir = Join-Path $publishRoot "flutter\android"
 $flutterWebPublishDir = Join-Path $publishRoot "flutter\web"
 $zipStagingDir = Join-Path $root "artifacts\zip-staging"
-$defaultZipOutputDir = Join-Path $root "artifacts\release-zips"
+$defaultZipOutputDir = "D:\PublishKaravi\IPNote.ir"
 
 Set-Location $root
 
@@ -427,7 +427,7 @@ if (-not $SkipPackage) {
             Write-Host "Non-interactive ZIP -> $ZipOutputDirectory" -ForegroundColor DarkGray
         }
         else {
-            Write-Host "مسیر پوشه برای ZIP خروجی استقرار را وارد کنید (Enter = artifacts\release-zips):" -ForegroundColor Cyan
+            Write-Host "مسیر پوشه برای ZIP خروجی استقرار را وارد کنید (Enter = D:\PublishKaravi\IPNote.ir):" -ForegroundColor Cyan
             $inputPath = Read-Host "ZIP output folder"
             if ([string]::IsNullOrWhiteSpace($inputPath)) {
                 $ZipOutputDirectory = $defaultZipOutputDir
@@ -480,7 +480,7 @@ Write-Host "Tips:" -ForegroundColor DarkYellow
 Write-Host "  -SkipPackage     daily dev build (default companion to run-all)" -ForegroundColor DarkGray
 Write-Host "  -Configuration Release -PackageOnly   release ZIP without AppHost" -ForegroundColor DarkGray
 Write-Host "  -SkipStopRunningProjects   skip killing AppHost/Web before build" -ForegroundColor DarkGray
-Write-Host "  publish/web, publish/flutter/*   all project publish outputs" -ForegroundColor DarkGray
-Write-Host "  -ZipOutputDirectory <path>   ZIP destination (default artifacts\release-zips)" -ForegroundColor DarkGray
+Write-Host "  publish/dotnet/*, publish/flutter/*   all project publish outputs" -ForegroundColor DarkGray
+Write-Host "  -ZipOutputDirectory <path>   ZIP destination (default D:\PublishKaravi\IPNote.ir)" -ForegroundColor DarkGray
 Write-Host "  -SkipFlutterAndroid   release ZIP without mobile Android artifacts" -ForegroundColor DarkGray
 Write-Host "  -SkipFlutterWeb       release ZIP without Flutter web artifacts" -ForegroundColor DarkGray
