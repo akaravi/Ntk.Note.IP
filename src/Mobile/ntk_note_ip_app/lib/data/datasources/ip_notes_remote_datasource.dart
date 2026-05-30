@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../api/generated/clients/ipnote_client.dart';
 import '../../api/generated/models/add_ip_note_command.dart';
 import '../../api/generated/models/update_ip_note_command.dart';
@@ -20,7 +22,7 @@ class IpNotesRemoteDataSource {
           envelope.data?.map((dto) => dto.toJson()).toList() ?? <Map<String, dynamic>>[];
       return ApiResult.ok(items);
     } catch (error) {
-      return ApiResult.fail(error.toString());
+      return ApiResult.fail(_messageFromError(error));
     }
   }
 
@@ -45,7 +47,7 @@ class IpNotesRemoteDataSource {
 
       return ApiResult.ok(int.tryParse(id?.toString() ?? '') ?? 0);
     } catch (error) {
-      return ApiResult.fail(error.toString());
+      return ApiResult.fail(_messageFromError(error));
     }
   }
 
@@ -69,7 +71,7 @@ class IpNotesRemoteDataSource {
       );
       return ApiResult.ok(null);
     } catch (error) {
-      return ApiResult.fail(error.toString());
+      return ApiResult.fail(_messageFromError(error));
     }
   }
 
@@ -78,7 +80,26 @@ class IpNotesRemoteDataSource {
       await _client.deleteIpNote(id: id);
       return ApiResult.ok(null);
     } catch (error) {
-      return ApiResult.fail(error.toString());
+      return ApiResult.fail(_messageFromError(error));
     }
+  }
+
+  String _messageFromError(Object error) {
+    if (error is DioException) {
+      final data = error.response?.data;
+      if (data is Map<String, dynamic>) {
+        final detail = data['detail'] ?? data['title'] ?? data['errorMessage'];
+        if (detail is String && detail.isNotEmpty) {
+          return detail;
+        }
+      }
+
+      final status = error.response?.statusCode;
+      if (status == 400) {
+        return 'Invalid request data.';
+      }
+    }
+
+    return error.toString();
   }
 }

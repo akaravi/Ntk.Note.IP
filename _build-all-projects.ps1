@@ -8,7 +8,7 @@
   Quick dev (build + tests + i18n, no ZIP, start Aspire):
     .\_build-all-projects.ps1 -SkipPackage
 
-  Release artifact ZIP (Web publish + Flutter Android APK/AAB + SPA in wwwroot):
+  Release artifact ZIP (Web publish + Flutter Android APK/AAB + Flutter web + SPA in wwwroot):
     .\_build-all-projects.ps1 -Configuration Release
 
   APK only (no Play Store bundle):
@@ -37,6 +37,7 @@ param(
     [switch]$SkipFlutter,
     [switch]$SkipFlutterAnalyze,
     [switch]$SkipFlutterAndroid,
+    [switch]$SkipFlutterWeb,
     [ValidateSet("apk", "appbundle", "all")]
     [string]$AndroidArtifact = "all",
     [string]$ApiBaseUrl = "https://api.ipnote.ir",
@@ -60,6 +61,7 @@ $appHostProj = Join-Path $root "src\AppHost\AppHost.csproj"
 $flutterAppPath = Join-Path $root "src\Mobile\ntk_note_ip_app"
 $publishWebDir = Join-Path $root "artifacts\publish\web"
 $androidPublishDir = Join-Path $root "publish\flutter\android"
+$flutterWebPublishDir = Join-Path $root "publish\flutter\web"
 
 Set-Location $root
 
@@ -285,6 +287,35 @@ function Invoke-FlutterAndroidRelease {
     }
 }
 
+function Invoke-FlutterWebRelease {
+    if ($SkipFlutter -or $SkipFlutterWeb) {
+        Write-Host "SKIP Flutter web release (-SkipFlutter / -SkipFlutterWeb)" -ForegroundColor DarkYellow
+        return
+    }
+
+    New-Item -ItemType Directory -Force -Path $flutterWebPublishDir | Out-Null
+
+    Write-Host "=== Flutter web release ===" -ForegroundColor Cyan
+    & (Join-Path $root "scripts\flutter-web-build.ps1") `
+        -ApiBaseUrl $ApiBaseUrl `
+        -SkipCi
+    if ($LASTEXITCODE -ne 0) { throw "flutter-web-build.ps1 failed" }
+
+    $webBuildDir = Join-Path $flutterAppPath "build\web"
+    if (-not (Test-Path -LiteralPath (Join-Path $webBuildDir "index.html"))) {
+        throw "Flutter web build output missing: $webBuildDir\index.html"
+    }
+
+    if (Test-Path -LiteralPath $flutterWebPublishDir) {
+        Remove-Item -Recurse -Force $flutterWebPublishDir
+    }
+    New-Item -ItemType Directory -Force -Path $flutterWebPublishDir | Out-Null
+    Copy-Item -Recurse -Force (Join-Path $webBuildDir "*") $flutterWebPublishDir
+
+    Write-Host "Flutter web copied -> $flutterWebPublishDir" -ForegroundColor Green
+    Write-Host "  [WEB] $(Join-Path $flutterWebPublishDir 'index.html')" -ForegroundColor DarkGreen
+}
+
 function Invoke-DeployZip {
     param([Parameter(Mandatory = $true)][string]$ZipDirectory)
 
@@ -329,6 +360,14 @@ function Invoke-DeployZip {
             $apkCount = @($androidFiles | Where-Object { $_.Extension -eq ".apk" }).Count
             $aabCount = @($androidFiles | Where-Object { $_.Extension -eq ".aab" }).Count
             Write-Host "ZIP mobile_android: $apkCount APK, $aabCount AAB" -ForegroundColor DarkGray
+        }
+    }
+
+    if (Test-Path -LiteralPath $flutterWebPublishDir) {
+        $webIndex = Join-Path $flutterWebPublishDir "index.html"
+        if (Test-Path -LiteralPath $webIndex) {
+            Copy-Item -Recurse -Force $flutterWebPublishDir (Join-Path $stageRoot "mobile_web")
+            Write-Host "ZIP mobile_web: Flutter web (index.html + assets)" -ForegroundColor DarkGray
         }
     }
 
@@ -397,6 +436,7 @@ if (-not $SkipPackage) {
     Invoke-WebPublish
     Invoke-FlutterCi
     Invoke-FlutterAndroidRelease
+    Invoke-FlutterWebRelease
     Invoke-DeployZip -ZipDirectory $ZipOutputDirectory
 }
 else {
@@ -430,4 +470,5 @@ Write-Host "  -SkipPackage     daily dev build (default companion to run-all)" -
 Write-Host "  -Configuration Release -PackageOnly   release ZIP without AppHost" -ForegroundColor DarkGray
 Write-Host "  -SkipStopRunningProjects   skip killing AppHost/Web before build" -ForegroundColor DarkGray
 Write-Host "  -AndroidArtifact apk|appbundle|all   default all (APK + AAB in ZIP)" -ForegroundColor DarkGray
-Write-Host "  -SkipFlutterAndroid   release ZIP without mobile artifacts" -ForegroundColor DarkGray
+Write-Host "  -SkipFlutterAndroid   release ZIP without mobile Android artifacts" -ForegroundColor DarkGray
+Write-Host "  -SkipFlutterWeb       release ZIP without Flutter web artifacts" -ForegroundColor DarkGray

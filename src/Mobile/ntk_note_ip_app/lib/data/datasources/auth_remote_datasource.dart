@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../api/generated/clients/ipnote_client.dart';
 import '../../api/generated/models/login_request.dart';
+import '../../api/generated/models/register_request.dart';
 import '../../api/generated/models/refresh_request.dart';
 import '../../core/auth/auth_token_mapper.dart';
 import '../../core/auth/auth_tokens.dart';
@@ -12,6 +13,23 @@ class AuthRemoteDataSource implements AuthRemotePort {
   AuthRemoteDataSource(this._client);
 
   final IpnoteClient _client;
+
+  @override
+  Future<ApiResult<void>> register({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _client.postApiV1UsersRegister(
+        body: RegisterRequest(email: email, password: password),
+      );
+      return ApiResult.ok(null);
+    } on DioException catch (error) {
+      return _failFromDio<void>(error, 'Registration failed');
+    } catch (error) {
+      return ApiResult.fail(error.toString());
+    }
+  }
 
   @override
   Future<ApiResult<AuthTokens>> login({

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/feedback/app_review_service.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/map/osm_static_map.dart';
 import '../../../domain/dashboard/dashboard_timeline.dart';
 import '../../../domain/entities/ip_lookup_record.dart';
@@ -139,7 +140,10 @@ class DashboardController extends Notifier<DashboardState> {
 
     state = state.copyWith(
       mapLoading: false,
-      mapUrl: OsmStaticMap.buildAggregateMapUrl(markers),
+      mapUrl: OsmStaticMap.buildAggregateMapUrl(
+        AppConfig.current.apiBaseUrl,
+        markers,
+      ),
     );
   }
 

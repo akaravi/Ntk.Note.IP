@@ -72,4 +72,14 @@ public class WebApiFactory(string connectionString) : WebApplicationFactory<Prog
             services.AddSingleton<IBlacklistChecker, FakeBlacklistChecker>();
         });
     }
+
+    /// <summary>
+    /// Production middleware/pipeline checks while keeping Aspire SQLite test DB (not SqlServer).
+    /// </summary>
+    protected static void ConfigureProductionTestHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment(Environments.Production);
+        builder.UseSetting("Database:Provider", "Sqlite");
+        builder.UseSetting("Database:ApplyMigrationsOnStartup", "false");
+    }
 }

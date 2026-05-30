@@ -6,6 +6,7 @@ import { I18nService } from '../core/i18n.service';
 import { IpHistoryService } from '../core/ip-history.service';
 import { IpLookupService } from '../ip-lookup/ip-lookup.service';
 import { IpNotesService } from '../ip-notes/ip-notes.service';
+import { API_BASE_URL } from '../web-api-client';
 import { buildAggregateMapUrl } from './dashboard-map';
 import {
   buildDashboardTimeline,
@@ -26,6 +27,7 @@ export class DashboardComponent implements OnInit {
   private readonly ipLookup = inject(IpLookupService);
   private readonly ipNotes = inject(IpNotesService);
   private readonly router = inject(Router);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
   readonly i18n = inject(I18nService);
 
   loading = signal(true);
@@ -131,7 +133,7 @@ export class DashboardComponent implements OnInit {
             lat: details!.geo.latitude!,
             lon: details!.geo.longitude!,
           }));
-        this.mapUrl.set(buildAggregateMapUrl(markers));
+        this.mapUrl.set(buildAggregateMapUrl(this.apiBaseUrl, markers));
         this.mapLoading.set(false);
       },
       error: () => {

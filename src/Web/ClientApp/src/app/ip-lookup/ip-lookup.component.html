@@ -16,18 +16,10 @@
         <span class="ip-lookup__badge">{{ ip.isIPv6 ? i18n.t('IP.IPV6') : i18n.t('IP.IPV4') }}</span>
         <span class="ip-lookup__badge ip-lookup__badge--muted">{{ i18n.t('IP.SCOPE') }}: {{ ip.scope }}</span>
       </div>
-      <button type="button" class="ip-lookup__note-btn outline" data-testid="note-this-ip" (click)="noteThisIp()">
-        {{ i18n.t('IP.NOTE_THIS') }}
-      </button>
-      @if (localIpAddress(); as local) {
-        <p class="ip-lookup__local">
-          {{ i18n.t('IP.LOCAL_IP') }}:
-          <span class="ip-lookup__mono">{{ local }}</span>
-        </p>
-      } @else {
-        <p class="ip-lookup__muted">{{ i18n.t('IP.LOCAL_IP_UNAVAILABLE') }}</p>
-      }
-      <div class="ip-lookup__row ip-lookup__plain-actions">
+      <div class="ip-lookup__row ip-lookup__hero-actions">
+        <button type="button" class="outline" data-testid="note-this-ip" (click)="noteThisIp()">
+          {{ i18n.t('IP.NOTE_THIS') }}
+        </button>
         <button type="button" class="secondary" (click)="copyAddress()">
           {{ addressCopied() ? i18n.t('IP.COPIED') : i18n.t('IP.COPY') }}
         </button>
@@ -38,6 +30,14 @@
           {{ plainCopied() ? i18n.t('IP.PLAIN_COPIED') : i18n.t('IP.PLAIN_TEXT') }}
         </button>
       </div>
+      @if (localIpAddress(); as local) {
+        <p class="ip-lookup__local">
+          {{ i18n.t('IP.LOCAL_IP') }}:
+          <span class="ip-lookup__mono">{{ local }}</span>
+        </p>
+      } @else {
+        <p class="ip-lookup__muted">{{ i18n.t('IP.LOCAL_IP_UNAVAILABLE') }}</p>
+      }
       @if (showQr() && qrDataUrl(); as qr) {
         <img class="ip-lookup__qr" [src]="qr" [alt]="i18n.t('IP.QR_ALT')" width="220" height="220" />
       }

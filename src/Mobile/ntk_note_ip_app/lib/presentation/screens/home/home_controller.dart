@@ -20,6 +20,7 @@ class HomeState {
     this.details,
     this.error,
     this.copied = false,
+    this.plainCopied = false,
     this.showQr = false,
     this.localIp,
     this.deviceInfo,
@@ -32,6 +33,7 @@ class HomeState {
   final IpDetails? details;
   final String? error;
   final bool copied;
+  final bool plainCopied;
   final bool showQr;
   final String? localIp;
   final DeviceInfoSummary? deviceInfo;
@@ -44,6 +46,7 @@ class HomeState {
     IpDetails? details,
     String? error,
     bool? copied,
+    bool? plainCopied,
     bool? showQr,
     String? localIp,
     DeviceInfoSummary? deviceInfo,
@@ -58,6 +61,7 @@ class HomeState {
       details: clearDetails ? null : (details ?? this.details),
       error: clearError ? null : (error ?? this.error),
       copied: copied ?? this.copied,
+      plainCopied: plainCopied ?? this.plainCopied,
       showQr: showQr ?? this.showQr,
       localIp: localIp ?? this.localIp,
       deviceInfo: deviceInfo ?? this.deviceInfo,
@@ -112,6 +116,7 @@ class HomeController extends Notifier<HomeState> {
       loading: true,
       clearError: true,
       copied: false,
+      plainCopied: false,
       showQr: false,
     );
 
@@ -177,15 +182,19 @@ class HomeController extends Notifier<HomeState> {
       ),
     );
 
-    await ref.read(ipHistoryStoreProvider).add(
-          address: details.address,
-          isIPv6: details.isIPv6,
-          scope: details.scope,
-          city: details.geo.city,
-          countryCode: details.geo.countryCode,
-          deviceLabel: state.deviceInfo?.label,
-        );
-    ref.invalidate(ipHistoryListProvider);
+    try {
+      await ref.read(ipHistoryStoreProvider).add(
+            address: details.address,
+            isIPv6: details.isIPv6,
+            scope: details.scope,
+            city: details.geo.city,
+            countryCode: details.geo.countryCode,
+            deviceLabel: state.deviceInfo?.label,
+          );
+      ref.invalidate(ipHistoryListProvider);
+    } catch (_) {
+      // Local history is best-effort; do not break home when storage fails on web.
+    }
 
     if (syncServer && ref.read(authControllerProvider).isAuthenticated) {
       await ref.read(actionLookupIpUseCaseProvider).call(address);
@@ -203,6 +212,24 @@ class HomeController extends Notifier<HomeState> {
     state = state.copyWith(copied: true);
     await Future<void>.delayed(const Duration(seconds: 2));
     state = state.copyWith(copied: false);
+  }
+
+  Future<void> copyPlainIp() async {
+    final result = await ref.read(getMyIpPlainUseCaseProvider).call();
+    if (!result.isSuccess || result.data == null) {
+      state = state.copyWith(error: result.errorMessage ?? 'Error');
+      return;
+    }
+
+    try {
+      await Clipboard.setData(ClipboardData(text: result.data!.trim()));
+      await AppHaptics.light();
+      state = state.copyWith(plainCopied: true);
+      await Future<void>.delayed(const Duration(seconds: 2));
+      state = state.copyWith(plainCopied: false);
+    } catch (error) {
+      state = state.copyWith(error: error.toString());
+    }
   }
 
   void toggleQr() {

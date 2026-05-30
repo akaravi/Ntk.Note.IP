@@ -49,12 +49,10 @@
   color: var(--ip-text-muted);
 }
 
-.ip-lookup__note-btn {
-  font-size: 0.82rem;
-  padding: 0.35rem 0.9rem;
-  margin: 0.25rem auto 0.85rem;
-  display: inline-block;
-  min-height: unset;
+.ip-lookup__hero-actions {
+  margin-top: 0.75rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .ip-lookup__hero-ip {
@@ -109,11 +107,6 @@
   margin: 1rem auto 0;
   border-radius: var(--pico-border-radius);
   border: 1px solid var(--ip-border);
-}
-
-.ip-lookup__plain-actions {
-  margin-top: 0.75rem;
-  justify-content: center;
 }
 
 .ip-lookup__mini-dl {
@@ -312,7 +305,7 @@
 }
 
 @media (max-width: 576px) {
-  .ip-lookup__row {
+  .ip-lookup__row:not(.ip-lookup__hero-actions) {
     flex-direction: column;
     align-items: stretch;
 
@@ -321,8 +314,14 @@
     }
   }
 
-  .ip-lookup__plain-actions {
-    flex-direction: column;
+  .ip-lookup__hero-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+
+    button {
+      flex: 1 1 auto;
+      min-width: max-content;
+    }
   }
 
   .ip-lookup__details dl {

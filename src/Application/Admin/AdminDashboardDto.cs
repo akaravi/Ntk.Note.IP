@@ -13,4 +13,8 @@ public class AdminDashboardDto
     public int OutboxPendingCount { get; init; }
 
     public int IpSnapshotCount { get; init; }
+
+    public int RoleCount { get; init; }
+
+    public int SupportTicketOpenCount { get; init; }
 }

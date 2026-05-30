@@ -5,12 +5,14 @@ using Ntk.Note.IP.Application.Common.Interfaces;
 using Ntk.Note.IP.Application.Common.Options;
 using Ntk.Note.IP.Domain.Constants;
 using Ntk.Note.IP.Infrastructure.Dns;
+using Ntk.Note.IP.Infrastructure.Email;
 using Ntk.Note.IP.Infrastructure.DnsResolution;
 using Ntk.Note.IP.Infrastructure.Blacklist;
 using Ntk.Note.IP.Infrastructure.BackgroundJobs;
 using Ntk.Note.IP.Infrastructure.Caching;
 using Ntk.Note.IP.Infrastructure.GeoIp;
 using Ntk.Note.IP.Infrastructure.IpLookup;
+using Ntk.Note.IP.Infrastructure.Maps;
 using Ntk.Note.IP.Shared;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -75,6 +77,10 @@ public static class DependencyInjection
 
         builder.Services.AddIpNoteAuthentication(builder.Configuration);
 
+        builder.Services.Configure<SiteOptions>(builder.Configuration.GetSection(SiteOptions.SectionName));
+        builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(SmtpOptions.SectionName));
+        builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy(Policies.RequireAdministrator, policy => policy.RequireRole(Roles.Administrator));
 
@@ -89,6 +95,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
         builder.Services.AddTransient<IAdminUserService, AdminUserService>();
+        builder.Services.AddTransient<IAdminRoleService, AdminRoleService>();
 
         builder.Services.AddSingleton<IDnsLookupService, SystemDnsLookupService>();
 
@@ -117,6 +124,12 @@ public static class DependencyInjection
                 : sp.GetRequiredService<FakeDnsPropagationChecker>();
         });
         builder.Services.AddMemoryCache();
+        builder.Services.AddHttpClient<IOsmStaticMapRenderer, OsmStaticMapRenderer>(client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("IPNote.ir/1.0 (+https://ipnote.ir; static-map)");
+            client.DefaultRequestHeaders.Accept.ParseAdd("image/png");
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
         builder.Services.Configure<CacheOptions>(builder.Configuration.GetSection(CacheOptions.SectionName));
         builder.Services.AddSingleton<ICacheService>(sp => new TwoTierCacheService(
             sp.GetRequiredService<IMemoryCache>(),

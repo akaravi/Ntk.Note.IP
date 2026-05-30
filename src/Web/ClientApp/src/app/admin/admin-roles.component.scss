@@ -1,0 +1,123 @@
+@import './admin-shared.scss';
+
+.admin-roles__layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 860px) {
+  .admin-roles__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-roles__sidebar {
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-surface-elevated);
+  padding: 0.75rem;
+}
+
+.admin-roles__sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  button {
+    margin: 0;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.82rem;
+  }
+}
+
+.admin-roles__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-roles__role-btn {
+  width: 100%;
+  text-align: start;
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+  background: var(--ip-surface);
+  color: var(--ip-text);
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+}
+
+.admin-roles__role-btn--active {
+  border-color: var(--ip-accent);
+  background: var(--ip-accent-soft);
+}
+
+.admin-roles__role-name {
+  display: block;
+  font-weight: 600;
+}
+
+.admin-roles__role-meta {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--ip-text-muted);
+  font-size: 0.82rem;
+}
+
+.admin-roles__panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0 0 0.25rem;
+  }
+}
+
+.admin-roles__matrix {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-roles__group {
+  margin: 0;
+  border: 1px solid var(--ip-border);
+  border-radius: var(--pico-border-radius);
+  padding: 0.75rem;
+
+  legend {
+    padding: 0 0.35rem;
+    color: var(--ip-text-muted);
+    font-size: 0.88rem;
+  }
+}
+
+.admin-roles__checks {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-roles__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  color: var(--ip-text);
+  font-size: 0.92rem;
+}
+
+.admin-roles__actions {
+  margin-top: 1rem;
+}

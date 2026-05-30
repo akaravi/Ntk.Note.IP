@@ -16,5 +16,7 @@ public interface IApplicationDbContext
 
     DbSet<UserPublicIpSnapshot> UserPublicIpSnapshots { get; }
 
+    DbSet<SupportTicket> SupportTickets { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

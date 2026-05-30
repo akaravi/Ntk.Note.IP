@@ -1,11 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { AdminService, AdminDashboardDto } from './admin.service';
+import { RouterLink } from '@angular/router';
+import { AdminService, AdminDashboardDto, AdminRoleDto } from './admin.service';
 import { I18nService } from '../core/i18n.service';
 
 @Component({
   standalone: false,
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
+  styleUrls: ['./admin-dashboard.component.scss'],
 })
 export class AdminDashboardComponent implements OnInit {
   private readonly admin = inject(AdminService);
@@ -14,6 +16,7 @@ export class AdminDashboardComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   stats = signal<AdminDashboardDto | null>(null);
+  roles = signal<AdminRoleDto[]>([]);
 
   ngOnInit(): void {
     this.load();
@@ -31,6 +34,11 @@ export class AdminDashboardComponent implements OnInit {
         this.error.set(err.message);
         this.loading.set(false);
       },
+    });
+
+    this.admin.getRoles().subscribe({
+      next: (data) => this.roles.set(data),
+      error: () => undefined,
     });
   }
 }

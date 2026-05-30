@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/ltr_technical_text.dart';
 import 'login_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -56,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
+                LtrTextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
@@ -73,7 +74,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                LtrTextFormField(
                   controller: _passwordController,
                   obscureText: true,
                   autofillHints: const [AutofillHints.password],
@@ -93,7 +94,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 12),
                   Text(state.error!, style: TextStyle(color: scheme.error)),
                 ],
-                const SizedBox(height: 20),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: state.rememberMe,
+                  onChanged: state.submitting
+                      ? null
+                      : (value) => ref
+                          .read(loginFormControllerProvider.notifier)
+                          .setRememberMe(value ?? true),
+                  title: Text(l10n.rememberMe),
+                ),
+                const SizedBox(height: 12),
                 FilledButton(
                   onPressed: state.submitting ? null : _submit,
                   child: state.submitting
@@ -103,6 +115,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(l10n.loginAction),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(l10n.noAccount),
+                    TextButton(
+                      onPressed: state.submitting ? null : () => context.go('/register'),
+                      child: Text(l10n.registerAction),
+                    ),
+                  ],
                 ),
               ],
             ),

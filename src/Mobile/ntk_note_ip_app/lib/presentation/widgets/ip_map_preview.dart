@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/map/osm_static_map.dart';
 import '../../domain/entities/ip_details.dart';
 
@@ -37,7 +38,11 @@ class IpMapPreview extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Image.network(
-                OsmStaticMap.imageUrl(latitude: lat, longitude: lon),
+                OsmStaticMap.imageUrl(
+                  apiBaseUrl: AppConfig.current.apiBaseUrl,
+                  latitude: lat,
+                  longitude: lon,
+                ),
                 height: 160,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => SizedBox(

@@ -17,6 +17,8 @@ public static class IdentityAuthenticationExtensions
     {
         var jwt = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
         var bearerExpiration = TimeSpan.FromHours(Math.Max(1, jwt.BearerTokenExpirationHours));
+        var refreshExpiration = TimeSpan.FromDays(Math.Max(1, jwt.RefreshTokenExpirationDays));
+        var cookieExpiration = TimeSpan.FromDays(Math.Max(1, jwt.CookieRememberMeDays));
 
         services
             .AddAuthentication(options =>
@@ -41,8 +43,15 @@ public static class IdentityAuthenticationExtensions
             .AddBearerToken(IdentityConstants.BearerScheme, options =>
             {
                 options.BearerTokenExpiration = bearerExpiration;
+                options.RefreshTokenExpiration = refreshExpiration;
             })
             .AddIdentityCookies();
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.ExpireTimeSpan = cookieExpiration;
+            options.SlidingExpiration = true;
+        });
 
         return services;
     }

@@ -12,10 +12,12 @@ export class AdminLayoutComponent {
 
   readonly navItems = [
     { path: 'dashboard', key: 'ADMIN.NAV.DASHBOARD' },
+    { path: 'roles', key: 'ADMIN.NAV.ROLES' },
     { path: 'users', key: 'ADMIN.NAV.USERS' },
     { path: 'ip-notes', key: 'ADMIN.NAV.IP_NOTES' },
     { path: 'ip-lookups', key: 'ADMIN.NAV.IP_LOOKUPS' },
     { path: 'push', key: 'ADMIN.NAV.PUSH' },
     { path: 'outbox', key: 'ADMIN.NAV.OUTBOX' },
+    { path: 'tickets', key: 'ADMIN.NAV.TICKETS' },
   ];
 }

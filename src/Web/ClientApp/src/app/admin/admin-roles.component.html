@@ -1,0 +1,98 @@
+<article class="admin-card admin-roles">
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else {
+    <div class="admin-roles__layout">
+      <aside class="admin-roles__sidebar" aria-label="{{ i18n.t('ADMIN.ROLES.LIST_TITLE') }}">
+        <div class="admin-roles__sidebar-head">
+          <h2>{{ i18n.t('ADMIN.ROLES.LIST_TITLE') }}</h2>
+          <button type="button" class="outline" (click)="openCreate()">{{ i18n.t('ADMIN.ROLES.ADD') }}</button>
+        </div>
+
+        <ul class="admin-roles__list">
+          @for (role of roles(); track role.id) {
+            <li>
+              <button
+                type="button"
+                class="admin-roles__role-btn"
+                [class.admin-roles__role-btn--active]="selectedRoleId() === role.id"
+                (click)="selectRole(role)"
+              >
+                <span class="admin-roles__role-name">{{ role.name }}</span>
+                <span class="admin-roles__role-meta">
+                  {{ role.userCount }} {{ i18n.t('ADMIN.ROLES.MEMBERS') }}
+                  @if (role.isSystem) {
+                    · {{ i18n.t('ADMIN.ROLES.SYSTEM') }}
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </aside>
+
+      <section class="admin-roles__panel">
+        @if (showCreate()) {
+          <header class="admin-roles__panel-head">
+            <h2>{{ i18n.t('ADMIN.ROLES.ADD') }}</h2>
+          </header>
+          <label for="new-role-name">{{ i18n.t('ADMIN.ROLES.NAME') }}</label>
+          <input
+            id="new-role-name"
+            [(ngModel)]="newRoleName"
+            [placeholder]="i18n.t('ADMIN.ROLES.NAME_PLACEHOLDER')"
+          />
+        } @else if (selectedRole(); as role) {
+          <header class="admin-roles__panel-head">
+            <div>
+              <h2>{{ role.name }}</h2>
+              <p class="admin-shell__muted">{{ i18n.t('ADMIN.ROLES.PERMISSIONS_HINT') }}</p>
+            </div>
+            @if (!role.isSystem) {
+              <button type="button" class="outline secondary" (click)="deleteRole(role)">
+                {{ i18n.t('ADMIN.ROLES.DELETE') }}
+              </button>
+            }
+          </header>
+        } @else {
+          <p>{{ i18n.t('ADMIN.ROLES.EMPTY') }}</p>
+        }
+
+        @if (showCreate() || selectedRole()) {
+          <div class="admin-roles__matrix">
+            @for (group of permissionGroups(); track group.groupKey) {
+              <fieldset class="admin-roles__group">
+                <legend>{{ i18n.t(group.groupKey) }}</legend>
+                <div class="admin-roles__checks">
+                  @for (item of group.items; track item.key) {
+                    <label class="admin-roles__check">
+                      <input
+                        type="checkbox"
+                        [checked]="isPermissionChecked(item.key)"
+                        (change)="togglePermission(item.key, $any($event.target).checked)"
+                      />
+                      <span>{{ permissionLabel(item.key) }}</span>
+                    </label>
+                  }
+                </div>
+              </fieldset>
+            }
+          </div>
+
+          <div class="admin-actions admin-roles__actions">
+            @if (showCreate()) {
+              <button type="button" (click)="createRole()" [disabled]="saving()">{{ i18n.t('ADMIN.ROLES.ADD') }}</button>
+              <button type="button" class="outline secondary" (click)="cancelCreate()">{{ i18n.t('COMMON.CANCEL') }}</button>
+            } @else {
+              <button type="button" (click)="savePermissions()" [disabled]="saving()">{{ i18n.t('COMMON.SAVE') }}</button>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</article>

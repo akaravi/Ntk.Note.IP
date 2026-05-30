@@ -45,7 +45,7 @@ class IpNoteSnapshotBuilder {
 
     return {
       'address': details.address,
-      'scope': details.scope,
+      'scope': _scopeToApiValue(details.scope),
       'isIPv6': details.isIPv6,
       'geo': {
         'latitude': details.geo.latitude,
@@ -63,5 +63,24 @@ class IpNoteSnapshotBuilder {
       'isp': details.isp,
       'reverseDns': details.reverseDns,
     };
+  }
+
+  int _scopeToApiValue(String scope) {
+    final parsed = int.tryParse(scope);
+    if (parsed != null) {
+      return parsed;
+    }
+
+    const values = {
+      'Public': 0,
+      'Private': 1,
+      'Loopback': 2,
+      'LinkLocal': 3,
+      'UniqueLocal': 4,
+      'Reserved': 5,
+      'Cgnat': 6,
+    };
+
+    return values[scope] ?? 0;
   }
 }

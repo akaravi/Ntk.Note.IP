@@ -19,7 +19,12 @@ class IpLookupRepositoryImpl implements IpLookupRepository {
       return ApiResult.fail(result.errorMessage ?? 'Request failed');
     }
 
-    return ApiResult.ok(OpenApiMappers.myIpFromJson(result.data!));
+    return ApiResult.ok(OpenApiMappers.toMyIp(result.data!));
+  }
+
+  @override
+  Future<ApiResult<String>> getMyIpPlain() async {
+    return _remote.getMyIpPlain();
   }
 
   @override
@@ -29,7 +34,7 @@ class IpLookupRepositoryImpl implements IpLookupRepository {
       return ApiResult.fail(result.errorMessage ?? 'Request failed');
     }
 
-    return ApiResult.ok(OpenApiMappers.ipDetailsFromJson(result.data!));
+    return ApiResult.ok(OpenApiMappers.toIpDetails(result.data!));
   }
 
   @override
@@ -49,7 +54,7 @@ class IpLookupRepositoryImpl implements IpLookupRepository {
       return ApiResult.fail(result.errorMessage ?? 'Request failed');
     }
 
-    return ApiResult.ok(OpenApiMappers.monitorMyIpResultFromJson(result.data!));
+    return ApiResult.ok(OpenApiMappers.toMonitorMyIpResult(result.data!));
   }
 
   @override
@@ -60,7 +65,7 @@ class IpLookupRepositoryImpl implements IpLookupRepository {
     }
 
     return ApiResult.ok(
-      result.data!.map(OpenApiMappers.ipLookupRecordFromJson).toList(),
+      result.data!.map(OpenApiMappers.toIpLookupRecord).toList(),
     );
   }
 }

@@ -7,11 +7,13 @@ import { ErrorExceptionResult, IpLookupRecordDto } from '../ip-lookup/ip-lookup.
 
 export interface AdminDashboardDto {
   userCount: number;
+  roleCount: number;
   ipNoteCount: number;
   ipLookupRecordCount: number;
   pushDeviceCount: number;
   outboxPendingCount: number;
   ipSnapshotCount: number;
+  supportTicketOpenCount: number;
 }
 
 export interface AdminAccessDto {
@@ -62,6 +64,32 @@ export interface AdminOutboxMessageDto {
   contentLength: number;
 }
 
+export interface AdminRoleDto {
+  id: string;
+  name: string;
+  userCount: number;
+  permissions: string[];
+  isSystem: boolean;
+}
+
+export interface AdminPermissionCatalogItemDto {
+  key: string;
+  groupKey: string;
+}
+
+export interface AdminSupportTicketDto {
+  id: number;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: string;
+  emailSent: boolean;
+  emailError?: string;
+  userId?: string;
+  created: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly dashboardBase: string;
@@ -71,6 +99,8 @@ export class AdminService {
   private readonly lookupsBase: string;
   private readonly pushBase: string;
   private readonly outboxBase: string;
+  private readonly rolesBase: string;
+  private readonly ticketsBase: string;
 
   constructor(
     private readonly http: HttpClient,
@@ -83,6 +113,8 @@ export class AdminService {
     this.lookupsBase = `${baseUrl}${apiV1Group('AdminIpLookupRecords')}`;
     this.pushBase = `${baseUrl}${apiV1Group('AdminPushDevices')}`;
     this.outboxBase = `${baseUrl}${apiV1Group('AdminOutbox')}`;
+    this.rolesBase = `${baseUrl}${apiV1Group('AdminRoles')}`;
+    this.ticketsBase = `${baseUrl}${apiV1Group('AdminSupportTickets')}`;
   }
 
   getAccess(): Observable<AdminAccessDto> {
@@ -150,6 +182,41 @@ export class AdminService {
     return this.http
       .get<ErrorExceptionResult<AdminOutboxMessageDto[]>>(`${this.outboxBase}/GetList`, { params })
       .pipe(this.unwrapList());
+  }
+
+  getRoles(): Observable<AdminRoleDto[]> {
+    return this.http
+      .get<ErrorExceptionResult<AdminRoleDto[]>>(`${this.rolesBase}/GetList`)
+      .pipe(this.unwrapList());
+  }
+
+  getPermissionCatalog(): Observable<AdminPermissionCatalogItemDto[]> {
+    return this.http
+      .get<ErrorExceptionResult<AdminPermissionCatalogItemDto[]>>(`${this.rolesBase}/GetListPermissions`)
+      .pipe(this.unwrapList());
+  }
+
+  addRole(name: string, permissions: string[]): Observable<void> {
+    return this.http.post<void>(`${this.rolesBase}/Add`, { name, permissions });
+  }
+
+  updateRolePermissions(roleId: string, permissions: string[]): Observable<void> {
+    return this.http.post<void>(`${this.rolesBase}/UpdatePermissions`, { roleId, permissions });
+  }
+
+  deleteRole(roleId: string): Observable<void> {
+    return this.http.delete<void>(`${this.rolesBase}/${roleId}`);
+  }
+
+  getSupportTickets(openOnly = false): Observable<AdminSupportTicketDto[]> {
+    const params = new HttpParams().set('openOnly', openOnly);
+    return this.http
+      .get<ErrorExceptionResult<AdminSupportTicketDto[]>>(`${this.ticketsBase}/GetList`, { params })
+      .pipe(this.unwrapList());
+  }
+
+  updateSupportTicketStatus(id: number, status: 'Open' | 'Closed'): Observable<void> {
+    return this.http.post<void>(`${this.ticketsBase}/ActionUpdateStatus`, { id, status });
   }
 
   private unwrap<T>() {

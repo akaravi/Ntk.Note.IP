@@ -6,11 +6,42 @@
   } @else if (stats(); as s) {
     <div class="admin-stats">
       <div class="admin-stat"><strong>{{ s.userCount }}</strong><span>{{ i18n.t('ADMIN.STAT.USERS') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.roleCount }}</strong><span>{{ i18n.t('ADMIN.STAT.ROLES') }}</span></div>
       <div class="admin-stat"><strong>{{ s.ipNoteCount }}</strong><span>{{ i18n.t('ADMIN.STAT.NOTES') }}</span></div>
       <div class="admin-stat"><strong>{{ s.ipLookupRecordCount }}</strong><span>{{ i18n.t('ADMIN.STAT.LOOKUPS') }}</span></div>
       <div class="admin-stat"><strong>{{ s.pushDeviceCount }}</strong><span>{{ i18n.t('ADMIN.STAT.PUSH') }}</span></div>
       <div class="admin-stat"><strong>{{ s.outboxPendingCount }}</strong><span>{{ i18n.t('ADMIN.STAT.OUTBOX_PENDING') }}</span></div>
+      <div class="admin-stat"><strong>{{ s.supportTicketOpenCount }}</strong><span>{{ i18n.t('ADMIN.STAT.TICKETS_OPEN') }}</span></div>
       <div class="admin-stat"><strong>{{ s.ipSnapshotCount }}</strong><span>{{ i18n.t('ADMIN.STAT.SNAPSHOTS') }}</span></div>
     </div>
   }
 </article>
+
+@if (!loading() && roles().length) {
+  <article class="admin-card admin-dashboard-roles">
+    <div class="admin-dashboard-roles__head">
+      <div>
+        <h2>{{ i18n.t('ADMIN.ROLES.SECTION_TITLE') }}</h2>
+        <p class="admin-shell__muted">{{ i18n.t('ADMIN.ROLES.SECTION_HINT') }}</p>
+      </div>
+      <a routerLink="/admin/roles" class="outline">{{ i18n.t('ADMIN.ROLES.MANAGE') }}</a>
+    </div>
+
+    <div class="admin-dashboard-roles__grid">
+      @for (role of roles(); track role.id) {
+        <div class="admin-dashboard-role">
+          <span class="admin-dashboard-role__name">{{ role.name }}</span>
+          <span class="admin-dashboard-role__meta">
+            {{ role.userCount }} {{ i18n.t('ADMIN.ROLES.MEMBERS') }}
+            @if (role.isSystem) {
+              · {{ i18n.t('ADMIN.ROLES.SYSTEM') }}
+            }
+          </span>
+          <span class="admin-dashboard-role__perms">
+            {{ role.permissions.length }} {{ i18n.t('ADMIN.ROLES.PERMISSION_COUNT') }}
+          </span>
+        </div>
+      }
+    </div>
+  </article>
+}

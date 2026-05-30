@@ -23,6 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<UserPublicIpSnapshot> UserPublicIpSnapshots => Set<UserPublicIpSnapshot>();
 
+    public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

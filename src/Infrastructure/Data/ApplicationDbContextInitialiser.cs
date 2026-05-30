@@ -73,6 +73,16 @@ public class ApplicationDbContextInitialiser
             await _roleManager.CreateAsync(administratorRole);
         }
 
+        var persistedAdministratorRole = await _roleManager.FindByNameAsync(Roles.Administrator);
+        if (persistedAdministratorRole is not null)
+        {
+            await AdminRoleService.EnsureRolePermissionsAsync(
+                _roleManager,
+                persistedAdministratorRole,
+                Permissions.All,
+                CancellationToken.None);
+        }
+
         // Default users
         var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
 

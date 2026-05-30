@@ -27,9 +27,12 @@ import { AdminIpNotesComponent } from './admin/admin-ip-notes.component';
 import { AdminIpLookupsComponent } from './admin/admin-ip-lookups.component';
 import { AdminPushComponent } from './admin/admin-push.component';
 import { AdminOutboxComponent } from './admin/admin-outbox.component';
+import { AdminRolesComponent } from './admin/admin-roles.component';
 import { AdminGuard } from './admin/admin.guard';
 import { AboutComponent } from './about/about.component';
 import { CopyrightComponent } from './copyright/copyright.component';
+import { ContactComponent } from './contact/contact.component';
+import { AdminTicketsComponent } from './admin/admin-tickets.component';
 import { PwaService } from './core/pwa.service';
 
 export function getApiBaseUrl(): string {
@@ -56,8 +59,11 @@ export function getApiBaseUrl(): string {
         AdminIpLookupsComponent,
         AdminPushComponent,
         AdminOutboxComponent,
+        AdminRolesComponent,
+        AdminTicketsComponent,
         AboutComponent,
-        CopyrightComponent
+        CopyrightComponent,
+        ContactComponent
     ],
     bootstrap: [AppComponent],
     imports: [
@@ -74,6 +80,7 @@ export function getApiBaseUrl(): string {
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent },
             { path: 'about', component: AboutComponent },
+            { path: 'contact', component: ContactComponent },
             { path: 'copyright', component: CopyrightComponent },
             {
                 path: 'admin',
@@ -82,11 +89,13 @@ export function getApiBaseUrl(): string {
                 children: [
                     { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
                     { path: 'dashboard', component: AdminDashboardComponent },
+                    { path: 'roles', component: AdminRolesComponent },
                     { path: 'users', component: AdminUsersComponent },
                     { path: 'ip-notes', component: AdminIpNotesComponent },
                     { path: 'ip-lookups', component: AdminIpLookupsComponent },
                     { path: 'push', component: AdminPushComponent },
                     { path: 'outbox', component: AdminOutboxComponent },
+                    { path: 'tickets', component: AdminTicketsComponent },
                 ],
             },
         ])

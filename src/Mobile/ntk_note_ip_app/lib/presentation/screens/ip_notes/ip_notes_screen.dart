@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 
 import '../../../domain/entities/ip_note.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/app_drawer.dart';
+import '../../widgets/ltr_technical_text.dart';
 import '../../providers/app_providers.dart';
 import 'ip_notes_controller.dart';
 
@@ -78,6 +80,7 @@ class _IpNotesScreenState extends ConsumerState<IpNotesScreen> {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(l10n.notesTitle),
         actions: [
@@ -111,7 +114,7 @@ class _IpNotesScreenState extends ConsumerState<IpNotesScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        TextFormField(
+                        LtrTextFormField(
                           controller: _addressController,
                           decoration: InputDecoration(
                             labelText: l10n.noteAddress,
@@ -229,7 +232,7 @@ class _IpNotesScreenState extends ConsumerState<IpNotesScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
+                  LtrTextFormField(
                     controller: addressController,
                     decoration: InputDecoration(
                       labelText: l10n.noteAddress,
@@ -338,7 +341,7 @@ class _NoteCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            LtrText(
               note.address,
               style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w600),
             ),
@@ -351,7 +354,9 @@ class _NoteCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             if (note.isp != null && note.isp!.isNotEmpty)
-              Text(note.isp!, style: Theme.of(context).textTheme.bodySmall),
+              isLatinTechnicalText(note.isp!)
+                  ? LtrText(note.isp!, style: Theme.of(context).textTheme.bodySmall)
+                  : Text(note.isp!, style: Theme.of(context).textTheme.bodySmall),
             if (note.title != null && note.title!.isNotEmpty)
               Text(note.title!, style: Theme.of(context).textTheme.titleSmall),
             if (note.body != null && note.body!.isNotEmpty) Text(note.body!),

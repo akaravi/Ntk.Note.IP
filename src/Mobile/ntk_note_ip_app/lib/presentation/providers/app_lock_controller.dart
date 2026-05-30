@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/biometric_auth_service.dart';
@@ -50,6 +51,11 @@ class AppLockController extends Notifier<AppLockState> {
   BiometricAuthService get _biometric => ref.read(biometricAuthServiceProvider);
 
   void _applyLockPolicy() {
+    if (kIsWeb) {
+      state = const AppLockState(locked: false);
+      return;
+    }
+
     final auth = ref.read(authControllerProvider);
     final settings = ref.read(settingsControllerProvider).valueOrNull;
 

@@ -13,6 +13,10 @@
       aria-describedby="login-error"
       autocomplete="current-password"
       (ngModelChange)="invalid = false" />
+    <label class="auth-remember">
+      <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe" />
+      {{ i18n.t('AUTH.REMEMBER_ME') }}
+    </label>
     @if (invalid) {
       <small id="login-error">{{ i18n.t('AUTH.LOGIN_INVALID') }}</small>
     }

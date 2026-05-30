@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../../domain/dashboard/dashboard_timeline.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
+import '../../widgets/app_drawer.dart';
+import '../../widgets/ltr_technical_text.dart';
 import '../../widgets/background_monitor_setting_tile.dart';
 import '../../widgets/biometric_setting_tile.dart';
 import 'dashboard_controller.dart';
@@ -20,6 +22,7 @@ class DashboardScreen extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(l10n.dashboardTitle),
         actions: [
@@ -281,7 +284,7 @@ class _TimelineTile extends StatelessWidget {
               ? Icons.sticky_note_2
               : Icons.public,
         ),
-        title: Text(
+        title: LtrText(
           item.address,
           style: const TextStyle(fontFamily: 'monospace'),
         ),

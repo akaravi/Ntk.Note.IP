@@ -1,0 +1,24 @@
+.contact-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.contact-page textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.contact-page__error {
+  color: var(--pico-del-color);
+}
+
+.contact-page__success {
+  color: var(--pico-ins-color);
+  margin: 0.5rem 0 0;
+}
+
+.contact-page button[type='submit'] {
+  margin-top: 0.75rem;
+  align-self: flex-start;
+}

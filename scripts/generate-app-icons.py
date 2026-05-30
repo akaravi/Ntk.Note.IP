@@ -113,6 +113,11 @@ def main() -> None:
         (ROOT / "src/Web/ClientApp-React/public/icon-192.png", 192),
         (ROOT / "src/Web/ClientApp-React/public/icon-512.png", 512),
         (ROOT / "src/Mobile/ntk_note_ip_app/assets/brand/app_icon.png", 1024),
+        (ROOT / "src/Mobile/ntk_note_ip_app/web/favicon.png", 32),
+        (ROOT / "src/Mobile/ntk_note_ip_app/web/icons/Icon-192.png", 192),
+        (ROOT / "src/Mobile/ntk_note_ip_app/web/icons/Icon-512.png", 512),
+        (ROOT / "src/Mobile/ntk_note_ip_app/web/icons/Icon-maskable-192.png", 192),
+        (ROOT / "src/Mobile/ntk_note_ip_app/web/icons/Icon-maskable-512.png", 512),
         (ROOT / ".template.config/icon.png", 256),
     ]
 

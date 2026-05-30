@@ -1,3 +1,4 @@
+import '../api/api_routes.dart';
 import '../config/app_config.dart';
 
 enum CurlCommandTabId { linux, mac, windows, powershell, mikrotik }
@@ -43,7 +44,7 @@ const curlCommandTabs = <CurlCommandTab>[
 ];
 
 String get myIpPlainUrl =>
-    '${AppConfig.current.apiBaseUrl}/api/v1/IpLookup/GetMyIpPlain';
+    ApiRoutes.myIpPlainUrl(AppConfig.current.apiBaseUrl);
 
 String _curlPlain(String url) => 'curl -4 -s "$url"';
 

@@ -7,7 +7,11 @@ import '../../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/ip_history_provider.dart' show ipHistoryListProvider, ipHistoryStoreProvider;
 import '../../providers/settings_controller.dart';
+import '../../widgets/app_drawer.dart';
+import '../../widgets/ltr_technical_text.dart';
+import '../../widgets/code_snippets_card.dart';
 import '../../widgets/curl_commands_card.dart';
+import '../../widgets/device_info_card.dart';
 import '../../widgets/info_row.dart';
 import '../../widgets/ip_map_preview.dart';
 import 'home_controller.dart';
@@ -43,6 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final historyAsync = ref.watch(ipHistoryListProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
@@ -90,6 +95,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               state: state,
               scheme: scheme,
               onCopy: () => ref.read(homeControllerProvider.notifier).copyAddress(),
+              onPlainCopy: () => ref.read(homeControllerProvider.notifier).copyPlainIp(),
+              plainCopied: state.plainCopied,
               onQr: () => ref.read(homeControllerProvider.notifier).toggleQr(),
               onRetry: () => ref.read(homeControllerProvider.notifier).load(),
               onNoteThis: () => _noteThisIp(context, ref, state),
@@ -105,7 +112,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ],
             const SizedBox(height: 16),
-            TextFormField(
+            LtrTextFormField(
               key: ValueKey('lookup-${state.myIp?.address ?? ''}'),
               initialValue: state.lookupAddress,
               decoration: InputDecoration(
@@ -128,12 +135,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.wifi),
                   title: Text(l10n.localIp),
-                  subtitle: Text(
+                  subtitle: LtrText(
                     state.localIp!,
                     style: const TextStyle(fontFamily: 'monospace'),
                   ),
                 ),
               ),
+            ],
+            if (state.deviceInfo != null) ...[
+              const SizedBox(height: 16),
+              DeviceInfoCard(info: state.deviceInfo!),
             ],
             if (state.detailsLoading)
               const Padding(
@@ -185,19 +196,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
-              if (state.deviceInfo != null) ...[
-                const SizedBox(height: 12),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.devices),
-                    title: Text(l10n.deviceTitle),
-                    subtitle: Text(state.deviceInfo!.label),
-                  ),
-                ),
-              ],
             ],
             const SizedBox(height: 16),
             const CurlCommandsCard(),
+            const CodeSnippetsCard(),
             historyAsync.when(
               loading: () => const SizedBox.shrink(),
               error: (_, _) => const SizedBox.shrink(),
@@ -233,7 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             margin: const EdgeInsets.only(bottom: 8),
                             child: ListTile(
                               leading: const Icon(Icons.history),
-                              title: Text(
+                              title: LtrText(
                                 entry.address,
                                 style: const TextStyle(fontFamily: 'monospace'),
                               ),
@@ -243,7 +245,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   entry.countryCode?.toUpperCase(),
                                 ].whereType<String>().where((v) => v.isNotEmpty).join(' · '),
                               ),
-                              trailing: const Icon(Icons.chevron_right),
+                              trailing: IconButton(
+                                tooltip: l10n.historyRemove,
+                                icon: const Icon(Icons.close),
+                                onPressed: () async {
+                                  await ref.read(ipHistoryStoreProvider).remove(entry.id);
+                                  ref.invalidate(ipHistoryListProvider);
+                                },
+                              ),
                               onTap: () => ref
                                   .read(homeControllerProvider.notifier)
                                   .lookupExternal(entry.address),
@@ -284,6 +293,8 @@ class _HeroCard extends StatelessWidget {
     required this.state,
     required this.scheme,
     required this.onCopy,
+    required this.onPlainCopy,
+    required this.plainCopied,
     required this.onQr,
     required this.onRetry,
     required this.onNoteThis,
@@ -293,6 +304,8 @@ class _HeroCard extends StatelessWidget {
   final HomeState state;
   final ColorScheme scheme;
   final VoidCallback onCopy;
+  final VoidCallback onPlainCopy;
+  final bool plainCopied;
   final VoidCallback onQr;
   final VoidCallback onRetry;
   final VoidCallback onNoteThis;
@@ -317,14 +330,16 @@ class _HeroCard extends StatelessWidget {
                 ],
               )
             else if (state.myIp != null) ...[
-              Text(
-                state.myIp!.address,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontFamily: 'monospace',
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
+              Center(
+                child: LtrText(
+                  state.myIp!.address,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ),
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -340,37 +355,63 @@ class _HeroCard extends StatelessWidget {
                 spacing: 8,
                 children: [
                   Chip(
-                    label: Text(state.myIp!.isIPv6 ? l10n.ipv6 : l10n.ipv4),
+                    label: LtrText(state.myIp!.isIPv6 ? l10n.ipv6 : l10n.ipv4),
                   ),
                   Chip(label: Text('${l10n.scope}: ${state.myIp!.scope}')),
                 ],
               ),
               const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: onNoteThis,
-                style: OutlinedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  textStyle: Theme.of(context).textTheme.labelMedium,
-                ),
-                child: Text(l10n.noteThis),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: onCopy,
-                      icon: const Icon(Icons.copy),
-                      label: Text(state.copied ? l10n.copied : l10n.copy),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                child: Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: onNoteThis,
+                      icon: const Icon(Icons.edit_note_outlined, size: 18),
+                      label: Text(l10n.noteThis),
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        minimumSize: const Size(0, 40),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filledTonal(
-                    tooltip: l10n.showQr,
-                    onPressed: onQr,
-                    icon: const Icon(Icons.qr_code_2),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: onCopy,
+                      icon: const Icon(Icons.copy, size: 18),
+                      label: Text(state.copied ? l10n.copied : l10n.copy),
+                      style: FilledButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        minimumSize: const Size(0, 40),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton.filledTonal(
+                      tooltip: l10n.showQr,
+                      onPressed: onQr,
+                      icon: const Icon(Icons.qr_code_2),
+                      style: IconButton.styleFrom(
+                        minimumSize: const Size(44, 40),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: onPlainCopy,
+                      icon: const Icon(Icons.content_paste, size: 18),
+                      label: Text(
+                        plainCopied ? l10n.plainCopied : l10n.plainText,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        minimumSize: const Size(0, 40),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ],

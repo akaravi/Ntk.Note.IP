@@ -14,13 +14,21 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthTokens?> getStoredTokens() => _store.read();
 
   @override
+  Future<ApiResult<void>> register({
+    required String email,
+    required String password,
+  }) =>
+      _remote.register(email: email, password: password);
+
+  @override
   Future<ApiResult<AuthTokens>> login({
     required String email,
     required String password,
+    required bool rememberMe,
   }) async {
     final result = await _remote.login(email: email, password: password);
     if (result.isSuccess && result.data != null && result.data!.isValid) {
-      await _store.write(result.data!);
+      await _store.write(result.data!, persist: rememberMe);
     }
 
     return result;
@@ -36,7 +44,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final result =
         await _remote.refresh(refreshToken: stored.refreshToken);
     if (result.isSuccess && result.data != null && result.data!.isValid) {
-      await _store.write(result.data!);
+      final persist = await _store.isPersistentSession();
+      await _store.write(result.data!, persist: persist);
     }
 
     return result;

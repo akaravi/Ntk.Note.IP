@@ -39,11 +39,36 @@ class AuthController extends Notifier<AuthState> {
   AuthRepository get _repo => ref.read(authRepositoryProvider);
 
   Future<void> _loadStored() async {
-    final tokens = await _repo.getStoredTokens();
-    state = AuthState(loading: false, tokens: tokens);
-    if (tokens?.isValid == true) {
-      await _afterAuthenticated();
+    try {
+      final tokens = await _repo.getStoredTokens();
+      if (tokens == null || !tokens.isValid) {
+        state = const AuthState(loading: false);
+        return;
+      }
+
+      if (tokens.refreshToken.isNotEmpty &&
+          (tokens.shouldRefreshAccessToken || tokens.expiresAt == null)) {
+        final refresh = await _repo.refreshTokens();
+        if (refresh.isSuccess && refresh.data != null) {
+          state = AuthState(loading: false, tokens: refresh.data);
+          _schedulePostAuthWork();
+          return;
+        }
+
+        await _repo.logout();
+        state = const AuthState(loading: false);
+        return;
+      }
+
+      state = AuthState(loading: false, tokens: tokens);
+      _schedulePostAuthWork();
+    } catch (_) {
+      state = const AuthState(loading: false);
     }
+  }
+
+  void _schedulePostAuthWork() {
+    Future(_afterAuthenticated);
   }
 
   Future<void> _afterAuthenticated() async {
@@ -56,12 +81,17 @@ class AuthController extends Notifier<AuthState> {
   Future<ApiResult<AuthTokens>> login({
     required String email,
     required String password,
+    required bool rememberMe,
   }) async {
     state = state.copyWith(loading: true);
-    final result = await _repo.login(email: email, password: password);
+    final result = await _repo.login(
+      email: email,
+      password: password,
+      rememberMe: rememberMe,
+    );
     if (result.isSuccess && result.data != null) {
       state = AuthState(loading: false, tokens: result.data);
-      await _afterAuthenticated();
+      _schedulePostAuthWork();
     } else {
       state = state.copyWith(loading: false);
     }

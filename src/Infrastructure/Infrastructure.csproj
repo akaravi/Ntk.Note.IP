@@ -28,6 +28,7 @@
     <PackageReference Include="Hangfire.MemoryStorage" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="MaxMind.GeoIP2" />
+    <PackageReference Include="SixLabors.ImageSharp" />
     <PackageReference Include="DnsClient" />
     <PackageReference Include="FirebaseAdmin" />
   </ItemGroup>

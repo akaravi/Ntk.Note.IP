@@ -1,0 +1,80 @@
+<article class="admin-card">
+  <div class="admin-toolbar">
+    <label>
+      <input type="checkbox" [(ngModel)]="openOnly" (change)="load()" />
+      {{ i18n.t('ADMIN.TICKETS.OPEN_ONLY') }}
+    </label>
+    <button type="button" (click)="load()">{{ i18n.t('DASHBOARD.REFRESH') }}</button>
+  </div>
+
+  @if (error()) {
+    <div class="admin-alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p>{{ i18n.t('COMMON.LOADING') }}</p>
+  } @else if (tickets().length === 0) {
+    <p>{{ i18n.t('ADMIN.EMPTY') }}</p>
+  } @else {
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{{ i18n.t('CONTACT.NAME') }}</th>
+            <th>{{ i18n.t('CONTACT.EMAIL') }}</th>
+            <th>{{ i18n.t('CONTACT.SUBJECT') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.STATUS') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.EMAIL') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.CREATED') }}</th>
+            <th>{{ i18n.t('ADMIN.COL.ACTION') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of tickets(); track ticket.id) {
+            <tr>
+              <td>{{ ticket.id }}</td>
+              <td>{{ ticket.name }}</td>
+              <td><a [href]="'mailto:' + ticket.email">{{ ticket.email }}</a></td>
+              <td>
+                <strong>{{ ticket.subject }}</strong>
+                <details>
+                  <summary>{{ i18n.t('CONTACT.MESSAGE') }}</summary>
+                  <p>{{ ticket.message }}</p>
+                </details>
+              </td>
+              <td>
+                @if (ticket.status === 'Open') {
+                  <span class="admin-badge admin-badge--warn">{{ i18n.t('ADMIN.TICKETS.STATUS_OPEN') }}</span>
+                } @else {
+                  <span class="admin-badge">{{ i18n.t('ADMIN.TICKETS.STATUS_CLOSED') }}</span>
+                }
+              </td>
+              <td>
+                @if (ticket.emailSent) {
+                  <span class="admin-badge">{{ i18n.t('ADMIN.TICKETS.EMAIL_SENT') }}</span>
+                } @else {
+                  <span class="admin-badge admin-badge--warn" [title]="ticket.emailError ?? ''">
+                    {{ i18n.t('ADMIN.TICKETS.EMAIL_FAILED') }}
+                  </span>
+                }
+              </td>
+              <td>{{ ticket.created | date: 'short' }}</td>
+              <td>
+                @if (ticket.status === 'Open') {
+                  <button type="button" class="outline secondary" (click)="closeTicket(ticket)">
+                    {{ i18n.t('ADMIN.TICKETS.CLOSE') }}
+                  </button>
+                } @else {
+                  <button type="button" class="outline" (click)="reopenTicket(ticket)">
+                    {{ i18n.t('ADMIN.TICKETS.REOPEN') }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

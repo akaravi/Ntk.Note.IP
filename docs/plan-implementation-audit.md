@@ -83,5 +83,5 @@
 
 ## Related
 
-- `Cursor.1.plan.md` … `Cursor.64.plan.md`
+- `cursor-plans/Cursor.1.plan.md` … `cursor-plans/Cursor.72.plan.md`
 - `plan.prompt/IPNote.plan.md`

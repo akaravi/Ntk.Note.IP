@@ -57,6 +57,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginAction => 'Sign in';
 
   @override
+  String get rememberMe => 'Remember me (1 month)';
+
+  @override
+  String get contactTitle => 'Contact us';
+
+  @override
+  String get contactSubtitle =>
+      'Send us a message — our support team will respond as soon as possible.';
+
+  @override
+  String get contactName => 'Name';
+
+  @override
+  String get contactSubject => 'Subject';
+
+  @override
+  String get contactMessage => 'Message';
+
+  @override
+  String get contactSubmit => 'Send';
+
+  @override
+  String get contactSuccess =>
+      'Your message was saved and a notification email was sent.';
+
+  @override
+  String get contactSuccessNoEmail =>
+      'Your message was saved. Email could not be sent; the ticket is stored in admin.';
+
+  @override
+  String get contactError => 'Submission failed. Please try again.';
+
+  @override
+  String get footerContact => 'Contact us';
+
+  @override
+  String get adminTicketsTab => 'Tickets';
+
+  @override
+  String get registerTitle => 'Register';
+
+  @override
+  String get registerSubtitle => 'Create an account for dashboard and IP notes';
+
+  @override
+  String get registerAction => 'Register';
+
+  @override
+  String get registerSuccess => 'Registration successful. Please sign in.';
+
+  @override
+  String get registerFailed => 'Registration failed. Please try again.';
+
+  @override
+  String get noAccount => 'Don\'t have an account?';
+
+  @override
+  String get hasAccount => 'Already have an account?';
+
+  @override
+  String get emailInvalid => 'Enter a valid email address.';
+
+  @override
+  String passwordMinLength(int min) {
+    return 'Password must be at least $min characters.';
+  }
+
+  @override
   String get email => 'Email';
 
   @override
@@ -312,4 +380,353 @@ class AppLocalizationsEn extends AppLocalizations {
   String backgroundIpChangedNotification(String address) {
     return 'Your public IP changed to $address';
   }
+
+  @override
+  String get languagePickerTitle => 'Choose your language';
+
+  @override
+  String get languagePickerSubtitle =>
+      'Select your preferred interface language';
+
+  @override
+  String get languagePickerContinue => 'Continue';
+
+  @override
+  String splashVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get plainText => 'Copy plain IP';
+
+  @override
+  String get plainCopied => 'Copied';
+
+  @override
+  String get historyRemove => 'Remove';
+
+  @override
+  String get historySync => 'Syncing with account…';
+
+  @override
+  String get codeTitle => 'Code samples';
+
+  @override
+  String get codeHint => 'Integrate in your app';
+
+  @override
+  String get codeCopy => 'Copy code';
+
+  @override
+  String get codeTabCsharp => 'C#';
+
+  @override
+  String get codeTabJavascript => 'JavaScript';
+
+  @override
+  String get codeTabPython => 'Python';
+
+  @override
+  String get codeTabBash => 'Bash';
+
+  @override
+  String get deviceBrowser => 'Browser';
+
+  @override
+  String get deviceOs => 'OS';
+
+  @override
+  String get deviceType => 'Device type';
+
+  @override
+  String get deviceLanguage => 'Language';
+
+  @override
+  String get toolsHubWhois => 'WHOIS & IP security';
+
+  @override
+  String get toolsHubWhoisDesc => 'WHOIS, blacklist, VPN/proxy flags';
+
+  @override
+  String get toolsHubDns => 'DNS lookup';
+
+  @override
+  String get toolsHubDnsDesc => 'DNS records for a domain';
+
+  @override
+  String get toolsHubPropagation => 'DNS propagation';
+
+  @override
+  String get toolsHubPropagationDesc => 'Compare public resolvers';
+
+  @override
+  String get toolsHubPort => 'Port & SSL';
+
+  @override
+  String get toolsHubPortDesc => 'Open port check and SSL certificate';
+
+  @override
+  String get toolsHubWhoisDomain => 'Domain WHOIS';
+
+  @override
+  String get toolsHubWhoisDomainDesc => 'Domain registration info';
+
+  @override
+  String get toolsWhois => 'WHOIS / RDAP';
+
+  @override
+  String get toolsWhoisRun => 'Run WHOIS';
+
+  @override
+  String get toolsBlacklist => 'DNSBL blacklist';
+
+  @override
+  String get toolsPrivacy => 'VPN / proxy / mobile';
+
+  @override
+  String get toolsListed => 'Listed';
+
+  @override
+  String get toolsClean => 'Clean';
+
+  @override
+  String get toolsCidr => 'CIDR';
+
+  @override
+  String get toolsSubnet => 'Calculate subnet';
+
+  @override
+  String get toolsWhoisDomain => 'Domain WHOIS';
+
+  @override
+  String get toolsPort => 'Check port';
+
+  @override
+  String get toolsSsl => 'SSL certificate';
+
+  @override
+  String get toolsPortOpen => 'Open';
+
+  @override
+  String get toolsPortClosed => 'Closed';
+
+  @override
+  String get dnsDomain => 'Domain name';
+
+  @override
+  String get dnsResolve => 'Resolve DNS';
+
+  @override
+  String get dnsType => 'Record type';
+
+  @override
+  String get dnsPropagationCheck => 'Check propagation';
+
+  @override
+  String get introTitle => 'Welcome';
+
+  @override
+  String get introBody =>
+      'IPNote.ir — IP lookup, notes, and network tools for web and mobile.';
+
+  @override
+  String get footerChangelog => 'Changelog';
+
+  @override
+  String get footerStatus => 'Service status';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get aboutSubtitle => 'IPNote.ir — an NTK product';
+
+  @override
+  String get aboutProductTitle => 'What is IPNote.ir?';
+
+  @override
+  String get aboutProductBody =>
+      'View your public IP, network details, notes, and DNS/WHOIS tools.';
+
+  @override
+  String get aboutFeatureLookup => 'IP lookup, geo, ASN, map';
+
+  @override
+  String get aboutFeatureNotes => 'Personal IP notes';
+
+  @override
+  String get aboutFeatureTools => 'DNS, WHOIS, port, SSL, subnet';
+
+  @override
+  String get aboutFeatureMobile => 'Mobile app with light/dark theme';
+
+  @override
+  String get aboutNtkTitle => 'NTK';
+
+  @override
+  String get aboutNtkBody =>
+      'NTK has been active in IT, software, and hosting since 2008.';
+
+  @override
+  String get aboutAuthorTitle => 'Alireza Karavi';
+
+  @override
+  String get aboutAuthorBody =>
+      'Full-stack developer focused on networking and security.';
+
+  @override
+  String get aboutAuthorSkill1 => '.NET, Angular, Flutter';
+
+  @override
+  String get aboutAuthorSkill2 => 'MikroTik, VoIP, monitoring';
+
+  @override
+  String get aboutAuthorSkill3 => 'Product leadership at NTK';
+
+  @override
+  String get aboutEcosystemTitle => 'Related projects';
+
+  @override
+  String get aboutEcosystemHint => 'Sibling brands and services';
+
+  @override
+  String get aboutBack => 'Back to lookup';
+
+  @override
+  String get copyrightTitle => 'Copyright';
+
+  @override
+  String get copyrightSubtitle => 'Legal information for IPNote.ir';
+
+  @override
+  String get copyrightOwnershipTitle => 'Ownership';
+
+  @override
+  String get copyrightOwnershipBody =>
+      'IPNote.ir is owned by NTK / Alireza Karavi.';
+
+  @override
+  String get copyrightLicenseTitle => 'License';
+
+  @override
+  String get copyrightLicenseBody =>
+      'Personal use is allowed; abuse and API overload are prohibited.';
+
+  @override
+  String get copyrightTrademarksTitle => 'Trademarks';
+
+  @override
+  String get copyrightTrademarksBody =>
+      'IPNote.ir and NTK are related trademarks.';
+
+  @override
+  String get copyrightThirdPartyTitle => 'Third-party services';
+
+  @override
+  String get copyrightThirdPartyBody =>
+      'Data is fetched from geo/DNS/WHOIS providers.';
+
+  @override
+  String get copyrightPrivacyTitle => 'Privacy';
+
+  @override
+  String get copyrightPrivacyBody =>
+      'Notes are visible only to the authenticated owner.';
+
+  @override
+  String get copyrightContactTitle => 'Legal contact';
+
+  @override
+  String get copyrightContactBody =>
+      'Contact support for commercial licensing or DMCA.';
+
+  @override
+  String get copyrightBack => 'Back';
+
+  @override
+  String get adminTitle => 'Admin panel';
+
+  @override
+  String get adminAccessDenied => 'Administrator access required.';
+
+  @override
+  String get adminBackToApp => 'Back';
+
+  @override
+  String get adminEmpty => 'Nothing to show.';
+
+  @override
+  String get adminConfirmDelete => 'Delete this item?';
+
+  @override
+  String get adminEditRoles => 'Edit roles';
+
+  @override
+  String get adminRolesHint => 'Administrator, …';
+
+  @override
+  String get adminRolesMembers => 'members';
+
+  @override
+  String get adminRolesPermissionCount => 'permissions';
+
+  @override
+  String get adminRolesPermissionsHint => 'Choose permissions for this role.';
+
+  @override
+  String get adminFilterPending => 'Pending only';
+
+  @override
+  String get adminNavDashboard => 'Dashboard';
+
+  @override
+  String get adminNavRoles => 'Roles';
+
+  @override
+  String get adminNavUsers => 'Users';
+
+  @override
+  String get adminNavNotes => 'Notes';
+
+  @override
+  String get adminNavLookups => 'Lookups';
+
+  @override
+  String get adminNavPush => 'Push';
+
+  @override
+  String get adminNavOutbox => 'Outbox';
+
+  @override
+  String get adminStatUsers => 'Users';
+
+  @override
+  String get adminStatRoles => 'Roles';
+
+  @override
+  String get adminStatNotes => 'Notes';
+
+  @override
+  String get adminStatLookups => 'Lookups';
+
+  @override
+  String get adminStatPush => 'Push devices';
+
+  @override
+  String get adminStatOutbox => 'Pending outbox';
+
+  @override
+  String get adminStatTicketsOpen => 'Open tickets';
+
+  @override
+  String get adminStatSnapshots => 'Snapshots';
+
+  @override
+  String get adminTicketsOpenOnly => 'Open tickets only';
+
+  @override
+  String get adminTicketClose => 'Close ticket';
+
+  @override
+  String get adminTicketReopen => 'Reopen ticket';
 }

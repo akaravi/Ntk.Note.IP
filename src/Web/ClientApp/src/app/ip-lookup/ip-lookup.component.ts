@@ -8,6 +8,7 @@ import { distinctUntilChanged, filter, switchMap, take } from 'rxjs';
 import { DeviceInfoService } from '../core/device-info.service';
 import { IpHistoryEntry, IpHistoryService } from '../core/ip-history.service';
 import { API_BASE_URL } from '../web-api-client';
+import { buildOpenStreetMapUrl, buildStaticMapUrl } from '../core/osm-static-map';
 import { MY_IP_SHORT_PATH } from '../core/api-routes';
 import {
   DnsPropagationResultDto,
@@ -153,11 +154,11 @@ export class IpLookupComponent implements OnInit, OnDestroy {
   }
 
   mapStaticUrl(lat: number, lon: number): string {
-    return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=10&size=640x280&markers=${lat},${lon},red`;
+    return buildStaticMapUrl(this.apiBaseUrl, lat, lon);
   }
 
   mapOpenUrl(lat: number, lon: number): string {
-    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=12/${lat}/${lon}`;
+    return buildOpenStreetMapUrl(lat, lon);
   }
 
   refreshHistory(): void {

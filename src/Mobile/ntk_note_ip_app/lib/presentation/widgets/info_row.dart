@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'ltr_technical_text.dart';
+
 class InfoRow extends StatelessWidget {
   const InfoRow({
     super.key,
@@ -31,7 +33,9 @@ class InfoRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(value, style: Theme.of(context).textTheme.bodyLarge),
+            child: isLatinTechnicalText(value)
+                ? LtrText(value, style: Theme.of(context).textTheme.bodyLarge)
+                : Text(value, style: Theme.of(context).textTheme.bodyLarge),
           ),
         ],
       ),

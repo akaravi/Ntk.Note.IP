@@ -9,7 +9,7 @@ $script:IpNoteDevPorts = [ordered]@{
     DashboardResourceHttp = 5346
     DashboardOtlpHttps    = 5347
     DashboardResourceHttps = 5348
-    Reserved              = 5349
+    Reserved              = 5349  # Flutter web (flutter run -d chrome --web-port=5349)
 }
 
 function Get-IpNoteWebBaseUrl {
@@ -39,7 +39,7 @@ function Get-IpNotePortAllocationRows {
         DashboardResourceHttp  = 'Aspire Resource Service HTTP'
         DashboardOtlpHttps     = 'Aspire OTLP HTTPS'
         DashboardResourceHttps = 'Aspire Resource Service HTTPS'
-        Reserved               = 'Reserved'
+        Reserved               = 'Flutter web (flutter run --web-port=5349)'
     }
 
     foreach ($key in $labels.Keys) {

@@ -1,5 +1,6 @@
 using Ntk.Note.IP.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ntk.Note.IP.Web.Infrastructure;
@@ -39,6 +40,13 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
                 Status = StatusCodes.Status403Forbidden,
                 Title = "Forbidden",
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.4"
+            }),
+            BadHttpRequestException badRequest => (StatusCodes.Status400BadRequest, new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Bad Request",
+                Detail = badRequest.Message,
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
             }),
             _ => (-1, null)
         };

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/cli/curl_command_snippets.dart';
 import '../../l10n/app_localizations.dart';
+import 'ltr_technical_text.dart';
 
 class CurlCommandsCard extends StatefulWidget {
   const CurlCommandsCard({super.key});
@@ -59,7 +60,7 @@ class _CurlCommandsCardState extends State<CurlCommandsCard> {
                     Padding(
                       padding: const EdgeInsetsDirectional.only(end: 8),
                       child: ChoiceChip(
-                        label: Text(_label(l10n, item.labelKey)),
+                        label: LtrText(_label(l10n, item.labelKey)),
                         selected: _activeTab == item.id,
                         onSelected: (_) => setState(() => _activeTab = item.id),
                       ),
@@ -74,10 +75,7 @@ class _CurlCommandsCardState extends State<CurlCommandsCard> {
                 color: scheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: SelectableText(
-                command,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-              ),
+              child: LtrCodeBlock(code: command),
             ),
             const SizedBox(height: 8),
             Align(

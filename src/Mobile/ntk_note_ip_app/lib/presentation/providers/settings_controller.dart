@@ -20,6 +20,16 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     await SettingsRepository().saveLocale(locale);
   }
 
+  Future<void> completeLocaleOnboarding(Locale locale) async {
+    final repo = SettingsRepository();
+    final current = state.value ?? AppSettings.defaults;
+    state = AsyncData(
+      current.copyWith(locale: locale, localeChosen: true),
+    );
+    await repo.saveLocale(locale);
+    await repo.saveLocaleChosen(true);
+  }
+
   Future<void> cycleThemeMode() async {
     final current = state.value ?? AppSettings.defaults;
     final next = switch (current.themeMode) {
@@ -33,9 +43,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
   Future<void> toggleLocale() async {
     final current = state.value ?? AppSettings.defaults;
-    final next = current.locale.languageCode == 'fa'
-        ? const Locale('en')
-        : const Locale('fa');
+    const order = [Locale('fa'), Locale('en'), Locale('ar'), Locale('fr')];
+    final index = order.indexWhere(
+      (locale) => locale.languageCode == current.locale.languageCode,
+    );
+    final next = order[(index + 1) % order.length];
     await setLocale(next);
   }
 

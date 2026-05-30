@@ -1,0 +1,66 @@
+<section class="static-page contact-page" [attr.dir]="i18n.direction()" [attr.lang]="i18n.locale()">
+  <header class="static-page__hero">
+    <h1>{{ i18n.t('CONTACT.TITLE') }}</h1>
+    <p class="static-page__tagline">{{ i18n.t('CONTACT.SUBTITLE') }}</p>
+  </header>
+
+  <article class="static-page__card">
+    <form (ngSubmit)="submit()" #contactForm="ngForm">
+      <label for="contact-name">{{ i18n.t('CONTACT.NAME') }}</label>
+      <input
+        type="text"
+        id="contact-name"
+        name="name"
+        [(ngModel)]="name"
+        required
+        maxlength="200"
+        autocomplete="name" />
+
+      <label for="contact-email">{{ i18n.t('CONTACT.EMAIL') }}</label>
+      <input
+        type="email"
+        id="contact-email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        maxlength="256"
+        autocomplete="email"
+        dir="ltr" />
+
+      <label for="contact-subject">{{ i18n.t('CONTACT.SUBJECT') }}</label>
+      <input
+        type="text"
+        id="contact-subject"
+        name="subject"
+        [(ngModel)]="subject"
+        required
+        maxlength="200" />
+
+      <label for="contact-message">{{ i18n.t('CONTACT.MESSAGE') }}</label>
+      <textarea
+        id="contact-message"
+        name="message"
+        rows="6"
+        [(ngModel)]="message"
+        required
+        maxlength="4000"></textarea>
+
+      @if (error) {
+        <small class="contact-page__error" role="alert">{{ error }}</small>
+      }
+      @if (success) {
+        <p class="contact-page__success" role="status">{{ success }}</p>
+      }
+
+      <button type="submit" [disabled]="submitting || contactForm.invalid">
+        {{ submitting ? i18n.t('COMMON.LOADING') : i18n.t('CONTACT.SUBMIT') }}
+      </button>
+    </form>
+  </article>
+
+  <p class="static-page__back">
+    <a routerLink="/about">{{ i18n.t('FOOTER.ABOUT') }}</a>
+    ·
+    <a routerLink="/ip-lookup">{{ i18n.t('NAV.IP_LOOKUP') }}</a>
+  </p>
+</section>

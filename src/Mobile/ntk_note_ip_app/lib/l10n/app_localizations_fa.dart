@@ -57,6 +57,74 @@ class AppLocalizationsFa extends AppLocalizations {
   String get loginAction => 'ورود';
 
   @override
+  String get rememberMe => 'مرا به خاطر بسپار (۱ ماه)';
+
+  @override
+  String get contactTitle => 'تماس با ما';
+
+  @override
+  String get contactSubtitle =>
+      'پیام خود را بفرستید؛ تیم پشتیبانی در اسرع وقت پاسخ می‌دهد.';
+
+  @override
+  String get contactName => 'نام';
+
+  @override
+  String get contactSubject => 'موضوع';
+
+  @override
+  String get contactMessage => 'پیام';
+
+  @override
+  String get contactSubmit => 'ارسال';
+
+  @override
+  String get contactSuccess =>
+      'پیام شما ثبت شد و ایمیل اطلاع‌رسانی ارسال گردید.';
+
+  @override
+  String get contactSuccessNoEmail =>
+      'پیام شما ثبت شد. ارسال ایمیل ممکن نبود؛ تیکت در پنل مدیریت ذخیره شده است.';
+
+  @override
+  String get contactError => 'ارسال ناموفق بود. لطفاً دوباره تلاش کنید.';
+
+  @override
+  String get footerContact => 'تماس با ما';
+
+  @override
+  String get adminTicketsTab => 'تیکت‌ها';
+
+  @override
+  String get registerTitle => 'ثبت‌نام';
+
+  @override
+  String get registerSubtitle => 'حساب جدید برای داشبورد و یادداشت IP';
+
+  @override
+  String get registerAction => 'ثبت‌نام';
+
+  @override
+  String get registerSuccess => 'ثبت‌نام موفق بود. وارد شوید.';
+
+  @override
+  String get registerFailed => 'ثبت‌نام ناموفق بود. دوباره تلاش کنید.';
+
+  @override
+  String get noAccount => 'حساب ندارید؟';
+
+  @override
+  String get hasAccount => 'قبلاً ثبت‌نام کرده‌اید؟';
+
+  @override
+  String get emailInvalid => 'ایمیل معتبر وارد کنید.';
+
+  @override
+  String passwordMinLength(int min) {
+    return 'رمز عبور باید حداقل $min کاراکتر باشد.';
+  }
+
+  @override
   String get email => 'ایمیل';
 
   @override
@@ -312,4 +380,353 @@ class AppLocalizationsFa extends AppLocalizations {
   String backgroundIpChangedNotification(String address) {
     return 'IP عمومی شما به $address تغییر کرد';
   }
+
+  @override
+  String get languagePickerTitle => 'زبان خود را انتخاب کنید';
+
+  @override
+  String get languagePickerSubtitle =>
+      'برای تجربهٔ بهتر، زبان رابط کاربر را مشخص کنید';
+
+  @override
+  String get languagePickerContinue => 'ادامه';
+
+  @override
+  String splashVersion(String version) {
+    return 'نسخه $version';
+  }
+
+  @override
+  String get plainText => 'کپی IP خام';
+
+  @override
+  String get plainCopied => 'کپی شد';
+
+  @override
+  String get historyRemove => 'حذف';
+
+  @override
+  String get historySync => 'همگام‌سازی با حساب…';
+
+  @override
+  String get codeTitle => 'نمونه کد دریافت IP';
+
+  @override
+  String get codeHint => 'برای یکپارچه‌سازی در برنامهٔ شما';
+
+  @override
+  String get codeCopy => 'کپی کد';
+
+  @override
+  String get codeTabCsharp => 'C#';
+
+  @override
+  String get codeTabJavascript => 'JavaScript';
+
+  @override
+  String get codeTabPython => 'Python';
+
+  @override
+  String get codeTabBash => 'Bash';
+
+  @override
+  String get deviceBrowser => 'مرورگر';
+
+  @override
+  String get deviceOs => 'سیستم‌عامل';
+
+  @override
+  String get deviceType => 'نوع دستگاه';
+
+  @override
+  String get deviceLanguage => 'زبان';
+
+  @override
+  String get toolsHubWhois => 'WHOIS و امنیت IP';
+
+  @override
+  String get toolsHubWhoisDesc => 'WHOIS، لیست سیاه و VPN/پروکسی';
+
+  @override
+  String get toolsHubDns => 'بررسی DNS';
+
+  @override
+  String get toolsHubDnsDesc => 'رکوردهای DNS یک دامنه';
+
+  @override
+  String get toolsHubPropagation => 'انتشار DNS';
+
+  @override
+  String get toolsHubPropagationDesc => 'مقایسهٔ ریزالورهای عمومی';
+
+  @override
+  String get toolsHubPort => 'پورت و SSL';
+
+  @override
+  String get toolsHubPortDesc => 'بررسی پورت باز و گواهی SSL';
+
+  @override
+  String get toolsHubWhoisDomain => 'WHOIS دامنه';
+
+  @override
+  String get toolsHubWhoisDomainDesc => 'اطلاعات ثبت دامنه';
+
+  @override
+  String get toolsWhois => 'WHOIS / RDAP';
+
+  @override
+  String get toolsWhoisRun => 'اجرای WHOIS';
+
+  @override
+  String get toolsBlacklist => 'لیست سیاه DNSBL';
+
+  @override
+  String get toolsPrivacy => 'VPN / پروکسی / موبایل';
+
+  @override
+  String get toolsListed => 'در لیست';
+
+  @override
+  String get toolsClean => 'پاک';
+
+  @override
+  String get toolsCidr => 'CIDR';
+
+  @override
+  String get toolsSubnet => 'محاسبهٔ زیرشبکه';
+
+  @override
+  String get toolsWhoisDomain => 'WHOIS دامنه';
+
+  @override
+  String get toolsPort => 'بررسی پورت';
+
+  @override
+  String get toolsSsl => 'گواهی SSL';
+
+  @override
+  String get toolsPortOpen => 'باز';
+
+  @override
+  String get toolsPortClosed => 'بسته';
+
+  @override
+  String get dnsDomain => 'نام دامنه';
+
+  @override
+  String get dnsResolve => 'بررسی DNS';
+
+  @override
+  String get dnsType => 'نوع رکورد';
+
+  @override
+  String get dnsPropagationCheck => 'بررسی انتشار';
+
+  @override
+  String get introTitle => 'معرفی';
+
+  @override
+  String get introBody =>
+      'IPNote.ir — جستجو، یادداشت و ابزار IP برای وب و موبایل.';
+
+  @override
+  String get footerChangelog => 'تغییرات';
+
+  @override
+  String get footerStatus => 'وضعیت سرویس';
+
+  @override
+  String get aboutTitle => 'درباره ما';
+
+  @override
+  String get aboutSubtitle => 'IPNote.ir — محصول NTK';
+
+  @override
+  String get aboutProductTitle => 'IPNote.ir چیست؟';
+
+  @override
+  String get aboutProductBody =>
+      'سامانه‌ای برای مشاهده IP عمومی، جزئیات شبکه، یادداشت‌برداری و ابزارهای DNS/WHOIS.';
+
+  @override
+  String get aboutFeatureLookup => 'جستجوی IP، Geo، ASN و نقشه';
+
+  @override
+  String get aboutFeatureNotes => 'یادداشت شخصی روی IP';
+
+  @override
+  String get aboutFeatureTools => 'DNS، WHOIS، پورت، SSL و subnet';
+
+  @override
+  String get aboutFeatureMobile => 'اپ موبایل با تم روشن/تاریک';
+
+  @override
+  String get aboutNtkTitle => 'NTK';
+
+  @override
+  String get aboutNtkBody =>
+      'NTK از سال ۱۳۸۷ در حوزه IT، توسعه نرم‌افزار و میزبانی وب فعال است.';
+
+  @override
+  String get aboutAuthorTitle => 'علیرضا کاروی';
+
+  @override
+  String get aboutAuthorBody =>
+      'برنامه‌نویس full-stack با تمرکز بر شبکه و امنیت.';
+
+  @override
+  String get aboutAuthorSkill1 => '.NET، Angular، Flutter';
+
+  @override
+  String get aboutAuthorSkill2 => 'MikroTik، VoIP، مانیتoring';
+
+  @override
+  String get aboutAuthorSkill3 => 'مدیریت محصول در NTK';
+
+  @override
+  String get aboutEcosystemTitle => 'پروژه‌های مرتبط';
+
+  @override
+  String get aboutEcosystemHint => 'برندها و سرویس‌های هم‌خانواده';
+
+  @override
+  String get aboutBack => 'بازگشت به جستجو';
+
+  @override
+  String get copyrightTitle => 'حقوق نشر';
+
+  @override
+  String get copyrightSubtitle => 'اطلاعات حقوقی IPNote.ir';
+
+  @override
+  String get copyrightOwnershipTitle => 'مالکیت';
+
+  @override
+  String get copyrightOwnershipBody =>
+      'حقوق IPNote.ir متعلق به NTK / علیرضا کاروی است.';
+
+  @override
+  String get copyrightLicenseTitle => 'مجوز استفاده';
+
+  @override
+  String get copyrightLicenseBody =>
+      'استفاده شخصی مجاز است؛ سوءاستفاده و بارگذاری بیش از حد API ممنوع.';
+
+  @override
+  String get copyrightTrademarksTitle => 'علائم تجاری';
+
+  @override
+  String get copyrightTrademarksBody =>
+      'IPNote.ir و NTK علامت‌های تجاری مرتبط هستند.';
+
+  @override
+  String get copyrightThirdPartyTitle => 'سرویس‌های شخص ثالث';
+
+  @override
+  String get copyrightThirdPartyBody =>
+      'داده‌ها از ارائه‌دهندگان Geo/DNS/WHOIS دریافت می‌شوند.';
+
+  @override
+  String get copyrightPrivacyTitle => 'حریم خصوصی';
+
+  @override
+  String get copyrightPrivacyBody =>
+      'یادداشت‌ها فقط برای کاربر احراز هویت‌شده قابل مشاهده است.';
+
+  @override
+  String get copyrightContactTitle => 'تماس حقوقی';
+
+  @override
+  String get copyrightContactBody =>
+      'برای مجوز تجاری یا DMCA با ایمیل پشتیبانی تماس بگیرید.';
+
+  @override
+  String get copyrightBack => 'بازگشت';
+
+  @override
+  String get adminTitle => 'پنل مدیریت';
+
+  @override
+  String get adminAccessDenied => 'دسترسی مدیر لازم است.';
+
+  @override
+  String get adminBackToApp => 'بازگشت';
+
+  @override
+  String get adminEmpty => 'موردی نیست.';
+
+  @override
+  String get adminConfirmDelete => 'حذف شود؟';
+
+  @override
+  String get adminEditRoles => 'ویرایش نقش‌ها';
+
+  @override
+  String get adminRolesHint => 'Administrator, …';
+
+  @override
+  String get adminRolesMembers => 'عضو';
+
+  @override
+  String get adminRolesPermissionCount => 'مجوز';
+
+  @override
+  String get adminRolesPermissionsHint => 'مجوزهای این نقش را انتخاب کنید.';
+
+  @override
+  String get adminFilterPending => 'فقط معلق';
+
+  @override
+  String get adminNavDashboard => 'داشبورد';
+
+  @override
+  String get adminNavRoles => 'نقش‌ها';
+
+  @override
+  String get adminNavUsers => 'کاربران';
+
+  @override
+  String get adminNavNotes => 'یادداشت‌ها';
+
+  @override
+  String get adminNavLookups => 'جستجوها';
+
+  @override
+  String get adminNavPush => 'پوش';
+
+  @override
+  String get adminNavOutbox => 'Outbox';
+
+  @override
+  String get adminStatUsers => 'کاربر';
+
+  @override
+  String get adminStatRoles => 'نقش';
+
+  @override
+  String get adminStatNotes => 'یادداشت';
+
+  @override
+  String get adminStatLookups => 'جستجو';
+
+  @override
+  String get adminStatPush => 'پوش';
+
+  @override
+  String get adminStatOutbox => 'Outbox معلق';
+
+  @override
+  String get adminStatTicketsOpen => 'تیکت باز';
+
+  @override
+  String get adminStatSnapshots => 'اسنپ‌شات';
+
+  @override
+  String get adminTicketsOpenOnly => 'فقط تیکت‌های باز';
+
+  @override
+  String get adminTicketClose => 'بستن تیکت';
+
+  @override
+  String get adminTicketReopen => 'بازگشایی تیکت';
 }

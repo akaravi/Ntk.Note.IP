@@ -1,5 +1,85 @@
 # Change History — Ntk.Note.IP
 
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter splash stuck fix:** Defer splash `onFinished` to post-frame (no setState during build); auth `_loadStored` try/catch so `loading` always clears; widget test auth override.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter MyIp short URL:** `getMyIpPlain`, curl/code snippets use `/myip` (`ApiRoutes.myIpShortPath`) instead of `/api/v1/IpLookup/GetMyIpPlain`.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Static map via API (OSM tiles):** `staticmap.openstreetmap.de` retired/unreachable — new `GET /api/v1/OsmMap/GetStatic` stitches OSM tiles server-side; Flutter + Angular use API URL instead of external staticmap.de.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter web white screen fix:** Stable `GoRouter` via `AppRouterRefresh` (no router recreate on auth); splash skips fade-to-white; `index.html` dark body; biometric lock disabled on web; IP history save wrapped in try/catch.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter web icons (brand):** Regenerated `web/icons/*` and `web/favicon.png` from `assets/brand/app_icon.png` via `dart run flutter_launcher_icons`; `web/manifest.json` uses IPNote.ir name and brand colors (#1A1625 / #7C3AED).
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Contact us page + ticketing:** `POST /api/v1/Contact` saves `SupportTicket`, emails `Site:ContactToEmail` via SMTP; admin `/admin/tickets` + Flutter admin tab; Web `/contact` + Flutter `/contact`; i18n fa/en + Flutter fa/en/ar/fr.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Auth remember me + token refresh (30 days):** Backend `RefreshTokenExpirationDays` / `CookieRememberMeDays` (30d); Flutter secure persist + startup refresh + 401 retry; Angular/Web cookie `useSessionCookies` + «مرا به خاطر بسپار» checkbox (dashboard + admin share `/login`).
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Home IP action buttons horizontal:** Flutter `home_screen.dart` — یادداشت کن، کپی، QR، کپی IP خام in one scrollable row. Angular `ip-lookup` — merged into `ip-lookup__hero-actions`; mobile keeps row with wrap (not full-width stack).
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Fix Add IP note 500:** Flutter snapshot sent `ipSnapshot.scope` as string; API expects `IpAddressScope` integer — map scope to int in `ip_note_snapshot_builder.dart`. API returns 400 (not 500) for bad JSON via `BadHttpRequestException` handler.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Admin roles & permissions:** API `AdminRoles` (GetList, GetListPermissions, Add, UpdatePermissions, Delete); permission claims on Identity roles; admin dashboard roles summary + `/admin/roles` matrix UI (Angular); Flutter admin tab «نقش‌ها»; i18n fa/en.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter web runtime fixes:** IP lookup datasource returns typed OpenAPI DTOs (no `.toJson()` round-trip); repository uses `OpenApiMappers.to*` — fixes `GeoLocationDto is not a subtype of Map` on web. Native splash on web via conditional import (`native_splash_binding.dart` stub on web, mobile impl on IO). Drift web: `DriftWebOptions` + `web/sqlite3.wasm` + `web/drift_worker.js` for IP history on web.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Build:** `_build-all-projects.ps1` + `scripts/flutter-web-build.ps1` — Flutter web release (`flutter build web`) copied to `publish/flutter/web` and included in deploy ZIP as `mobile_web`; `-SkipFlutterWeb` switch.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter LTR technical text:** `ltr_technical_text.dart` — `LtrText`, `LtrCodeBlock`, `LtrTextFormField`; English-only fields (curl/code, IP, DNS, email) always render LTR in fa/ar RTL UI; `InfoRow` auto-detects Latin values.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter web parity:** Network tools (WHOIS IP/domain, DNS, propagation, port/SSL, blacklist, privacy, subnet); tools hub cards; code samples (C#/JS/Python/Bash); plain IP copy; per-history delete; device info card; About/Copyright/Intro pages; admin panel (6 tabs); app drawer nav; 4-language picker from drawer; i18n fa/en/ar/fr.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter language onboarding:** After first splash, `LanguagePickerScreen` asks user to choose fa/en/ar/fr; `localeChosen` persisted in settings; new `app_ar.arb` / `app_fr.arb`; RTL typography for fa/ar via `supported_app_locales.dart`.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter register:** `/register` screen + API `POST /api/v1/Users/register`; login/register cross-links; i18n fa/en; validation (email format, min 6 char password) aligned with Angular SPA.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Flutter web:** Added `web/` platform; `main.dart` skips native splash/workmanager/background monitor on `kIsWeb`; CORS `5349` in Development; Flutter web dev server on **http://localhost:5349** with `API_BASE_URL=http://localhost:5340`.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Mobile splash:** Two-stage splash — native (`flutter_native_splash` preserved until Flutter mounts) then in-app `AppSplashScreen` with brand icon, tagline, loading indicator, and localized version label at bottom (`package_info_plus`); i18n key `splashVersion` (fa/en).
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Fix tests:** Production functional tests (`ProductionHardeningApiTests`, `RateLimitingApiTests`) failed with `Keyword not supported: 'cache'` — Production env pulled `Database.Provider=SqlServer` while test host uses SQLite (`Cache=Shared`). Added `ConfigureProductionTestHost` in `WebApiFactory` to force `Sqlite` + `ApplyMigrationsOnStartup=false` for production-pipeline tests.
+
+## 2026-05-30 (Asia/Tehran)
+
+- **Docs:** Moved all 72 `Cursor.*.plan.md` files from repo root to `cursor-plans/`; added `cursor-plans/README.md`; updated `docs/plan-implementation-audit.md` path reference.
+
 ## 2026-05-29 22:30 (Asia/Tehran)
 
 - **Pages:** `/about` and `/copyright` Angular pages (fa/en i18n) — IPNote.ir, NTK (ntk.ir), Alireza Karavi (alikaravi.com, GitHub akaravi). Static `about.html` / `copyright.html` in wwwroot. Footer links on all SPA pages + changelog/status.
@@ -497,6 +577,15 @@
 - **Domain:** `IpRecord` entity + soft-delete filter; events `IpChangedEvent`, `NewConnectionDetectedEvent`.
 - **API:** `/api/IpNotes` — GetList, GetOne, Add, Update, Delete with `ErrorExceptionResult` envelope.
 - **Tests:** 5 domain tests for IpAddress; 2 functional tests for IpNotes; pipeline 43 tests green.
+
+## 2026-05-30 08:33 (Asia/Tehran)
+
+- **Brand / Logo:** Redesigned the project logo as a combination of **IP** + **Note** while keeping the existing violet (`#8b5cf6` → `#6d28d9` → `#1e1b3a`) brand gradient.
+- **Vector masters:** Added `src/Web/wwwroot/logo.svg` (rounded square, standard) and `src/Web/wwwroot/logo-maskable.svg` (full-bleed, PWA safe-zone). Motif: white note sheet with folded corner + note lines and bold violet "IP" wordmark.
+- **Web favicons replaced:** `src/Web/ClientApp/src/favicon.png`, `src/Web/wwwroot/favicon.png`, `src/Web/ClientApp-React/public/favicon.png` (+`favicon.ico` 16/32/48), `src/Mobile/ntk_note_ip_app/web/favicon.png`.
+- **PWA icons replaced (192/512 + maskable):** `src/Web/wwwroot/assets/icons`, `src/Web/ClientApp/src/assets/icons`, `src/Mobile/ntk_note_ip_app/web/icons`.
+- **Mobile source of truth:** Created missing `src/Mobile/ntk_note_ip_app/assets/brand/app_icon.png` (1024×1024) and regenerated native icons + splash via `flutter_launcher_icons` and `flutter_native_splash:create` (Android adaptive, iOS, Web, Windows).
+- **Tooling:** Rendered PNG/ICO from SVG with a temporary Node + `sharp` script (removed after generation).
 
 ## 2026-05-29 11:45 (Asia/Tehran)
 

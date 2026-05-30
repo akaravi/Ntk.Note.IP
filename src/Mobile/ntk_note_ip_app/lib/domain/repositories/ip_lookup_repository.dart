@@ -7,6 +7,8 @@ import '../entities/my_ip.dart';
 abstract interface class IpLookupRepository {
   Future<ApiResult<MyIp>> getMyIp();
 
+  Future<ApiResult<String>> getMyIpPlain();
+
   Future<ApiResult<IpDetails>> getIpDetails(String address);
 
   Future<ApiResult<void>> actionLookup(String address);

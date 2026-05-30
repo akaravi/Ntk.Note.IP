@@ -39,8 +39,9 @@ export class AuthService {
     );
   }
 
-  login(email: string, password: string): Observable<void> {
-    return this.usersClient.login(true, undefined, new LoginRequest({ email, password })).pipe(
+  login(email: string, password: string, rememberMe = true): Observable<void> {
+    const useSessionCookies = !rememberMe;
+    return this.usersClient.login(true, useSessionCookies, new LoginRequest({ email, password })).pipe(
       tap(() => this._isAuthenticated.next(true)),
       switchMap(() => this.refreshAdminAccess()),
       switchMap(() => this.historySync.syncAfterAuthentication()),

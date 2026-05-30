@@ -123,4 +123,12 @@ if ($magick) {
 $wwwRoot = Join-Path $root 'src\Web\wwwroot'
 Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $wwwRoot 'favicon.png') -Size 32
 
+# Flutter web PWA
+$flutterWeb = Join-Path $root 'src\Mobile\ntk_note_ip_app\web'
+Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $flutterWeb 'favicon.png') -Size 32
+Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $flutterWeb 'icons\Icon-192.png') -Size 192
+Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $flutterWeb 'icons\Icon-512.png') -Size 512
+Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $flutterWeb 'icons\Icon-maskable-192.png') -Size 192
+Save-PngResize -SourcePath $MasterIcon -DestinationPath (Join-Path $flutterWeb 'icons\Icon-maskable-512.png') -Size 512
+
 Write-Host "Web icons synced." -ForegroundColor Green

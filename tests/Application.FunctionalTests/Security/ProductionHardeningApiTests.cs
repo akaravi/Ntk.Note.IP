@@ -68,7 +68,7 @@ public class ProductionHardeningApiTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             base.ConfigureWebHost(builder);
-            builder.UseEnvironment(Environments.Production);
+            ConfigureProductionTestHost(builder);
         }
     }
 }

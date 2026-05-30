@@ -7,12 +7,14 @@ import 'package:flutter/widgets.dart';
 class DeviceInfoSummary {
   const DeviceInfoSummary({
     required this.label,
+    required this.browser,
     required this.os,
     required this.device,
     required this.language,
   });
 
   final String label;
+  final String browser;
   final String os;
   final String device;
   final String language;
@@ -24,8 +26,10 @@ class DeviceInfoSummary {
 
     if (kIsWeb) {
       final web = await plugin.webBrowserInfo;
+      final browser = web.browserName.name;
       return DeviceInfoSummary(
-        label: '${web.browserName.name} · Web',
+        label: '$browser · Web',
+        browser: browser,
         os: 'Web',
         device: web.userAgent ?? 'Browser',
         language: language,
@@ -37,6 +41,7 @@ class DeviceInfoSummary {
       final os = 'Android ${info.version.release}';
       return DeviceInfoSummary(
         label: '$os · ${info.model}',
+        browser: 'App',
         os: os,
         device: info.model,
         language: language,
@@ -48,6 +53,7 @@ class DeviceInfoSummary {
       final os = '${info.systemName} ${info.systemVersion}';
       return DeviceInfoSummary(
         label: '$os · ${info.model}',
+        browser: 'App',
         os: os,
         device: info.model,
         language: language,
@@ -58,6 +64,7 @@ class DeviceInfoSummary {
       final info = await plugin.windowsInfo;
       return DeviceInfoSummary(
         label: 'Windows · ${info.computerName}',
+        browser: 'App',
         os: 'Windows',
         device: info.computerName,
         language: language,
@@ -66,6 +73,7 @@ class DeviceInfoSummary {
 
     return DeviceInfoSummary(
       label: Platform.operatingSystem,
+      browser: 'App',
       os: Platform.operatingSystem,
       device: Platform.localHostname,
       language: language,

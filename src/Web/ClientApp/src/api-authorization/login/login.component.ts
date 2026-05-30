@@ -13,6 +13,7 @@ export class LoginComponent {
   readonly i18n = inject(I18nService);
   email = '';
   password = '';
+  rememberMe = true;
   invalid = false;
 
   constructor(
@@ -25,7 +26,7 @@ export class LoginComponent {
   async login() {
     this.invalid = false;
     try {
-      await firstValueFrom(this.authService.login(this.email, this.password));
+      await firstValueFrom(this.authService.login(this.email, this.password, this.rememberMe));
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
       await this.router.navigateByUrl(returnUrl);
     } catch {

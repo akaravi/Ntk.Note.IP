@@ -5,6 +5,7 @@ import '../../core/network/api_client.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/datasources/ip_lookup_remote_datasource.dart';
 import '../../data/datasources/ip_notes_remote_datasource.dart';
+import '../../data/datasources/network_tools_remote_datasource.dart';
 import '../../data/datasources/push_device_remote_datasource.dart';
 import '../../core/push/fcm_token_provider.dart';
 import '../../core/push/push_ip_monitor_listener.dart';
@@ -27,6 +28,7 @@ import '../../domain/usecases/get_list_ip_lookup_records.dart';
 import '../../domain/usecases/get_list_ip_notes.dart';
 import '../../core/history/ip_history_sync_service.dart';
 import '../../domain/usecases/get_my_ip.dart';
+import '../../domain/usecases/get_my_ip_plain.dart';
 import 'auth_controller.dart';
 import 'ip_history_provider.dart';
 
@@ -83,12 +85,20 @@ final pushIpMonitorListenerProvider = Provider<PushIpMonitorListener>((ref) {
 });
 
 final ipLookupRepositoryProvider = Provider<IpLookupRepository>((ref) {
-  final remote = IpLookupRemoteDataSource(ref.watch(ipnoteClientProvider));
+  final apiClient = ref.watch(apiClientProvider);
+  final remote = IpLookupRemoteDataSource(
+    ref.watch(ipnoteClientProvider),
+    apiClient.dio,
+  );
   return IpLookupRepositoryImpl(remote);
 });
 
 final getMyIpUseCaseProvider = Provider<GetMyIpUseCase>((ref) {
   return GetMyIpUseCase(ref.watch(ipLookupRepositoryProvider));
+});
+
+final getMyIpPlainUseCaseProvider = Provider<GetMyIpPlainUseCase>((ref) {
+  return GetMyIpPlainUseCase(ref.watch(ipLookupRepositoryProvider));
 });
 
 final getIpDetailsUseCaseProvider = Provider<GetIpDetailsUseCase>((ref) {
@@ -141,4 +151,9 @@ final ipHistorySyncServiceProvider = Provider<IpHistorySyncService>((ref) {
     ref.watch(getListIpLookupRecordsUseCaseProvider),
     ref.watch(actionLookupIpUseCaseProvider),
   );
+});
+
+final networkToolsRemoteDataSourceProvider =
+    Provider<NetworkToolsRemoteDataSource>((ref) {
+  return NetworkToolsRemoteDataSource(ref.watch(apiClientProvider).dio);
 });
